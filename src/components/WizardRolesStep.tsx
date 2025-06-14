@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { RolePill } from "./ui/RolePill";
 import { AddRoleModal } from "./ui/AddRoleModal";
@@ -6,6 +5,7 @@ import { PercentBar } from "./ui/PercentBar";
 import { AccentButton } from "./ui/AccentButton";
 import type { Role, ProjectType } from "@/hooks/useWizardState";
 import { useRoleTemplates } from "@/hooks/useRoleTemplates";
+import { useToast } from "@/hooks/use-toast";
 
 const projectTypes: ProjectType[] = ["Music", "Film", "Fashion", "Art", "Other"];
 
@@ -37,6 +37,9 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
   const [showTemplateMenu, setShowTemplateMenu] = useState(false);
   const [newTemplateName, setNewTemplateName] = useState("");
 
+  // Toast notifications
+  const { toast } = useToast();
+
   // Percent validation
   const sumPercent = roles.reduce((sum, r) => sum + r.percent, 0);
   let percentMsg = "";
@@ -55,6 +58,10 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
       templatesCtx.saveTemplate(newTemplateName.trim(), roles);
       setNewTemplateName("");
       setShowTemplateMenu(false);
+      toast({
+        title: "Template Saved",
+        description: `Saved template '${newTemplateName.trim()}'`,
+      });
     }
   };
 
@@ -63,7 +70,19 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
     if (tplRoles) {
       setField("roles", tplRoles.map(r => ({ ...r }))); // Deep copy to prevent reference bugs
       setShowTemplateMenu(false);
+      toast({
+        title: "Template Loaded",
+        description: `Loaded template '${templateName}'`,
+      });
     }
+  };
+
+  const handleDeleteTemplate = (templateName: string) => {
+    templatesCtx.deleteTemplate(templateName);
+    toast({
+      title: "Template Deleted",
+      description: `Deleted template '${templateName}'`,
+    });
   };
 
   return (
@@ -134,7 +153,7 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
                       </button>
                       <button
                         className="ml-1 text-[11px] text-red-400 border rounded px-1 py-0.5 border-border hover:bg-red-400/20"
-                        onClick={() => templatesCtx.deleteTemplate(tpl.name)}
+                        onClick={() => handleDeleteTemplate(tpl.name)}
                         type="button"
                         aria-label={`Delete template ${tpl.name}`}
                       >
