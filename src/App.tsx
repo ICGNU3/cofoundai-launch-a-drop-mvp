@@ -9,6 +9,29 @@ import NotFound from "./pages/NotFound";
 import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
 import React from "react";
 
+// Define the Base Sepolia chain object
+const baseSepoliaChain = {
+  id: 84532,
+  name: "Base Sepolia",
+  rpcUrls: ["https://sepolia.base.org"],
+  blockExplorers: [
+    {
+      name: "Base Sepolia Explorer",
+      url: "https://sepolia.basescan.org",
+    },
+  ],
+  nativeCurrency: {
+    name: "Base Sepolia Ether",
+    symbol: "ETH",
+    decimals: 18,
+  },
+  icon: {
+    url: "https://cryptologos.cc/logos/base-base-logo.png",
+    alt: "Base Logo"
+  },
+  testnet: true,
+};
+
 const queryClient = new QueryClient();
 
 const PRIVY_APP_ID = "cmbwrcdqp00sijy0mx4wx4aew";
@@ -69,8 +92,8 @@ const App = () => (
     config={{
       loginMethods: ['email', 'wallet'],
       appearance: { theme: 'dark' },
-      defaultChain: 'base-sepolia',
-      supportedChains: ['base-sepolia'],
+      defaultChain: baseSepoliaChain,
+      supportedChains: [baseSepoliaChain],
       embeddedWallets: { createOnLogin: "all-users" },
     }}
   >
