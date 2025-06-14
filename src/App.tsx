@@ -69,7 +69,8 @@ const App = () => (
     config={{
       loginMethods: ['email', 'wallet'],
       appearance: { theme: 'dark' },
-      defaultChain: 'base-sepolia', // Use chain slug, not number; update this if the SDK requires a different string
+      defaultChain: 'base-sepolia',
+      supportedChains: ['base-sepolia'],
       embeddedWallets: { createOnLogin: "all-users" },
     }}
   >
@@ -85,3 +86,4 @@ const App = () => (
 );
 
 export default App;
+
