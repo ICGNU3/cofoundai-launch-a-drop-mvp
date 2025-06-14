@@ -3,16 +3,16 @@ import React from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
 import { AccentButton } from "@/components/ui/AccentButton";
-import GenerativeBanner from "@/components/GenerativeBanner";
+import FullWaveBackground from "@/components/FullWaveBackground";
 
 const Index: React.FC = () => {
   const wizard = useWizardState();
 
   return (
-    <div className="min-h-screen bg-background text-body-text flex items-center justify-center">
-      <div className="w-full flex flex-col items-center px-2">
-        <div className="card flex flex-col items-center text-center mt-10 wizard-card shadow-lg">
-          <GenerativeBanner />
+    <div className="min-h-screen bg-background text-body-text flex items-center justify-center relative overflow-x-hidden">
+      <FullWaveBackground />
+      <div className="w-full flex flex-col items-center px-2 z-10 relative">
+        <div className="card flex flex-col items-center text-center mt-10 wizard-card shadow-lg bg-opacity-95 backdrop-blur-sm">
           <h1 className="hero-title headline mb-1">Launch a Drop in 60 seconds.</h1>
           <div className="hero-tagline tagline">
             Type your project idea, add each role & expense, press Mint & Fund.<br />
@@ -40,3 +40,4 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+
