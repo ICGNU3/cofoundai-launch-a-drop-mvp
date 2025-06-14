@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useWizardState } from "@/hooks/useWizardState";
 import { AccentButton } from "./ui/AccentButton";
@@ -53,7 +52,7 @@ export const WizardModal: React.FC<{
 
   return !state.isWizardOpen ? null : (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm transition">
-      <div className="card w-[95vw] max-w-lg mx-auto relative animate-fade-in">
+      <div className="wizard-card w-[95vw] max-w-card mx-auto relative animate-fade-in shadow-lg">
         <button
           className="absolute top-3 right-4 text-body-text opacity-70 hover:opacity-100"
           onClick={close}
@@ -66,16 +65,20 @@ export const WizardModal: React.FC<{
           {[1, 2, 3].map(n => (
             <div
               key={n}
-              className={`mx-1 w-6 h-2 rounded-full ${state.step === n ? "bg-accent" : "bg-[#333]"}`}
+              className={`mx-1 w-6 h-2 rounded-full ${
+                state.step === n 
+                  ? "progress-bar"
+                  : "bg-[#333]"
+              }`}
             />
           ))}
         </div>
         {/* Step 1 */}
         {state.step === 1 && (
           <div>
-            <h2 className="headline mb-2 text-center">Describe Your Project Idea</h2>
+            <h2 className="hero-title text-center">Describe Your Project Idea</h2>
             <textarea
-              className="w-full p-3 rounded-lg bg-[#1c1c1c] text-body-text border border-border focus:border-accent outline-none mb-6 min-h-[100px] resize-none"
+              className="w-full mt-2 mb-7 min-h-[100px] resize-none"
               value={state.projectIdea}
               maxLength={256}
               onChange={e => setField("projectIdea", e.target.value)}
@@ -89,13 +92,13 @@ export const WizardModal: React.FC<{
         {/* Step 2 */}
         {state.step === 2 && (
           <div>
-            <h2 className="headline mb-2 text-center">Crew &amp; Cut</h2>
+            <h2 className="headline text-center mb-2">Crew &amp; Cut</h2>
             <div className="flex flex-col gap-2">
-              <label className="block mb-1 text-body-text font-medium">
+              <label className="block mb-1 text-body-text font-semibold">
                 Project Type
               </label>
               <select
-                className="w-full p-2 rounded border border-border bg-background text-body-text mb-2"
+                className="w-full mb-2"
                 value={state.projectType}
                 onChange={e => {
                   setField("projectType", e.target.value as typeof projectTypes[number]);
@@ -162,7 +165,7 @@ export const WizardModal: React.FC<{
         {/* Step 3 */}
         {state.step === 3 && (
           <div>
-            <h2 className="headline mb-2 text-center">Expenses &amp; Funding</h2>
+            <h2 className="headline text-center mb-2">Expenses &amp; Funding</h2>
             <div>
               {/* Expense Pills */}
               <div className="mb-2 flex flex-wrap gap-2">
@@ -194,7 +197,7 @@ export const WizardModal: React.FC<{
                 You need <span className="font-semibold text-accent">${expenseSum.toFixed(2)}</span> USDC +{' '}
                 {pledgeNum > 0 ? <>{pledgeNum} (pledge)</> : <>any extra for revenue splits</>}
               </div>
-              <label className="block mt-5 mb-1 font-medium text-body-text">
+              <label className="block mt-5 mb-1 font-semibold text-body-text">
                 (Optional) Pledge in USDC
               </label>
               <input
@@ -205,7 +208,7 @@ export const WizardModal: React.FC<{
                 placeholder="e.g. 100"
                 value={state.pledgeUSDC}
                 onChange={e => setField("pledgeUSDC", e.target.value.replace(/^0+/, ""))}
-                className="w-full p-3 rounded-lg bg-[#1c1c1c] text-body-text border border-border focus:border-accent outline-none mb-1"
+                className="w-full mb-1"
               />
               <div className="flex flex-col gap-3 mt-6">
                 {/* Simulate Connect Wallet as button */}
