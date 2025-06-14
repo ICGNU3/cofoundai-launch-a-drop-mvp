@@ -1,73 +1,102 @@
-# Welcome to your Lovable project
 
-## Project info
+# CoFound AI – Launch-a-Drop MVP
 
-**URL**: https://lovable.dev/projects/98652b0f-f283-41ae-9a3d-095a41efd175
+Turns any music, film, fashion, or art idea into a funded token economy in 60 seconds.<br>
+Describe the project → set each collaborator’s cut → add fixed expenses → click **Mint & Fund**.<br>
+The app mints a Zora Coins V4 creator-token, pins cover art to IPFS, locks funds on Base, and streams payouts when the work ships.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+### Features
 
-**Use Lovable**
+| Flow                  | What happens                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Idea → Crew & Cut** | Unlimited roles (Artist, Producer, DP, Gallery, etc.). Pills add / delete. Progress bar enforces 100 % split. |
+| **Fixed Expenses**    | One-off costs—studio time, camera rentals, fabric orders—paid before revenue streams.                         |
+| **Tokens**            | Zora Coins V4 on Base testnet. Collect page auto-listed on Zora.                                              |
+| **Funding**           | Optional USDC pledge wraps to USDCx and locks in escrow.                                                      |
+| **Auto-Pay**          | Superfluid CFA starts continuous streams to every wallet at “Mark Complete.”                                  |
+| **Flex Badges**       | Zora Editions mint to contributors as on-chain proof of work.                                                 |
+| **Dark UI**           | Satin-black background, Satoshi headings, Inter body, electric-purple accents.                                |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/98652b0f-f283-41ae-9a3d-095a41efd175) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+### Stack
 
-**Use your preferred IDE**
+Next.js 14 · Tailwind · Satoshi Variable · Inter · OpenAI GPT-4o · Anthropic Claude · Google Gemini  
+Pinata IPFS · Zora Coins V4 SDK · Superfluid SDK · Base Testnet · Privy + Safe · Supabase
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Live demo
 
-Follow these steps:
+`https://cofoundai.com` → **Launch a Drop**  
+(Testnet wallet required—Base Sepolia or Base Goerli.)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Getting started (local)
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+git clone https://github.com/yourname/cofoundai.git
+cd cofoundai
+pnpm install
+cp .env.example .env      # add keys below
+pnpm dev                  # http://localhost:3000
 ```
 
-**Edit a file directly in GitHub**
+#### Required environment vars
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+OPENAI_KEY=
+ANTHROPIC_KEY=
+GEMINI_KEY=
+PINATA_JWT=
+ZORA_AUTH=Bearer …
+SUPERFLUID_KEY=
+NEXT_PUBLIC_BASE_RPC=https://sepolia.base.org
+```
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Folder map
 
-## What technologies are used for this project?
+```
+/src
+  /components   UI atoms, RolePill, ExpensePill, ProgressBar
+  /lib          zoraCoin.ts, pinata.ts, superfluid.ts
+  /pages        landing, wizard, result
+  /styles       globals.css (dark theme)
+```
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Running the flow
 
-## How can I deploy this project?
+1. Connect a Base testnet wallet.
+2. Type the project idea.
+3. Add roles until the bar reads **Cuts balanced ✓**.
+4. Add any fixed expenses.
+5. Hit **Mint & Fund** – confirm both txs.
+6. Share the Zora collect link.
+7. Once the project is done, click **Mark Complete**.
+8. Check wallets—streams run, Flex Badges appear.
 
-Simply open [Lovable](https://lovable.dev/projects/98652b0f-f283-41ae-9a3d-095a41efd175) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+### Roadmap
 
-Yes, you can!
+* Multi-model comparison view (GPT vs Claude vs Gemini).
+* Public talent pool with on-chain reliability scores.
+* Venture flow (equity / SAFE) via NEPLUS contracts.
+* Mainnet launch on Base.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### License
+
+MIT — do anything, give credit, no liability.
+
+---
+
+Built in 48 hours for **AI Showdown (Lovable)** and extended for **Bolt Hackathon + Zora Coinathon**.
