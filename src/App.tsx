@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,23 +6,60 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { PrivyProvider, usePrivy, LoginButton, LogoutButton } from "@privy-io/react-auth";
+import React from "react";
 
 const queryClient = new QueryClient();
 
+const PRIVY_APP_ID = "cmbwrcdqp00sijy0mx4wx4aew";
+
+// Simple UI at the top for login/logout with Privy
+const PrivyAuthBar = () => {
+  const { ready, authenticated, user } = usePrivy();
+  if (!ready) return null;
+  return (
+    <div className="w-full flex justify-end p-2">
+      {authenticated ? (
+        <div className="flex gap-4 items-center">
+          <span className="text-xs text-zinc-300">Hi, {user?.email ?? user?.wallet?.address?.slice(0, 8)}</span>
+          <LogoutButton className="bg-zinc-800 px-3 py-1 rounded text-xs hover:bg-zinc-700"/>
+        </div>
+      ) : (
+        <LoginButton className="bg-purple-600 px-3 py-1 rounded text-xs text-white hover:bg-purple-700" />
+      )}
+    </div>
+  );
+};
+
+const AppRoutes = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </BrowserRouter>
+);
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <PrivyProvider
+    appId={PRIVY_APP_ID}
+    config={{
+      loginMethods: ['email','wallet'],
+      appearance: { theme: 'dark' },
+      defaultChain: 84532,
+      embeddedWallets: { createOnLogin: "all-users" },
+    }}
+  >
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <PrivyAuthBar />
+        <AppRoutes />
+      </TooltipProvider>
+    </QueryClientProvider>
+  </PrivyProvider>
 );
 
 export default App;
