@@ -98,8 +98,8 @@ export const WizardModal: React.FC<{
                 className="w-full p-2 rounded border border-border bg-background text-body-text mb-2"
                 value={state.projectType}
                 onChange={e => {
-                  setField("projectType", e.target.value);
-                  loadDefaultRoles(e.target.value);
+                  setField("projectType", e.target.value as typeof projectTypes[number]);
+                  loadDefaultRoles(e.target.value as typeof projectTypes[number]);
                 }}
               >
                 {projectTypes.map(type => (
@@ -151,7 +151,8 @@ export const WizardModal: React.FC<{
               }
               onClose={() => setRoleModalOpen(false)}
               onSave={role => {
-                saveRole(role, state.editingRoleIdx);
+                // Patch: ensure 'isFixed: false' added for Role typing
+                saveRole({ ...role, isFixed: false }, state.editingRoleIdx);
                 setRoleModalOpen(false);
               }}
               existingRoles={state.roles}
