@@ -6,6 +6,7 @@ import { AddRoleModal } from "./ui/AddRoleModal";
 import { ExpensePill } from "./ui/ExpensePill";
 import { AddExpenseModal } from "./ui/AddExpenseModal";
 import { PercentBar } from "./ui/PercentBar";
+import { WizardRolesStep } from "./WizardRolesStep";
 
 const projectTypes = ["Music", "Film", "Fashion", "Art", "Other"] as const;
 
@@ -95,82 +96,16 @@ export const WizardModal: React.FC<{
         )}
         {/* Step 2 */}
         {state.step === 2 && (
-          <div>
-            <h2 className="headline text-center mb-2">Crew &amp; Cut</h2>
-            <div className="flex flex-col gap-2">
-              <label className="block mb-1 text-body-text font-semibold">
-                Project Type
-              </label>
-              <select
-                className="w-full mb-2"
-                value={state.projectType}
-                onChange={e => {
-                  setField("projectType", e.target.value as typeof projectTypes[number]);
-                  loadDefaultRoles(e.target.value as typeof projectTypes[number]);
-                }}
-              >
-                {projectTypes.map(type => (
-                  <option value={type} key={type}>{type}</option>
-                ))}
-              </select>
-
-              {/* PercentBar - live feedback on allocation */}
-              <PercentBar used={sumPercent} />
-
-              {/* Role Pills */}
-              <div className="mb-2 flex flex-wrap gap-2">
-                {state.roles.map((role, i) => (
-                  <RolePill
-                    key={i}
-                    role={role}
-                    onEdit={() => {
-                      setField("editingRoleIdx", i);
-                      setRoleModalOpen(true);
-                    }}
-                    onDelete={() => removeRole(i)}
-                  />
-                ))}
-                <button
-                  className="role-pill bg-[#222] text-accent border-accent hover:bg-accent/10 ml-1"
-                  onClick={() => {
-                    setField("editingRoleIdx", null);
-                    setRoleModalOpen(true);
-                  }}
-                  aria-label="Add Role"
-                  type="button"
-                >
-                  + Add Role
-                </button>
-              </div>
-              <div className={`text-sm font-semibold ${percentColor} mb-2`}>{percentMsg}</div>
-              <div className="flex gap-2 mt-2">
-                <AccentButton
-                  secondary
-                  className="w-1/2"
-                  onClick={() => setStep(1)}
-                >← Back</AccentButton>
-                <AccentButton
-                  className="w-1/2"
-                  disabled={disableStep2Next}
-                  onClick={() => setStep(3)}
-                >Next: Expenses →</AccentButton>
-              </div>
-            </div>
-            {/* AddRoleModal */}
-            <AddRoleModal
-              open={roleModalOpen}
-              defaultRole={
-                state.editingRoleIdx !== null ? state.roles[state.editingRoleIdx] : undefined
-              }
-              onClose={() => setRoleModalOpen(false)}
-              onSave={role => {
-                // Patch: ensure 'isFixed: false' added for Role typing
-                saveRole({ ...role, isFixed: false }, state.editingRoleIdx);
-                setRoleModalOpen(false);
-              }}
-              existingRoles={state.roles}
-            />
-          </div>
+          <WizardRolesStep
+            roles={state.roles}
+            editingRoleIdx={state.editingRoleIdx}
+            projectType={state.projectType}
+            setField={setField}
+            loadDefaultRoles={loadDefaultRoles}
+            saveRole={saveRole}
+            removeRole={removeRole}
+            setStep={setStep}
+          />
         )}
         {/* Step 3 */}
         {state.step === 3 && (
