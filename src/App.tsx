@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import { PrivyProvider, usePrivy, CHAINS } from "@privy-io/react-auth";
+import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
 import React from "react";
 
 const queryClient = new QueryClient();
@@ -68,8 +69,8 @@ const App = () => (
     config={{
       loginMethods: ['email', 'wallet'],
       appearance: { theme: 'dark' },
-      defaultChain: CHAINS.baseSepolia,
-      supportedChains: [CHAINS.baseSepolia],
+      defaultChain: 'base-sepolia',
+      supportedChains: ['base-sepolia'],
       embeddedWallets: { createOnLogin: "all-users" },
     }}
   >
