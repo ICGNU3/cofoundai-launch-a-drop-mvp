@@ -1,28 +1,41 @@
 
 import React from "react";
+import { Edit, X } from "lucide-react";
 
 export type RolePillProps = {
   role: { roleName: string, percent: number; };
   onEdit?: () => void;
   onDelete?: () => void;
 };
+
 export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete }) => (
   <span
-    className="inline-flex items-center role-pill cursor-pointer select-none"
-    onClick={onEdit}
-    tabIndex={0}
-    aria-label={`Edit ${role.roleName} role`}
+    className="inline-flex items-center role-pill cursor-default select-none border border-accent bg-[#18181a] px-2 py-1 rounded text-[15px]"
+    tabIndex={-1}
+    aria-label={`Role: ${role.roleName}`}
   >
-    {role.roleName} {role.percent}%
+    <span className="font-medium">{role.roleName}</span>
+    <span className="ml-1 font-mono tracking-tight">{role.percent}%</span>
+    {onEdit && (
+      <button
+        className="ml-2 text-accent hover:bg-accent/10 p-1 rounded"
+        aria-label={`Edit ${role.roleName}`}
+        tabIndex={0}
+        type="button"
+        onClick={e => { e.stopPropagation(); onEdit(); }}
+      >
+        <Edit size={16} />
+      </button>
+    )}
     {onDelete && (
       <button
-        className="ml-2 px-1 text-[15px] font-bold text-accent hover:text-white bg-transparent border-0 cursor-pointer"
+        className="ml-1 text-destructive hover:bg-destructive/10 p-1 rounded"
         aria-label={`Remove ${role.roleName}`}
-        onClick={e => { e.stopPropagation(); onDelete(); }}
-        tabIndex={-1}
+        tabIndex={0}
         type="button"
+        onClick={e => { e.stopPropagation(); onDelete(); }}
       >
-        ×
+        <X size={16} />
       </button>
     )}
   </span>

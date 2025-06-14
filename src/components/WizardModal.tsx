@@ -5,6 +5,7 @@ import { RolePill } from "./ui/RolePill";
 import { AddRoleModal } from "./ui/AddRoleModal";
 import { ExpensePill } from "./ui/ExpensePill";
 import { AddExpenseModal } from "./ui/AddExpenseModal";
+import { PercentBar } from "./ui/PercentBar";
 
 const projectTypes = ["Music", "Film", "Fashion", "Art", "Other"] as const;
 
@@ -38,9 +39,9 @@ export const WizardModal: React.FC<{
   let percentMsg = "";
   let percentColor = "";
   if (sumPercent < 100)
-    percentMsg = `Need ${100 - sumPercent} %`;
+    percentMsg = `Need ${100 - sumPercent} % allocated`;
   else if (sumPercent > 100)
-    percentMsg = `Remove ${sumPercent - 100} %`;
+    percentMsg = `Remove ${sumPercent - 100} % (over-allocated)`;
   else percentMsg = "Cuts balanced ✓";
   percentColor = sumPercent === 100 ? "text-green-400" : "text-red-500";
   const disableStep2Next = sumPercent !== 100;
@@ -112,6 +113,10 @@ export const WizardModal: React.FC<{
                   <option value={type} key={type}>{type}</option>
                 ))}
               </select>
+
+              {/* PercentBar - live feedback on allocation */}
+              <PercentBar used={sumPercent} />
+
               {/* Role Pills */}
               <div className="mb-2 flex flex-wrap gap-2">
                 {state.roles.map((role, i) => (
@@ -133,7 +138,9 @@ export const WizardModal: React.FC<{
                   }}
                   aria-label="Add Role"
                   type="button"
-                >+ Add Role</button>
+                >
+                  + Add Role
+                </button>
               </div>
               <div className={`text-sm font-semibold ${percentColor} mb-2`}>{percentMsg}</div>
               <div className="flex gap-2 mt-2">
