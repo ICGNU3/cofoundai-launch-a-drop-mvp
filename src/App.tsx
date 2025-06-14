@@ -14,12 +14,12 @@ const baseSepoliaChain = {
   id: 84532,
   name: "Base Sepolia",
   rpcUrls: ["https://sepolia.base.org"],
-  blockExplorers: [
-    {
+  blockExplorers: {
+    default: {
       name: "Base Sepolia Explorer",
       url: "https://sepolia.basescan.org",
     },
-  ],
+  },
   nativeCurrency: {
     name: "Base Sepolia Ether",
     symbol: "ETH",
