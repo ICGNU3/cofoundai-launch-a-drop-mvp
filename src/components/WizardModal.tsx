@@ -1,19 +1,57 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useWizardState } from "@/hooks/useWizardState";
 import { AccentButton } from "./ui/AccentButton";
-import { CrewSplitSlider } from "./CrewSplitSlider";
+import { RolePill } from "./ui/RolePill";
+import { AddRoleModal } from "./ui/AddRoleModal";
+import { ExpensePill } from "./ui/ExpensePill";
+import { AddExpenseModal } from "./ui/AddExpenseModal";
+
+const projectTypes = ["Music", "Film", "Fashion", "Art", "Other"] as const;
 
 export const WizardModal: React.FC<{
   state: ReturnType<typeof useWizardState>["state"];
   setField: ReturnType<typeof useWizardState>["setField"];
   setStep: (s: 1 | 2 | 3) => void;
   close: () => void;
-}> = ({ state, setField, setStep, close }) => {
+  saveRole: ReturnType<typeof useWizardState>["saveRole"];
+  removeRole: ReturnType<typeof useWizardState>["removeRole"];
+  saveExpense: ReturnType<typeof useWizardState>["saveExpense"];
+  removeExpense: ReturnType<typeof useWizardState>["removeExpense"];
+  loadDefaultRoles: ReturnType<typeof useWizardState>["loadDefaultRoles"];
+}> = ({
+  state,
+  setField,
+  setStep,
+  close,
+  saveRole,
+  removeRole,
+  saveExpense,
+  removeExpense,
+  loadDefaultRoles,
+}) => {
   // For MVP, modal overlay and simple transitions only
-  if (!state.isWizardOpen) return null;
+  const [roleModalOpen, setRoleModalOpen] = useState(false);
+  const [expenseModalOpen, setExpenseModalOpen] = useState(false);
 
-  return (
+  // Percent validation
+  const sumPercent = state.roles.reduce((sum, r) => sum + r.percent, 0);
+  let percentMsg = "";
+  let percentColor = "";
+  if (sumPercent < 100)
+    percentMsg = `Need ${100 - sumPercent} %`;
+  else if (sumPercent > 100)
+    percentMsg = `Remove ${sumPercent - 100} %`;
+  else percentMsg = "Cuts balanced ✓";
+  percentColor = sumPercent === 100 ? "text-green-400" : "text-red-500";
+  const disableStep2Next = sumPercent !== 100;
+
+  // Expense/calculation
+  const expenseSum = state.expenses.reduce((sum, x) => sum + x.amountUSDC, 0);
+  const pledgeNum = Number(state.pledgeUSDC) || 0;
+  const totalNeeded = expenseSum + pledgeNum;
+
+  return !state.isWizardOpen ? null : (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm transition">
       <div className="card w-[95vw] max-w-lg mx-auto relative animate-fade-in">
         <button
@@ -23,17 +61,16 @@ export const WizardModal: React.FC<{
         >
           ×
         </button>
-        {/* Header Step Indicator */}
+        {/* Stepper */}
         <div className="flex justify-center mb-6">
           {[1, 2, 3].map(n => (
             <div
               key={n}
-              className={`mx-1 w-6 h-2 rounded-full ${state.step === n
-                ? "bg-accent"
-                : "bg-[#333]"}`}
+              className={`mx-1 w-6 h-2 rounded-full ${state.step === n ? "bg-accent" : "bg-[#333]"}`}
             />
           ))}
         </div>
+        {/* Step 1 */}
         {state.step === 1 && (
           <div>
             <h2 className="headline mb-2 text-center">Describe Your Project Idea</h2>
@@ -42,110 +79,175 @@ export const WizardModal: React.FC<{
               value={state.projectIdea}
               maxLength={256}
               onChange={e => setField("projectIdea", e.target.value)}
-              placeholder='Three-track lo-fi EP...'
+              placeholder="Three-track lo-fi EP…"
             />
             <AccentButton className="w-full mt-2" onClick={() => setStep(2)}>
-              Next: Choose Model →
+              Next: Crew &amp; Cut →
             </AccentButton>
           </div>
         )}
+        {/* Step 2 */}
         {state.step === 2 && (
           <div>
-            <h2 className="headline mb-4 text-center">Choose AI Model</h2>
-            <div className="flex flex-col gap-3 mb-6">
-              <label className={`flex items-center p-3 rounded-lg border ${state.modelChoice === "openai" ? "border-accent bg-accent/10" : "border-border hover:border-accent/80"}`}>
-                <input
-                  type="radio"
-                  className="accent"
-                  value="openai"
-                  checked={state.modelChoice === "openai"}
-                  onChange={() => setField("modelChoice", "openai")}
-                />
-                <span className="ml-3 font-semibold text-accent">OpenAI</span>
-                <span className="ml-2 text-xs text-body-text opacity-70">Best all-around (copy + art)</span>
+            <h2 className="headline mb-2 text-center">Crew &amp; Cut</h2>
+            <div className="flex flex-col gap-2">
+              <label className="block mb-1 text-body-text font-medium">
+                Project Type
               </label>
-              <label className={`flex items-center p-3 rounded-lg border ${state.modelChoice === "claude" ? "border-accent bg-accent/10" : "border-border hover:border-accent/80"}`}>
-                <input
-                  type="radio"
-                  className="accent"
-                  value="claude"
-                  checked={state.modelChoice === "claude"}
-                  onChange={() => setField("modelChoice", "claude")}
-                />
-                <span className="ml-3 font-semibold text-accent">Claude</span>
-                <span className="ml-2 text-xs text-body-text opacity-70">Best launch copy</span>
-              </label>
-              <label className={`flex items-center p-3 rounded-lg border ${state.modelChoice === "gemini" ? "border-accent bg-accent/10" : "border-border hover:border-accent/80"}`}>
-                <input
-                  type="radio"
-                  className="accent"
-                  value="gemini"
-                  checked={state.modelChoice === "gemini"}
-                  onChange={() => setField("modelChoice", "gemini")}
-                />
-                <span className="ml-3 font-semibold text-accent">Gemini</span>
-                <span className="ml-2 text-xs text-body-text opacity-70">Free backup</span>
-              </label>
+              <select
+                className="w-full p-2 rounded border border-border bg-background text-body-text mb-2"
+                value={state.projectType}
+                onChange={e => {
+                  setField("projectType", e.target.value);
+                  loadDefaultRoles(e.target.value);
+                }}
+              >
+                {projectTypes.map(type => (
+                  <option value={type} key={type}>{type}</option>
+                ))}
+              </select>
+              {/* Role Pills */}
+              <div className="mb-2 flex flex-wrap gap-2">
+                {state.roles.map((role, i) => (
+                  <RolePill
+                    key={i}
+                    role={role}
+                    onEdit={() => {
+                      setField("editingRoleIdx", i);
+                      setRoleModalOpen(true);
+                    }}
+                    onDelete={() => removeRole(i)}
+                  />
+                ))}
+                <button
+                  className="role-pill bg-[#222] text-accent border-accent hover:bg-accent/10 ml-1"
+                  onClick={() => {
+                    setField("editingRoleIdx", null);
+                    setRoleModalOpen(true);
+                  }}
+                  aria-label="Add Role"
+                  type="button"
+                >+ Add Role</button>
+              </div>
+              <div className={`text-sm font-semibold ${percentColor} mb-2`}>{percentMsg}</div>
+              <div className="flex gap-2 mt-2">
+                <AccentButton
+                  secondary
+                  className="w-1/2"
+                  onClick={() => setStep(1)}
+                >← Back</AccentButton>
+                <AccentButton
+                  className="w-1/2"
+                  disabled={disableStep2Next}
+                  onClick={() => setStep(3)}
+                >Next: Expenses →</AccentButton>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <AccentButton secondary className="w-1/2" onClick={() => setStep(1)}>
-                ← Back
-              </AccentButton>
-              <AccentButton className="w-1/2" onClick={() => setStep(3)}>
-                Next: Crew & Cut →
-              </AccentButton>
-            </div>
+            {/* AddRoleModal */}
+            <AddRoleModal
+              open={roleModalOpen}
+              defaultRole={
+                state.editingRoleIdx !== null ? state.roles[state.editingRoleIdx] : undefined
+              }
+              onClose={() => setRoleModalOpen(false)}
+              onSave={role => {
+                saveRole(role, state.editingRoleIdx);
+                setRoleModalOpen(false);
+              }}
+              existingRoles={state.roles}
+            />
           </div>
         )}
+        {/* Step 3 */}
         {state.step === 3 && (
           <div>
-            <h2 className="headline mb-4 text-center">Crew &amp; Cut + Pledge</h2>
-            <CrewSplitSlider
-              value={state.crewSplit}
-              onChange={v => setField("crewSplit", v)}
-            />
-            <label className="block mt-5 mb-2 font-medium text-body-text">
-              (Optional) Pledge in USDC
-            </label>
-            <input
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="0.01"
-              placeholder="e.g. 100"
-              value={state.pledgeUSDC}
-              onChange={e => setField("pledgeUSDC", e.target.value.replace(/^0+/, ""))}
-              className="w-full p-3 rounded-lg bg-[#1c1c1c] text-body-text border border-border focus:border-accent outline-none"
-            />
-            <div className="flex flex-col gap-3 mt-6">
-              {/* Simulate Connect Wallet as button */}
-              {!state.walletAddress ? (
+            <h2 className="headline mb-2 text-center">Expenses &amp; Funding</h2>
+            <div>
+              {/* Expense Pills */}
+              <div className="mb-2 flex flex-wrap gap-2">
+                {state.expenses.map((expense, i) => (
+                  <ExpensePill
+                    key={i}
+                    expense={expense}
+                    onEdit={() => {
+                      setField("editingExpenseIdx", i);
+                      setExpenseModalOpen(true);
+                    }}
+                    onDelete={() => removeExpense(i)}
+                  />
+                ))}
+                <button
+                  className="expense-pill bg-[#292929] text-accent border-accent hover:bg-accent/10 ml-1"
+                  onClick={() => {
+                    setField("editingExpenseIdx", null);
+                    setExpenseModalOpen(true);
+                  }}
+                  aria-label="Add Expense"
+                  type="button"
+                >+ Add Expense</button>
+              </div>
+              <div className="text-body-text text-sm opacity-80 mb-2">
+                Total expenses: <span className="font-semibold text-accent">${expenseSum.toFixed(2)}</span>
+              </div>
+              <div className="text-body-text text-sm opacity-80 mb-2">
+                You need <span className="font-semibold text-accent">${expenseSum.toFixed(2)}</span> USDC +{' '}
+                {pledgeNum > 0 ? <>{pledgeNum} (pledge)</> : <>any extra for revenue splits</>}
+              </div>
+              <label className="block mt-5 mb-1 font-medium text-body-text">
+                (Optional) Pledge in USDC
+              </label>
+              <input
+                type="number"
+                inputMode="decimal"
+                min={0}
+                step="0.01"
+                placeholder="e.g. 100"
+                value={state.pledgeUSDC}
+                onChange={e => setField("pledgeUSDC", e.target.value.replace(/^0+/, ""))}
+                className="w-full p-3 rounded-lg bg-[#1c1c1c] text-body-text border border-border focus:border-accent outline-none mb-1"
+              />
+              <div className="flex flex-col gap-3 mt-6">
+                {/* Simulate Connect Wallet as button */}
+                {!state.walletAddress ? (
+                  <AccentButton
+                    className="w-full"
+                    onClick={() => setField("walletAddress", "0x1234...5678")}
+                  >
+                    Connect Wallet (Demo)
+                  </AccentButton>
+                ) : (
+                  <div className="rounded border border-accent px-4 py-3 text-accent mb-2 text-center font-mono text-sm">
+                    {state.walletAddress}
+                  </div>
+                )}
                 <AccentButton
                   className="w-full"
-                  onClick={() => setField("walletAddress", "0x1234...5678")}
+                  disabled={!state.walletAddress}
+                  onClick={() => {/* Automations next step coming soon */}}
                 >
-                  Connect Wallet (Demo)
+                  Mint &amp; Fund
                 </AccentButton>
-              ) : (
-                <div className="rounded border border-accent px-4 py-3 text-accent mb-2 text-center font-mono text-sm">
-                  {state.walletAddress}
-                </div>
-              )}
-              <AccentButton
-                className="w-full"
-                disabled={!state.walletAddress}
-                onClick={() => {/* coming soon: handle wizard next */}}
-              >
-                Mint &amp; Fund
-              </AccentButton>
-              <AccentButton
-                secondary
-                className="w-full"
-                onClick={() => setStep(2)}
-              >
-                ← Back
-              </AccentButton>
+                <AccentButton
+                  secondary
+                  className="w-full"
+                  onClick={() => setStep(2)}
+                >
+                  ← Back
+                </AccentButton>
+              </div>
             </div>
+            {/* Expense Modal */}
+            <AddExpenseModal
+              open={expenseModalOpen}
+              defaultExpense={
+                state.editingExpenseIdx !== null ? state.expenses[state.editingExpenseIdx] : undefined
+              }
+              onClose={() => setExpenseModalOpen(false)}
+              onSave={exp => {
+                saveExpense({...exp, isFixed: true}, state.editingExpenseIdx);
+                setExpenseModalOpen(false);
+              }}
+            />
           </div>
         )}
       </div>

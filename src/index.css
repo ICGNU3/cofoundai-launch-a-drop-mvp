@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -46,4 +45,25 @@ button:hover, .accent-btn:hover {
 .toast {
   background: #1E1E1E;
   color: #F9F9F9;
+}
+
+.role-pill {
+  background: #18181a;
+  border: 1.5px solid #555;
+  border-radius: 20px;
+  padding: 6px 10px;
+  margin: 4px 4px 4px 0;
+  font-size: 14px;
+  color: #E4E4E4;
+  transition: background .16s;
+}
+.expense-pill {
+  background: #262626;
+  border: 1.5px solid #555;
+  border-radius: 20px;
+  padding: 6px 10px;
+  margin: 4px 4px 4px 0;
+  font-size: 14px;
+  color: #E4E4E4;
+  transition: background .16s;
 }
