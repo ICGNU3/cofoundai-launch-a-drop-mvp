@@ -46,7 +46,10 @@ export const WizardModal: React.FC<{
   const disableStep2Next = sumPercent !== 100;
 
   // Expense/calculation
-  const expenseSum = state.expenses.reduce((sum, x) => sum + x.amountUSDC, 0);
+  const upfrontExpenses = state.expenses.filter(e => e.payoutType === "immediate");
+  const uponOutcomeExpenses = state.expenses.filter(e => e.payoutType === "uponOutcome");
+  const expenseSum = upfrontExpenses.reduce((sum, x) => sum + x.amountUSDC, 0);
+  const outcomeSum = uponOutcomeExpenses.reduce((sum, x) => sum + x.amountUSDC, 0);
   const pledgeNum = Number(state.pledgeUSDC) || 0;
   const totalNeeded = expenseSum + pledgeNum;
 
@@ -169,7 +172,7 @@ export const WizardModal: React.FC<{
             <div>
               {/* Expense Pills */}
               <div className="mb-2 flex flex-wrap gap-2">
-                {state.expenses.map((expense, i) => (
+                {[...upfrontExpenses, ...uponOutcomeExpenses].map((expense, i) => (
                   <ExpensePill
                     key={i}
                     expense={expense}
@@ -191,7 +194,12 @@ export const WizardModal: React.FC<{
                 >+ Add Expense</button>
               </div>
               <div className="text-body-text text-sm opacity-80 mb-2">
-                Total expenses: <span className="font-semibold text-accent">${expenseSum.toFixed(2)}</span>
+                <span className="font-semibold text-accent">{upfrontExpenses.length} Up Front</span> &middot;{" "}
+                <span className="font-semibold text-yellow-500">{uponOutcomeExpenses.length} Upon Outcome</span>
+              </div>
+              <div className="text-body-text text-sm opacity-80 mb-2">
+                Up front expenses: <span className="font-semibold text-accent">${expenseSum.toFixed(2)}</span><br/>
+                Upon outcome: <span className="font-semibold text-yellow-500">${outcomeSum.toFixed(2)}</span>
               </div>
               <div className="text-body-text text-sm opacity-80 mb-2">
                 You need <span className="font-semibold text-accent">${expenseSum.toFixed(2)}</span> USDC +{' '}
@@ -248,7 +256,8 @@ export const WizardModal: React.FC<{
               }
               onClose={() => setExpenseModalOpen(false)}
               onSave={exp => {
-                saveExpense({...exp, isFixed: true}, state.editingExpenseIdx);
+                // Use exp.payoutType from modal. Always set isFixed: true.
+                saveExpense({ ...exp, isFixed: true }, state.editingExpenseIdx);
                 setExpenseModalOpen(false);
               }}
             />

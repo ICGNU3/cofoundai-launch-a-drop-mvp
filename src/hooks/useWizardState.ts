@@ -1,6 +1,8 @@
 
 import React from "react";
 
+// --- UPDATED: Add payoutType ---
+export type PayoutType = "immediate" | "uponOutcome";
 export type WizardStep = 1 | 2 | 3;
 
 export interface Role {
@@ -14,6 +16,7 @@ export interface Expense {
   vendorWallet: string;
   amountUSDC: number;
   isFixed: true;
+  payoutType: PayoutType; // ADDED
 }
 export type ProjectType = "Music" | "Film" | "Fashion" | "Art" | "Other";
 
@@ -38,6 +41,7 @@ const defaultRole = (roleName: string, percent: number, walletAddress = ""): Rol
   isFixed: false,
 });
 
+// --- UPDATED: Add payoutType (default: immediate) to expense creation ---
 export function useWizardState() {
   const [state, setState] = React.useState<WizardStateData>({
     step: 1,
@@ -57,7 +61,6 @@ export function useWizardState() {
   const setField = <K extends keyof WizardStateData>(k: K, v: WizardStateData[K]) =>
     setState(s => ({ ...s, [k]: v }));
 
-  // Adds a new role or updates an existing one
   const saveRole = (role: Role, idx: number|null) => {
     setState(s => {
       let roles = [...s.roles];
@@ -72,7 +75,6 @@ export function useWizardState() {
       roles: s.roles.filter((_, i) => i !== idx)
     }));
 
-  // Similar for expenses
   const saveExpense = (exp: Expense, idx: number|null) => {
     setState(s => {
       let expenses = [...s.expenses];
