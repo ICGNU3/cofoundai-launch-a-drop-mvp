@@ -1,4 +1,3 @@
-
 import React from "react";
 import { X } from "lucide-react";
 import { WizardStep1Describe } from "./WizardStep1Describe";
@@ -54,23 +53,21 @@ export const WizardModal: React.FC<{
   const lastStep = totalSteps;
   const progressStep = Math.max(1, Math.min(state.step, totalSteps));
 
-  // Correction: Always render *something* at step 5—even if non-advanced—so hook order is *not* broken
-
-  // If user is at step 5 but didn't select advanced, auto-advance to launch with a safe effect.
-  React.useEffect(() => {
-    if (!state.doAdvancedToken && state.step === 5) {
-      // Slight delay to ensure react does not skip a render pass,
-      // but safe to call immediately as it just changes state.
-      setTimeout(() => setStep(6), 0);
-    }
-  }, [state.doAdvancedToken, state.step, setStep]);
+  // -------------------------------------------------------------------
+  // !!! CRITICAL: SKIP STEP 5 OUTSIDE OF RENDER !!!
+  // If user is on step 5 but didn't select advanced, immediately redirect to step 6 BEFORE rendering.
+  // -------------------------------------------------------------------
+  if (state.step === 5 && !state.doAdvancedToken) {
+    setStep(6);
+    return null;
+  }
 
   const handleNext = () => {
     if (state.step === 4) {
       if (state.doAdvancedToken) setStep(5);
       else setStep(6);
     } else if (state.step === 5 && !state.doAdvancedToken) {
-      setStep(6); // Should never hit now, but just in case.
+      setStep(6); // Should never hit now
     } else if (state.step < lastStep) {
       setStep((state.step + 1) as any);
     }
@@ -203,7 +200,8 @@ export const WizardModal: React.FC<{
                 />
               </div>
             ) : (
-              <SkippingStepLoader />
+              // We should never render this now, but just in case: render nothing.
+              <></>
             )
           )}
 
@@ -227,4 +225,3 @@ export const WizardModal: React.FC<{
 };
 
 // ... End of file. This WizardModal.tsx file is long. Consider breaking out additional steps or logic into their own files for even better maintainability!
-
