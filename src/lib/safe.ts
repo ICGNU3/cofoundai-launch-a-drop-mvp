@@ -2,11 +2,9 @@
 import { ethers } from 'ethers';
 
 import Safe, {
-  SafeAccountConfig
+  SafeAccountConfig,
+  SafeFactory,
 } from '@safe-global/protocol-kit';
-
-// Import SafeFactory from the correct location
-import SafeFactory from '@safe-global/protocol-kit/dist/src/factory';
 
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
@@ -23,7 +21,7 @@ export async function createSafe(owner: `0x${string}`) {
     signerOrProvider: signer
   });
 
-  // 3. Safe factory (default export from factory module)
+  // 3. Safe factory (public API)
   const safeFactory = await SafeFactory.create({ ethAdapter });
 
   // 4. Deploy a 1-owner Safe
