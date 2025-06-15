@@ -1,25 +1,28 @@
+
 import { ethers } from 'ethers';
-import Safe, { SafeAccountConfig } from '@safe-global/protocol-kit';
-import SafeFactory from '@safe-global/protocol-kit';
+import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
-const RPC = 'https://sepolia.base.org'; // Base Sepolia
+const RPC_URL = 'https://sepolia.base.org';
 
-export async function createSafe(owner: `0x${string}`) {
-  // 1. Provider + signer for owner
-  const provider = new ethers.providers.JsonRpcProvider(RPC);
-  const signer = provider.getSigner(owner);
+export async function createSafe(owner: string): Promise<string> {
+  // 1. Set up JSON-RPC provider and signer for the owner
+  const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+  const signer   = provider.getSigner(owner);
 
-  // 2. Ethers adapter
+  // 2. Initialize the Ethers adapter
   const ethAdapter = new EthersAdapter({
-    ethers: require('ethers'), // HACK: make "ethers" look like v5 for Safe
+    ethers,
     signerOrProvider: signer,
   });
 
-  // 3. Create SafeFactory and deploy new Safe
+  // 3. Create the Safe factory (static create method)
   const factory = await SafeFactory.create({ ethAdapter });
-  const config: SafeAccountConfig = { owners: [owner], threshold: 1 };
-  const sdk: Safe = await factory.deploySafe({ safeAccountConfig: config });
 
-  return await sdk.getAddress(); // Smart-wallet address
+  // 4. Deploy a new Safe with a single owner
+  const config: SafeAccountConfig = { owners: [owner], threshold: 1 };
+  const safeSdk = await factory.deploySafe({ safeAccountConfig: config });
+
+  // 5. Return the new Safe address
+  return safeSdk.getAddress();
 }
