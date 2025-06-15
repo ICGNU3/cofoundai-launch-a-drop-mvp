@@ -772,10 +772,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_stats: {
+        Row: {
+          total_drops: number | null
+          total_streamed: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_streamed: number
+          total_drops: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
