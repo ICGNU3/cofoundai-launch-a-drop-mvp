@@ -1,79 +1,110 @@
 
 import React from "react";
-import { motion } from "framer-motion";
-import { Edit, X } from "lucide-react";
-import type { Role, Expense } from "@/hooks/useWizardState";
+import { Pencil, Trash2 } from "lucide-react";
 
-export type BudgetItemType = 
-  | (Role & { type: "share" })
-  | (Expense & { type: "fixed" });
-
-export type BudgetItemProps = {
-  item: BudgetItemType;
-  onEdit?: () => void;
-  onDelete?: () => void;
+export type BudgetItemType = {
+  type: "share" | "fixed";
+  roleName?: string;
+  walletAddress?: string;
+  percentNum?: number;
+  percentStr?: string;
+  percent?: number;
+  isFixed?: boolean;
+  expenseName?: string;
+  amountUSDC?: number;
+  payoutType?: "immediate" | "uponOutcome";
 };
 
-export const BudgetItem: React.FC<BudgetItemProps> = ({ item, onEdit, onDelete }) => {
-  const isShare = item.type === "share";
-  
-  return (
-    <motion.div 
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-      className="flex items-center justify-between p-3 bg-[#18181a] border border-[#333] rounded-lg transition-all duration-200 hover:border-accent/50 mobile-budget-item"
-    >
-      <div className="flex items-center gap-3 mobile-budget-content">
-        <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium mobile-budget-pill ${
-          isShare 
-            ? "bg-accent/20 text-accent border border-accent/30" 
-            : "bg-[#ffe7b1]/20 text-yellow-500 border border-yellow-500/30"
-        }`}>
-          {isShare ? (
-            <span>{(item as Role).roleName} — {(item as Role).percent}%</span>
-          ) : (
-            <span>{(item as Expense).expenseName} — ${(item as Expense).amountUSDC}</span>
-          )}
-        </div>
-        {!isShare && (
-          <span className={`text-xs px-2 py-1 rounded mobile-payout-type ${
-            (item as Expense).payoutType === "immediate"
-              ? "bg-accent/10 text-accent"
-              : "bg-yellow-500/10 text-yellow-500"
-          }`}>
-            {(item as Expense).payoutType === "immediate" ? "Up Front" : "Upon Outcome"}
+type BudgetItemProps = {
+  item: BudgetItemType;
+  onEdit: () => void;
+  onDelete: () => void;
+  onPercentChange?: (newPercent: number) => void;
+};
+
+export const BudgetItem: React.FC<BudgetItemProps> = ({
+  item,
+  onEdit,
+  onDelete,
+  onPercentChange,
+}) => {
+  const isRole = item.type === "share";
+
+  if (isRole) {
+    return (
+      <div className="role-pill flex items-center justify-between w-full">
+        <div className="flex items-center gap-2 flex-1">
+          <span className="font-medium">{item.roleName}</span>
+          <span className="text-xs opacity-60">
+            {item.walletAddress?.slice(0, 6)}...{item.walletAddress?.slice(-4)}
           </span>
-        )}
-      </div>
-      <div className="flex gap-1 mobile-budget-actions">
-        {onEdit && (
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="p-1 text-accent hover:bg-accent/10 rounded focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={item.percentStr || (item.percentNum || item.percent || 0).toString()}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v === '' || /^\d{0,3}$/.test(v)) {
+                // This would need to be handled by parent component
+                console.log('Percent change:', v);
+              }
+            }}
+            onBlur={(e) => {
+              const parsed = parseInt(e.target.value, 10);
+              const final = isNaN(parsed) ? 0 : Math.min(parsed, 100);
+              if (onPercentChange) {
+                onPercentChange(final);
+              }
+            }}
+            className="w-12 text-right text-sm bg-transparent border-0 outline-0"
+          />
+          <span className="text-sm">%</span>
+          <button
             onClick={onEdit}
-            type="button"
-            aria-label={`Edit ${isShare ? (item as Role).roleName : (item as Expense).expenseName}`}
+            className="p-1 hover:bg-white/10 rounded"
+            aria-label="Edit role"
           >
-            <Edit size={14} />
-          </motion.button>
-        )}
-        {onDelete && (
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="p-1 text-red-400 hover:bg-red-400/10 rounded focus-visible:outline-2 focus-visible:outline-red-400 focus-visible:outline-offset-2"
+            <Pencil className="w-3 h-3" />
+          </button>
+          <button
             onClick={onDelete}
-            type="button"
-            aria-label={`Delete ${isShare ? (item as Role).roleName : (item as Expense).expenseName}`}
+            className="p-1 hover:bg-red-500/20 rounded text-red-400"
+            aria-label="Delete role"
           >
-            <X size={14} />
-          </motion.button>
-        )}
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
       </div>
-    </motion.div>
+    );
+  }
+
+  // Expense item
+  return (
+    <div className="expense-pill flex items-center justify-between w-full">
+      <div className="flex items-center gap-2 flex-1">
+        <span className="font-medium">{item.expenseName}</span>
+        <span className="text-xs opacity-60">
+          {item.payoutType === "immediate" ? "Up Front" : "Upon Outcome"}
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-sm">${item.amountUSDC?.toFixed(2)}</span>
+        <button
+          onClick={onEdit}
+          className="p-1 hover:bg-white/10 rounded"
+          aria-label="Edit expense"
+        >
+          <Pencil className="w-3 h-3" />
+        </button>
+        <button
+          onClick={onDelete}
+          className="p-1 hover:bg-red-500/20 rounded text-red-400"
+          aria-label="Delete expense"
+        >
+          <Trash2 className="w-3 h-3" />
+        </button>
+      </div>
+    </div>
   );
 };

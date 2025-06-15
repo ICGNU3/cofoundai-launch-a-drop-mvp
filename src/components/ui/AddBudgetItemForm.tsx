@@ -1,120 +1,140 @@
 
 import React, { useState } from "react";
-import { AccentButton } from "./AccentButton";
-import type { Role, Expense, PayoutType } from "@/hooks/useWizardState";
+import { Plus } from "lucide-react";
+import type { Role, Expense } from "@/hooks/useWizardState";
 
-type ItemType = "share" | "fixed";
-
-interface AddBudgetItemFormProps {
+type AddBudgetItemFormProps = {
   onAddRole: (role: Role) => void;
   onAddExpense: (expense: Expense) => void;
   existingRoles: Role[];
-}
+};
 
 export const AddBudgetItemForm: React.FC<AddBudgetItemFormProps> = ({
   onAddRole,
   onAddExpense,
-  existingRoles
+  existingRoles,
 }) => {
-  const [itemType, setItemType] = useState<ItemType>("share");
-  const [name, setName] = useState("");
-  const [wallet, setWallet] = useState("");
-  const [value, setValue] = useState("");
-  const [payoutType, setPayoutType] = useState<PayoutType>("immediate");
+  const [itemType, setItemType] = useState<"role" | "expense">("role");
+  const [roleName, setRoleName] = useState("");
+  const [walletAddress, setWalletAddress] = useState("");
+  const [expenseName, setExpenseName] = useState("");
+  const [amountUSDC, setAmountUSDC] = useState("");
+  const [payoutType, setPayoutType] = useState<"immediate" | "uponOutcome">("immediate");
 
-  const handleAdd = () => {
-    if (!name.trim() || !wallet.trim() || !value.trim()) return;
-
-    if (itemType === "share") {
-      const percent = Number(value);
-      if (percent <= 0 || percent > 100) return;
-      
-      onAddRole({
-        roleName: name.trim(),
-        walletAddress: wallet.trim(),
-        percent,
-        isFixed: false
-      });
-    } else {
-      const amount = Number(value);
-      if (amount <= 0) return;
-      
-      onAddExpense({
-        expenseName: name.trim(),
-        vendorWallet: wallet.trim(),
-        amountUSDC: amount,
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (itemType === "role" && roleName.trim() && walletAddress.trim()) {
+      const newRole: Role = {
+        roleName: roleName.trim(),
+        walletAddress: walletAddress.trim(),
+        percent: 10,
+        percentNum: 10,
+        percentStr: "10",
+        isFixed: false,
+      };
+      onAddRole(newRole);
+      setRoleName("");
+      setWalletAddress("");
+    } else if (itemType === "expense" && expenseName.trim() && amountUSDC) {
+      const newExpense: Expense = {
+        expenseName: expenseName.trim(),
+        amountUSDC: parseFloat(amountUSDC),
+        payoutType,
         isFixed: true,
-        payoutType
-      });
+      };
+      onAddExpense(newExpense);
+      setExpenseName("");
+      setAmountUSDC("");
     }
-
-    // Reset form
-    setName("");
-    setWallet("");
-    setValue("");
   };
 
   return (
-    <div className="p-4 bg-[#1a1a1a] border border-[#333] rounded-lg">
-      <div className="flex flex-col gap-3">
-        <div className="flex gap-2">
-          <select
-            value={itemType}
-            onChange={(e) => setItemType(e.target.value as ItemType)}
-            className="px-3 py-2 text-sm border border-[#333] rounded bg-[#232323]"
-          >
-            <option value="share">Share %</option>
-            <option value="fixed">Fixed $</option>
-          </select>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-2">
-          <input
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="px-3 py-2 text-sm border border-[#333] rounded bg-[#232323]"
-          />
-          <input
-            placeholder="Wallet"
-            value={wallet}
-            onChange={(e) => setWallet(e.target.value)}
-            className="px-3 py-2 text-sm border border-[#333] rounded bg-[#232323]"
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <input
-            type="number"
-            placeholder={itemType === "share" ? "Percent" : "USDC Amount"}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            min="0"
-            step={itemType === "share" ? "1" : "0.01"}
-            max={itemType === "share" ? "100" : undefined}
-            className="flex-1 px-3 py-2 text-sm border border-[#333] rounded bg-[#232323]"
-          />
-          
-          {itemType === "fixed" && (
+    <div className="border border-border rounded-lg p-4 bg-card/50">
+      <div className="flex gap-2 mb-4">
+        <button
+          type="button"
+          onClick={() => setItemType("role")}
+          className={`px-3 py-1 rounded text-sm ${
+            itemType === "role" 
+              ? "bg-accent text-background" 
+              : "border border-border text-body-text hover:bg-accent/10"
+          }`}
+        >
+          Revenue Share
+        </button>
+        <button
+          type="button"
+          onClick={() => setItemType("expense")}
+          className={`px-3 py-1 rounded text-sm ${
+            itemType === "expense" 
+              ? "bg-accent text-background" 
+              : "border border-border text-body-text hover:bg-accent/10"
+          }`}
+        >
+          Fixed Expense
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {itemType === "role" ? (
+          <>
+            <input
+              type="text"
+              placeholder="Role name (e.g., Producer)"
+              value={roleName}
+              onChange={(e) => setRoleName(e.target.value)}
+              className="w-full p-2 rounded border border-border bg-background text-body-text"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Wallet address"
+              value={walletAddress}
+              onChange={(e) => setWalletAddress(e.target.value)}
+              className="w-full p-2 rounded border border-border bg-background text-body-text"
+              required
+            />
+          </>
+        ) : (
+          <>
+            <input
+              type="text"
+              placeholder="Expense name (e.g., Studio rental)"
+              value={expenseName}
+              onChange={(e) => setExpenseName(e.target.value)}
+              className="w-full p-2 rounded border border-border bg-background text-body-text"
+              required
+            />
+            <input
+              type="number"
+              placeholder="Amount in USDC"
+              value={amountUSDC}
+              onChange={(e) => setAmountUSDC(e.target.value)}
+              className="w-full p-2 rounded border border-border bg-background text-body-text"
+              min="0"
+              step="0.01"
+              required
+            />
             <select
               value={payoutType}
-              onChange={(e) => setPayoutType(e.target.value as PayoutType)}
-              className="px-3 py-2 text-sm border border-[#333] rounded bg-[#232323]"
+              onChange={(e) => setPayoutType(e.target.value as "immediate" | "uponOutcome")}
+              className="w-full p-2 rounded border border-border bg-background text-body-text"
             >
-              <option value="immediate">Up Front</option>
-              <option value="uponOutcome">Upon Outcome</option>
+              <option value="immediate">Pay Up Front</option>
+              <option value="uponOutcome">Pay Upon Outcome</option>
             </select>
-          )}
-        </div>
+          </>
+        )}
         
-        <AccentButton
-          onClick={handleAdd}
-          disabled={!name.trim() || !wallet.trim() || !value.trim()}
-          className="w-full text-sm h-9"
+        <button
+          type="submit"
+          className="w-full flex items-center justify-center gap-2 p-2 bg-accent text-background rounded hover:bg-accent/90 transition-colors"
         >
-          Add Line Item
-        </AccentButton>
-      </div>
+          <Plus className="w-4 h-4" />
+          Add {itemType === "role" ? "Role" : "Expense"}
+        </button>
+      </form>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { WizardStep1Describe } from "./WizardStep1Describe";
 import { WizardBudgetStep } from "./WizardBudgetStep";
 import { WizardStep3Expenses } from "./WizardStep3Expenses";
 import { WizardStep4Success } from "./WizardStep4Success";
+import { ScrollArea } from "./ui/scroll-area";
 
 export const WizardModal: React.FC<{
   state: ReturnType<typeof useWizardState>["state"];
@@ -82,9 +83,9 @@ export const WizardModal: React.FC<{
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm transition"
     >
-      <div className="wizard-card w-[95vw] max-w-card mx-auto relative shadow-lg">
+      <div className="wizard-card w-[95vw] max-w-card mx-auto relative shadow-lg max-h-[90vh] flex flex-col">
         <button
-          className="absolute top-3 right-4 text-body-text opacity-70 hover:opacity-100"
+          className="absolute top-3 right-4 text-body-text opacity-70 hover:opacity-100 z-50"
           onClick={close}
           aria-label="Close"
         >
@@ -92,7 +93,7 @@ export const WizardModal: React.FC<{
         </button>
         
         {/* Stepper */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-6 flex-shrink-0">
           {[1, 2, 3, 4].map(n => (
             <motion.div
               key={n}
@@ -111,93 +112,104 @@ export const WizardModal: React.FC<{
           ))}
         </div>
         
-        {/* Steps with slide animations */}
-        <AnimatePresence mode="wait">
-          {state.step === 1 && (
-            <motion.div
-              key="step1"
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.2, ease: "easeOut" }}
-            >
-              <WizardStep1Describe
-                projectIdea={state.projectIdea}
-                setField={setField}
-                onNext={() => setStep(2)}
-              />
-            </motion.div>
-          )}
-          {state.step === 2 && (
-            <motion.div
-              key="step2"
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.2, ease: "easeOut" }}
-            >
-              <WizardBudgetStep
-                roles={state.roles}
-                expenses={state.expenses}
-                editingRoleIdx={state.editingRoleIdx}
-                editingExpenseIdx={state.editingExpenseIdx}
-                projectType={state.projectType}
-                setField={setField}
-                loadDefaultRoles={loadDefaultRoles}
-                saveRole={saveRole}
-                removeRole={removeRole}
-                updateRolePercent={updateRolePercent}
-                saveExpense={saveExpense}
-                removeExpense={removeExpense}
-                setStep={setStep}
-              />
-            </motion.div>
-          )}
-          {state.step === 3 && (
-            <motion.div
-              key="step3"
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.2, ease: "easeOut" }}
-            >
-              <WizardStep3Expenses
-                expenses={state.expenses}
-                editingExpenseIdx={state.editingExpenseIdx}
-                setField={setField}
-                saveExpense={saveExpense}
-                removeExpense={removeExpense}
-                pledgeUSDC={state.pledgeUSDC}
-                walletAddress={state.walletAddress}
-                setStep={setStep}
-                roles={state.roles}
-              />
-            </motion.div>
-          )}
-          {state.step === 4 && (
-            <motion.div
-              key="step4"
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.2, ease: "easeOut" }}
-            >
-              <WizardStep4Success
-                projectIdea={state.projectIdea}
-                projectType={state.projectType}
-                roles={state.roles}
-                expenses={state.expenses}
-                pledgeUSDC={state.pledgeUSDC}
-                walletAddress={state.walletAddress}
-                onRestart={handleStartNewDrop}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Scrollable content area */}
+        <ScrollArea className="flex-1 px-1">
+          <AnimatePresence mode="wait">
+            {state.step === 1 && (
+              <motion.div
+                key="step1"
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.2, ease: "easeOut" }}
+              >
+                <WizardStep1Describe
+                  projectIdea={state.projectIdea}
+                  setField={setField}
+                  onNext={() => setStep(2)}
+                />
+              </motion.div>
+            )}
+            {state.step === 2 && (
+              <motion.div
+                key="step2"
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.2, ease: "easeOut" }}
+              >
+                <WizardBudgetStep
+                  roles={state.roles}
+                  expenses={state.expenses}
+                  editingRoleIdx={state.editingRoleIdx}
+                  editingExpenseIdx={state.editingExpenseIdx}
+                  projectType={state.projectType}
+                  setField={setField}
+                  loadDefaultRoles={loadDefaultRoles}
+                  saveRole={saveRole}
+                  removeRole={removeRole}
+                  updateRolePercent={updateRolePercent}
+                  saveExpense={saveExpense}
+                  removeExpense={removeExpense}
+                  setStep={setStep}
+                />
+              </motion.div>
+            )}
+            {state.step === 3 && (
+              <motion.div
+                key="step3"
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.2, ease: "easeOut" }}
+              >
+                <WizardStep3Expenses
+                  expenses={state.expenses}
+                  editingExpenseIdx={state.editingExpenseIdx}
+                  setField={setField}
+                  saveExpense={saveExpense}
+                  removeExpense={removeExpense}
+                  pledgeUSDC={state.pledgeUSDC}
+                  walletAddress={state.walletAddress}
+                  setStep={setStep}
+                  roles={state.roles}
+                />
+              </motion.div>
+            )}
+            {state.step === 4 && (
+              <motion.div
+                key="step4"
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.2, ease: "easeOut" }}
+              >
+                <WizardStep4Success
+                  projectIdea={state.projectIdea}
+                  projectType={state.projectType}
+                  roles={state.roles}
+                  expenses={state.expenses}
+                  pledgeUSDC={state.pledgeUSDC}
+                  walletAddress={state.walletAddress}
+                  onRestart={() => {
+                    setField("projectIdea", "");
+                    setField("roles", []);
+                    setField("expenses", []);
+                    setField("pledgeUSDC", "");
+                    setField("walletAddress", null);
+                    setField("projectType", "Music");
+                    setField("step", 1);
+                    close();
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </ScrollArea>
       </div>
     </motion.div>
   );
