@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import { WizardStep1Describe } from "./WizardStep1Describe";
@@ -24,25 +23,31 @@ function WizardStepTokenConfirm({
     <div className="flex flex-col items-center justify-center h-full py-12">
       <h2 className="text-xl font-bold mb-4">Customize Your Token?</h2>
       <p className="max-w-md text-center mb-6 text-body-text/80">
-        Would you like to deeply customize your project's associated token—supply, distribution, vesting, and utility—or use a simple default token template? (Recommended for advanced users. <span className="text-gold">Optional</span>)
+        Would you like to deeply customize your project's associated token—supply, distribution, vesting, and utility—or use a simple default token template? <span className="text-gold">Optional</span>
       </p>
       <div className="flex gap-4 mb-4">
         <button
-          className={`accent-btn ${doAdvancedToken ? "" : "secondary"} px-6`}
+          className={`accent-btn px-6 ${!doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text"}`}
+          type="button"
+          aria-pressed={!doAdvancedToken}
           onClick={() => setDoAdvancedToken(false)}
         >
           No, use default token
         </button>
         <button
-          className={`accent-btn ${doAdvancedToken ? "bg-accent" : ""} px-6`}
+          className={`accent-btn px-6 ${doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text"}`}
+          type="button"
+          aria-pressed={doAdvancedToken}
           onClick={() => setDoAdvancedToken(true)}
         >
           Yes, customize token
         </button>
       </div>
       <div className="flex justify-between mt-6 w-full max-w-xs">
-        <button className="accent-btn secondary" onClick={onBack}>← Back</button>
-        <button className="accent-btn" onClick={onNext}>Next</button>
+        <button className="accent-btn secondary" type="button" onClick={onBack}>← Back</button>
+        <button className="accent-btn" type="button" onClick={onNext}>
+          Next
+        </button>
       </div>
     </div>
   );
@@ -82,18 +87,21 @@ export const WizardModal: React.FC<{
 
   // Navigation logic
   const handleNext = () => {
-    // If at token confirm, go to advanced or skip
+    // Only allow progress to valid step numbers!
+    // At token confirm...
     if (state.step === 4) {
-      if (state.doAdvancedToken) setStep(5);
-      else setStep(6);
+      if (state.doAdvancedToken) {
+        setStep(5); // Go to advanced
+      } else {
+        setStep(6); // Skip to launch
+      }
     } else if (isFinalStep()) {
-      // stay
+      // stay at final
     } else {
       setStep((state.step + 1) as any);
     }
   };
   const handleBack = () => {
-    // If at token confirm, go back to budget
     if (state.step === 4) setStep(3);
     else if (state.step === 5 && state.doAdvancedToken) setStep(4);
     else if (state.step > 1) setStep((state.step - 1) as any);
@@ -114,13 +122,16 @@ export const WizardModal: React.FC<{
     if (state.step === 2) return "Define Roles & Revenue Split";
     if (state.step === 3) return "Budget Breakdown";
     if (state.step === 4) return "Token Customization";
-    if (state.step === 5 && state.doAdvancedToken) return "Advanced Token Customization";
+    if (state.doAdvancedToken && state.step === 5) return "Advanced Token Customization";
     if (state.step === (state.doAdvancedToken ? 6 : 5)) return "Launch Your Drop";
     return "Create Your Drop";
   };
 
   // Progress Indicator
   const totalSteps = state.doAdvancedToken ? 6 : 5;
+
+  // Define the correct step count based on decision
+  const progressStep = Math.max(1, Math.min(state.step, totalSteps));
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -130,7 +141,7 @@ export const WizardModal: React.FC<{
           <div>
             <h2 className="text-2xl font-bold text-headline">{getStepTitle()}</h2>
             <div className="text-sm text-body-text/70 mt-1">
-              Step {state.step} of {totalSteps}
+              Step {progressStep} of {totalSteps}
             </div>
           </div>
           <button
@@ -147,9 +158,9 @@ export const WizardModal: React.FC<{
               <div
                 key={stepNum}
                 className={`flex-1 h-2 rounded-full ${
-                  stepNum <= state.step
+                  stepNum <= progressStep
                     ? "bg-accent"
-                    : stepNum === state.step + 1
+                    : stepNum === progressStep + 1
                     ? "bg-accent/30"
                     : "bg-border"
                 }`}
@@ -196,7 +207,7 @@ export const WizardModal: React.FC<{
               onBack={handleBack}
             />
           )}
-          {/* NEW: Token customization branching step */}
+          {/* Token branching step */}
           {state.step === 4 && (
             <WizardStepTokenConfirm
               doAdvancedToken={!!state.doAdvancedToken}
@@ -205,7 +216,7 @@ export const WizardModal: React.FC<{
               onBack={handleBack}
             />
           )}
-          {/* NEW: Advanced config - only if chosen */}
+          {/* Advanced config - only if chosen */}
           {state.doAdvancedToken && state.step === 5 && (
             <div className="overflow-y-auto px-6 py-4 h-full">
               <AdvancedTokenCustomizationWrapper
