@@ -223,8 +223,8 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
       <div className="space-y-2 min-h-[200px]">
         {budgetItems.map((item, index) => {
           const isRole = item.type === "share";
-          const roleIndex = isRole ? roles.findIndex(r => r === item) : -1;
-          const expenseIndex = !isRole ? expenses.findIndex(e => e === item) : -1;
+          const roleIndex = isRole ? roles.findIndex(r => r.roleName === item.roleName && r.walletAddress === item.walletAddress) : -1;
+          const expenseIndex = !isRole ? expenses.findIndex(e => e.expenseName === item.expenseName) : -1;
           
           return (
             <div
@@ -285,7 +285,13 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
         defaultRole={editingRoleIdx !== null ? roles[editingRoleIdx] : undefined}
         onClose={() => setRoleModalOpen(false)}
         onSave={role => {
-          saveRole({ ...role, isFixed: false }, editingRoleIdx);
+          const roleWithPercent = {
+            ...role,
+            percentNum: role.percent || 10,
+            percentStr: (role.percent || 10).toString(),
+            isFixed: false
+          };
+          saveRole(roleWithPercent, editingRoleIdx);
           setRoleModalOpen(false);
         }}
         existingRoles={roles}

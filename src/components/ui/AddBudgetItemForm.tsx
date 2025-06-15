@@ -19,6 +19,7 @@ export const AddBudgetItemForm: React.FC<AddBudgetItemFormProps> = ({
   const [walletAddress, setWalletAddress] = useState("");
   const [expenseName, setExpenseName] = useState("");
   const [amountUSDC, setAmountUSDC] = useState("");
+  const [vendorWallet, setVendorWallet] = useState("");
   const [payoutType, setPayoutType] = useState<"immediate" | "uponOutcome">("immediate");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -36,9 +37,10 @@ export const AddBudgetItemForm: React.FC<AddBudgetItemFormProps> = ({
       onAddRole(newRole);
       setRoleName("");
       setWalletAddress("");
-    } else if (itemType === "expense" && expenseName.trim() && amountUSDC) {
+    } else if (itemType === "expense" && expenseName.trim() && amountUSDC && vendorWallet.trim()) {
       const newExpense: Expense = {
         expenseName: expenseName.trim(),
+        vendorWallet: vendorWallet.trim(),
         amountUSDC: parseFloat(amountUSDC),
         payoutType,
         isFixed: true,
@@ -46,6 +48,7 @@ export const AddBudgetItemForm: React.FC<AddBudgetItemFormProps> = ({
       onAddExpense(newExpense);
       setExpenseName("");
       setAmountUSDC("");
+      setVendorWallet("");
     }
   };
 
@@ -103,6 +106,14 @@ export const AddBudgetItemForm: React.FC<AddBudgetItemFormProps> = ({
               placeholder="Expense name (e.g., Studio rental)"
               value={expenseName}
               onChange={(e) => setExpenseName(e.target.value)}
+              className="w-full p-2 rounded border border-border bg-background text-body-text"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Vendor wallet address"
+              value={vendorWallet}
+              onChange={(e) => setVendorWallet(e.target.value)}
               className="w-full p-2 rounded border border-border bg-background text-body-text"
               required
             />
