@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -7,6 +6,7 @@ import FullWaveBackground from "@/components/FullWaveBackground";
 import { Web3WalletModule } from "@/components/Web3WalletModule";
 import { Wallet } from "lucide-react";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
+import HeroMotionCanvas from "@/components/HeroMotionCanvas";
 
 const Index: React.FC = () => {
   const wizard = useWizardState();
@@ -15,8 +15,10 @@ const Index: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-x-hidden">
       <FullWaveBackground />
-      {/* HERO SECTION */}
+      {/* --- HERO SECTION --- */}
       <div className="w-full pt-24 pb-10 px-4 z-10 relative flex flex-col items-center">
+        {/* --- Hero SVG animation layer --- */}
+        <HeroMotionCanvas />
         {/* Wallet button right-aligned (desktop), mobile top-right */}
         <div className="w-full max-w-5xl flex justify-end">
           <button
@@ -57,4 +59,3 @@ const Index: React.FC = () => {
 };
 
 export default Index;
-
