@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useWizardState } from "@/hooks/useWizardState";
 import { AccentButton } from "./ui/AccentButton";
@@ -132,14 +131,98 @@ export const WizardModal: React.FC<{
   const pledgeNum = Number(state.pledgeUSDC) || 0;
   const totalNeeded = expenseSum + pledgeNum;
 
+  // PINATA JWT input (for MVP/testing)
+  const [pinataJwt, setPinataJwt] = useState<string>("");
+
+  // Helper: Call OpenAI DALL·E 3 with prompt
+  async function generateImageDalle3(prompt: string, openaiApiKey: string): Promise<string> {
+    const resp = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${openaiApiKey}`,
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: prompt,
+        n: 1,
+        size: "1024x1024",
+      }),
+    });
+    if (!resp.ok) throw new Error("DALL·E API call failed");
+    const data = await resp.json();
+    return data.data[0].url as string;
+  }
+
+  // Helper: Fetch image and return base64 (as a PNG file buffer)
+  async function fetchImageAsBase64(url: string): Promise<{base64: string, ext: string}> {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error("Failed to download image");
+    const blob = await resp.blob();
+    const ext = blob.type.split("/")[1] ?? "png";
+    const arrayBuffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    const base64 = btoa(String.fromCharCode(...bytes));
+    return { base64, ext };
+  }
+
+  // Helper: POST to Pinata; returns ipfsHash
+  async function pinToPinata(base64: string, ext: string, pinataJwt: string): Promise<string> {
+    const boundary = "----WebKitFormBoundary" + Math.random().toString(36).substring(2);
+    // Construct FormData manually (for base64 + JWT support)
+    const filename = `image.${ext}`;
+    const formDataParts = [
+      `--${boundary}`,
+      `Content-Disposition: form-data; name="file"; filename="${filename}"`,
+      `Content-Type: image/${ext}`,
+      "",
+      atob(base64),
+      `--${boundary}--`,
+      "",
+    ];
+    const body = new Blob(formDataParts.map(part =>
+      typeof part === "string" ? new TextEncoder().encode(part + "\r\n") : part
+    ));
+    const resp = await fetch(
+      "https://api.pinata.cloud/pinning/pinFileToIPFS",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${pinataJwt}`,
+          "Content-Type": `multipart/form-data; boundary=${boundary}`,
+        },
+        body,
+      }
+    );
+    if (!resp.ok) throw new Error("Pinata upload failed: " + await resp.text());
+    const data = await resp.json();
+    return data.IpfsHash as string;
+  }
+
   // Handler for Mint & Fund button (calls OpenAI, binds fields)
   const handleMintAndFund = async () => {
     setOpenaiFields({});
     setError(null);
     setLoading(true);
+    setIpfsHash(null);
+
     try {
+      // 1. Call OpenAI Chat API, get metadata fields
       const fields = await fetchTokenMetadata(state.projectIdea);
       setOpenaiFields(fields);
+
+      // 2. Call DALL·E 3 if modelChoice=OpenAI (we will assume so here)
+      const openaiApiKey = ""; // <--- TODO: Supply your OpenAI API Key here
+      if (!openaiApiKey) throw new Error("OpenAI API Key required");
+      const imageUrl = await generateImageDalle3(fields.imagePrompt, openaiApiKey);
+
+      // 3. Download image as base64
+      const { base64, ext } = await fetchImageAsBase64(imageUrl);
+
+      // 4. Pin to Pinata via pinFileToIPFS (needs Pinata JWT)
+      if (!pinataJwt) throw new Error("Pinata JWT required (see below)");
+      const hash = await pinToPinata(base64, ext, pinataJwt);
+      setIpfsHash(hash);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -253,6 +336,14 @@ export const WizardModal: React.FC<{
                 className="w-full mb-1"
               />
               <div className="flex flex-col gap-3 mt-6">
+                {/* PINATA JWT input (for MVP/testing) */}
+                <input
+                  type="password"
+                  className="w-full text-xs border border-yellow-500 bg-neutral-900 rounded px-3 py-2 mb-3"
+                  placeholder="Pinata JWT (Paste here for IPFS upload)"
+                  value={pinataJwt}
+                  onChange={e => setPinataJwt(e.target.value)}
+                />
                 {/* Simulate Connect Wallet as button */}
                 {!state.walletAddress ? (
                   <AccentButton
@@ -283,6 +374,23 @@ export const WizardModal: React.FC<{
                     <div><b>Supply:</b> {openaiFields.tokenSupply}</div>
                     <div><b>Image Prompt:</b> {openaiFields.imagePrompt}</div>
                     <div><b>Launch Copy:</b> {openaiFields.launchCopy}</div>
+                  </div>
+                )}
+                {loading && (
+                  <div className="text-yellow-400 text-xs text-center mt-2">Generating image & uploading&hellip;</div>
+                )}
+                {ipfsHash && (
+                  <div className="mt-3 p-2 border border-cyan-700 bg-cyan-900/20 text-cyan-300 rounded text-xs font-mono ">
+                    <b>IPFS Hash:</b> <span className="break-all">{ipfsHash}</span>
+                    <div>
+                      <a
+                        href={`https://gateway.pinata.cloud/ipfs/${ipfsHash}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="underline text-cyan-200 ml-2"
+                      >
+                        View image
+                      </a>
+                    </div>
                   </div>
                 )}
                 <AccentButton
