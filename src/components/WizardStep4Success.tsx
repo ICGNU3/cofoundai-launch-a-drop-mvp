@@ -43,6 +43,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   const [generatedContent, setGeneratedContent] = useState<any>({});
   const [showConfetti, setShowConfetti] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [loadingMint, setLoadingMint] = useState(false);
   const { toast } = useToast();
 
   const {
@@ -68,6 +69,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
 
   const handleMintAndFund = async () => {
     if (!walletAddress) return;
+    setLoadingMint(true);
     try {
       // infer tokenSymbol, e.g. from projectIdea or user input. Here set fallback:
       const tokenSymbol = "DROP"; // REPLACE as needed to pull actual symbol
@@ -85,17 +87,20 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
         walletAddress,
         fundingTarget,
         expenseSum,
-        coverIpfs: mintData.ipfsHash,
-        ...mintData,
+        tokenAddress: mintData.tokenAddress,
+        txHash: mintData.txHash,
+        // Do NOT pass coverIpfs: ... (fixes build error)
       });
       setProjectId(project.id);
       sessionStorage.setItem('autoNavigateToProject', project.id);
 
       completeMinting();
       pollUSDCxBalance();
-
     } catch (error) {
       console.error("Mint and fund error:", error);
+      // Overlay will show "Mint failed" as handled in MintingLoadingOverlay
+    } finally {
+      setLoadingMint(false);
     }
   };
 
@@ -236,7 +241,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
           <ProjectActionButtons
             projectId={projectId}
             walletAddress={walletAddress}
-            isMinting={isMinting}
+            isMinting={isMinting || loadingMint}
             usdcxBalanceConfirmed={usdcxBalanceConfirmed}
             onMintAndFund={handleMintAndFund}
             onRestart={onRestart}

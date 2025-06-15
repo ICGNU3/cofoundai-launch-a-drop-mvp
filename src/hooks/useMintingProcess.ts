@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export type MintingStep = 
   | "ready"
+  | "uploading-cover"
   | "generating-art" 
   | "uploading-metadata"
   | "minting-token"
@@ -20,7 +20,6 @@ export const useMintingProcess = () => {
   const { toast } = useToast();
 
   const mintingSteps = [
-    // Cover upload step is now not generative, just upload to Pinata
     { key: "uploading-cover", label: "Uploading Cover Art", description: "Storing cover image on IPFS..." },
     { key: "uploading-metadata", label: "Uploading Metadata", description: "Storing project data on IPFS..." },
     { key: "minting-token", label: "Minting Zora Coin", description: "Creating your NFT on blockchain..." },
@@ -28,11 +27,7 @@ export const useMintingProcess = () => {
     { key: "saving-project", label: "Finalizing Project", description: "Setting up your project hub..." },
   ];
 
-  // Pinata upload util (assume available globally or inject via context/util)
   async function pinFileToIPFS({ dataURL, name }: { dataURL: string; name: string; }): Promise<{ IpfsHash: string; }> {
-    // Use fetch to call your Pinata upload endpoint or direct API
-    // This is a placeholder; replace with your app implementation.
-    // Example:
     const formData = new FormData();
     formData.append("file", await fetch(dataURL).then(r => r.blob()), name);
     const res = await fetch("/api/pinata/upload", {
@@ -44,7 +39,6 @@ export const useMintingProcess = () => {
     return { IpfsHash: json.IpfsHash };
   }
 
-  // Adapted simulateMinting to require props for coverBase64, tokenSymbol
   const simulateMinting = async ({
     coverBase64,
     tokenSymbol,
@@ -59,7 +53,6 @@ export const useMintingProcess = () => {
     setProgress(10);
 
     try {
-      // 1. Upload Cover Art to Pinata
       setMintingStatus("📤 Uploading cover to IPFS...");
       let ipfsHash: string;
       if (!coverBase64) throw new Error("No cover image to upload!");
@@ -68,31 +61,27 @@ export const useMintingProcess = () => {
       ipfsHash = res.IpfsHash;
       setProgress(35);
 
-      // 2. Upload metadata (use IPFS hash in token URI)
       setCurrentStep("uploading-metadata");
       setMintingStatus("📡 Uploading metadata to IPFS...");
       setProgress(55);
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // 3. Mint Token: pass "uri": "ipfs://"+ipfsHash to Zora mint API
       setCurrentStep("minting-token");
       setMintingStatus("🚀 Minting your Zora coin...");
       setProgress(70);
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // 4. Confirm
       setCurrentStep("confirming-transaction");
       setMintingStatus("⛽ Confirming on blockchain...");
       setProgress(90);
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // 5. Project saving
       setCurrentStep("saving-project");
       setMintingStatus("💾 Setting up your project hub...");
       setProgress(97);
       await new Promise(resolve => setTimeout(resolve, 800));
 
-      // Generate mock data (replace as needed)
+      // Generate mock data
       const mockTokenAddress = `0x${Math.random().toString(16).substr(2, 40)}`;
       const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`;
       const coverArtUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
