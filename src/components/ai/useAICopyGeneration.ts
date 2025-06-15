@@ -12,13 +12,12 @@ export function useAICopyGeneration() {
 
   const fetchAIContent = async (prompt: string, model = "gpt-4o-mini") => {
     try {
-      // Send the authorization header!
+      // Send the authorization header with proper Bearer format
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY || "",
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY || ""}`,
       };
-      if (SUPABASE_ANON_KEY) {
-        headers["authorization"] = `Bearer ${SUPABASE_ANON_KEY}`;
-      }
 
       const res = await fetch(SUPABASE_EDGE_FN_URL, {
         method: "POST",
@@ -55,6 +54,7 @@ export function useAICopyGeneration() {
                        (data.details ? ` (${data.details})` : ""),
           variant: "destructive",
         });
+        return null;
       }
       // Fallback: error but nothing useable sent back
       toast({
@@ -76,4 +76,3 @@ export function useAICopyGeneration() {
 
   return { fetchAIContent };
 }
-
