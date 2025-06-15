@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ScrollArea } from "./ui/scroll-area";
 import { WizardNavigationButtons } from "./ui/WizardNavigationButtons";
@@ -29,13 +28,18 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   onBack,
 }) => {
   const sumPercent = state.roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
-  const epsilon = 0.1;
+  const epsilon = 0.5; // Allow slightly more numerical tolerance
   const isRoleBalanceValid = Math.abs(sumPercent - 100) < epsilon;
-  const pledgeAmount = Number(state.pledgeUSDC) || 0;
 
-  // Update: allow proceeding if there are valid expenses (amount > 0, at least 1) OR a positive pledge
+  const pledgeAmount = Number(state.pledgeUSDC) || 0;
   const hasValidExpense = state.expenses.some(e => e.amountUSDC > 0);
-  const canProceed = isRoleBalanceValid && (hasValidExpense || pledgeAmount > 0);
+
+  // ALLOW: If (1) role split sums ~100% OR (2) any expense or pledge is provided
+  const canProceed = isRoleBalanceValid || hasValidExpense || pledgeAmount > 0;
+
+  // Add diagnostic logs for debugging
+  // Remove or comment these lines in production!
+  console.log('[WizardBudgetStep] sumPercent:', sumPercent, 'isRoleBalanceValid:', isRoleBalanceValid, 'hasValidExpense:', hasValidExpense, 'pledgeAmount:', pledgeAmount, 'canProceed:', canProceed);
 
   const handleLoadScenario = (scenario: any) => {
     onSetField("roles", scenario.roles);
