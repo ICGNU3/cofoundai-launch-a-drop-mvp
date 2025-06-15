@@ -1,9 +1,11 @@
-
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Plus, Undo, Redo } from "lucide-react";
 // Removed unused ProgressBar import
 // import { ProgressBar } from "./ui/PercentBar";
 import { cn } from "@/lib/utils";
+import { AddRoleModalStandalone } from "./AddRoleModalStandalone";
+import { useUndoRedo } from "@/hooks/useUndoRedo";
+import { proportionalRebalance } from "@/utils/roleRebalancer";
 
 export type Role = {
   id: string;
@@ -81,38 +83,45 @@ const colorByPercent = (sum: number) => {
 };
 
 export const RoleAllocationPanel: React.FC<{}> = () => {
-  // MAIN STATE
-  const [roles, setRoles] = useState<Role[]>([
+  // Use custom undo/redo hook for roles
+  const {
+    state: roles,
+    set: setRolesWithHistory,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    setDirect: setRoles,
+  } = useUndoRedo<Role[]>([
     { id: genId(), name: "Artist", wallet: "", percent: 50 },
     { id: genId(), name: "Producer", wallet: "", percent: 30 },
     { id: genId(), name: "Label", wallet: "", percent: 20 }
   ]);
   const [addOpen, setAddOpen] = useState(false);
   const [newRole, setNewRole] = useState({ name: "", wallet: "" });
-  const [editing, setEditing] = useState<string | null>(null); // id of pill being resized
+  const [editing, setEditing] = useState<string | null>(null);
   const [preset, setPreset] = useState("Music");
-  // Undo/redo stacks
-  const [history, setHistory] = useState<Role[][]>([]);
-  const [future, setFuture] = useState<Role[][]>([]);
 
-  // Derived/calculated
   const sum = Math.round(roles.reduce((s, r) => s + r.percent, 2) * 100) / 100;
 
-  // Store state for undo
-  const pushHistory = (next: Role[]) => {
-    setHistory(h =>
-      ((h.length > 8) ? [...h.slice(h.length - 8), roles] : [...h, roles])
-    );
-    setFuture([]);
-    setRoles(next);
+  // For add role modal
+  const handleAddRole = ({ name, wallet }: { name: string; wallet: string }) => {
+    if (!name.trim()) return;
+    if (roles.length > 8) return;
+    const base = { id: genId(), name, wallet, percent: 10 };
+    let next = roles.map(r => ({ ...r, percent: Math.round((r.percent / 100) * 90 * 10) / 10 }));
+    next = [ ...next, base ];
+    let sum = next.reduce((s, r) => s + r.percent, 0);
+    if (Math.abs(sum - 100) > 0.1) next[0].percent += 100 - sum;
+    setRolesWithHistory(next);
+    setAddOpen(false);
   };
 
-  // Handle drag or +/- keyboard
   const handleResize = (i: number, newValue: number) => {
     if (newValue < 1) newValue = 1;
     if (newValue > 100) newValue = 100;
     const next = proportionalRebalance(roles, i, newValue);
-    pushHistory(next);
+    setRolesWithHistory(next);
   };
 
   // Pill +/- with keys
@@ -156,36 +165,18 @@ export const RoleAllocationPanel: React.FC<{}> = () => {
     window.removeEventListener("mouseup", onUp);
   }, []);
 
-  // Add Role modal logic
-  const handleAddRole = () => {
-    if (!newRole.name.trim()) return;
-    if (roles.length > 8) return; // Limit pills for now
-    // 1. Give 10% to new pill, rebalance rest to 90%
-    const base = { id: genId(), name: newRole.name, wallet: newRole.wallet, percent: 10 };
-    let next = roles.map(r => ({ ...r, percent: Math.round((r.percent / 100) * 90 * 10) / 10 }));
-    next = [ ...next, base ];
-    // Final normalize
-    let sum = next.reduce((s, r) => s + r.percent, 0);
-    if (Math.abs(sum - 100) > 0.1) next[0].percent += 100 - sum;
-    pushHistory(next);
-    setNewRole({ name: "", wallet: "" });
-    setAddOpen(false);
-  };
-
   // Remove role
   const handleRemove = (idx: number) => {
     if (roles.length === 1) return;
-    // Remove and spread among the others
     const removedPercent = roles[idx].percent;
     const remainers = roles.filter((_, i) => i !== idx);
     const total = remainers.reduce((s, r) => s + r.percent, 0);
     const next = remainers.map(r =>
       ({ ...r, percent: Math.round((r.percent + (r.percent / total) * removedPercent) * 10) / 10 })
     );
-    // Normalize
     let sum = next.reduce((s, r) => s + r.percent, 0);
     if (Math.abs(sum - 100) > 0.01) next[0].percent += 100 - sum;
-    pushHistory(next);
+    setRolesWithHistory(next);
   };
 
   // Preset dropdown
@@ -193,32 +184,15 @@ export const RoleAllocationPanel: React.FC<{}> = () => {
     const p = PRESETS.find(t => t.label === presetLabel);
     if (p) {
       setPreset(p.label);
-      setRoles(p.roles.map(r => ({
+      setRolesWithHistory(p.roles.map(r => ({
         id: genId(),
         name: r.name,
         wallet: "",
         percent: r.percent
       })));
-      setHistory([]);
-      setFuture([]);
     }
   };
 
-  // Undo/Redo
-  const undo = () => {
-    if (!history.length) return;
-    setFuture(f => [ roles, ...f ]);
-    setRoles(history[history.length - 1]);
-    setHistory(h => h.slice(0, h.length - 1));
-  };
-  const redo = () => {
-    if (!future.length) return;
-    setHistory(h => [ ...h, roles ]);
-    setRoles(future[0]);
-    setFuture(f => f.slice(1));
-  };
-
-  // ProgressBar coloring
   const barColor = sum === 100
     ? "bg-green-400"
     : sum < 100
@@ -230,10 +204,10 @@ export const RoleAllocationPanel: React.FC<{}> = () => {
       <div className="flex items-center gap-2 mb-2">
         <span className="font-bold text-lg">Crew Split</span>
         <div className="ml-auto flex items-center gap-1">
-          <button className="border p-1 rounded hover:bg-border" onClick={undo} disabled={!history.length}>
+          <button className="border p-1 rounded hover:bg-border" onClick={undo} disabled={!canUndo}>
             <Undo size={16} />
           </button>
-          <button className="border p-1 rounded hover:bg-border" onClick={redo} disabled={!future.length}>
+          <button className="border p-1 rounded hover:bg-border" onClick={redo} disabled={!canRedo}>
             <Redo size={16} />
           </button>
         </div>
@@ -311,36 +285,11 @@ export const RoleAllocationPanel: React.FC<{}> = () => {
           </div>
         ))}
       </div>
-      {/* Add Role Modal */}
-      {addOpen && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fade-in">
-          <div className="bg-[#242226] p-6 rounded-lg shadow-lg border border-border w-full max-w-xs relative">
-            <button className="absolute top-2 right-3 text-xl" onClick={() => setAddOpen(false)}>
-              ×
-            </button>
-            <h3 className="font-bold mb-2">Add Role</h3>
-            <input
-              placeholder="Role Name"
-              className="mb-2 w-full p-2 rounded bg-[#19191b] border border-border"
-              value={newRole.name}
-              onChange={e => setNewRole(r => ({ ...r, name: e.target.value }))}
-            />
-            <input
-              placeholder="Wallet Address"
-              className="mb-2 w-full p-2 rounded bg-[#19191b] border border-border"
-              value={newRole.wallet}
-              onChange={e => setNewRole(r => ({ ...r, wallet: e.target.value }))}
-            />
-            <button
-              className="accent-btn w-full mt-1"
-              onClick={handleAddRole}
-              disabled={!newRole.name.trim()}
-            >
-              Add
-            </button>
-          </div>
-        </div>
-      )}
+      <AddRoleModalStandalone
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onAdd={handleAddRole}
+      />
     </div>
   );
 };
