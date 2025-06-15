@@ -18,9 +18,9 @@ export const Wizard4AIContentSection: React.FC<Wizard4AIContentSectionProps> = (
 }) => (
   <div className="space-y-6">
     <div className="text-center space-y-2 mb-6">
-      <h3 className="text-xl font-bold">AI-Powered Content Generation</h3>
+      <h3 className="text-xl font-bold">Content Suite</h3>
       <p className="text-body-text/70">
-        Create professional marketing assets before launching your drop
+        Upload or create marketing assets for your drop here.
       </p>
     </div>
 

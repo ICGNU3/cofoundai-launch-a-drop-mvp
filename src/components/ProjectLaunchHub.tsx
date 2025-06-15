@@ -94,7 +94,7 @@ export const ProjectLaunchHub: React.FC<ProjectLaunchHubProps> = ({
       </div>
 
       <div className="p-8 flex flex-col gap-8">
-        {/* Zora Coin Link + Cover Art */}
+        {/* Cover Art Display */}
         <div className="flex flex-col md:flex-row items-center gap-8">
           {project.cover_art_url && (
             <div className="relative">

@@ -204,7 +204,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
           </TabsTrigger>
           <TabsTrigger value="ai-content" className="flex items-center gap-2">
             <Wand2 size={16} />
-            AI Content Suite
+            Content Suite
           </TabsTrigger>
         </TabsList>
 
@@ -235,6 +235,12 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
         </TabsContent>
 
         <TabsContent value="ai-content" className="space-y-6">
+          <div className="text-center space-y-2 mb-6">
+            <h3 className="text-xl font-bold">Content Suite</h3>
+            <p className="text-body-text/70">
+              Upload your marketing assets and copy for your drop here.
+            </p>
+          </div>
           <Wizard4AIContentSection
             projectIdea={projectIdea}
             projectType={projectType}
