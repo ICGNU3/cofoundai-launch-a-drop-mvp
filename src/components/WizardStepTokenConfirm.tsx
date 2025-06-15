@@ -28,7 +28,11 @@ export const WizardStepTokenConfirm: React.FC<WizardStepTokenConfirmProps> = ({
         </p>
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <button
-            className={`accent-btn px-4 md:px-6 py-3 transition-all text-sm md:text-base ${!doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text hover:bg-accent/10"}`}
+            className={`px-4 md:px-6 py-3 rounded-lg border-2 transition-all text-sm md:text-base font-semibold ${
+              !doAdvancedToken 
+                ? "bg-accent border-accent text-background" 
+                : "bg-black border-gray-600 text-body-text hover:border-accent/50"
+            }`}
             type="button"
             aria-pressed={!doAdvancedToken}
             onClick={() => {
@@ -39,7 +43,11 @@ export const WizardStepTokenConfirm: React.FC<WizardStepTokenConfirmProps> = ({
             No, use default token
           </button>
           <button
-            className={`accent-btn px-4 md:px-6 py-3 transition-all text-sm md:text-base ${doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text hover:bg-accent/10"}`}
+            className={`px-4 md:px-6 py-3 rounded-lg border-2 transition-all text-sm md:text-base font-semibold ${
+              doAdvancedToken 
+                ? "bg-accent border-accent text-background" 
+                : "bg-black border-gray-600 text-body-text hover:border-accent/50"
+            }`}
             type="button"
             aria-pressed={doAdvancedToken}
             onClick={() => {
