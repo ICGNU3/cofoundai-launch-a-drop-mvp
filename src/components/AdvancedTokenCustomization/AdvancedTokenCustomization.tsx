@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TokenNaming } from "./TokenNaming";
 import { SupplySchedule } from "./SupplySchedule";
 import { TokenTypeSelector } from "./TokenTypeSelector";
@@ -8,31 +7,39 @@ import { TokenUtility } from "./TokenUtility";
 import { TokenPreview } from "./TokenPreview";
 
 // Token customization master component (fits Zora V4 extensible principles)
-const AdvancedTokenCustomization: React.FC = () => {
-  // All token customization state
-  const [tokenName, setTokenName] = useState("");
-  const [tokenSymbol, setTokenSymbol] = useState("");
-  const [tokenType, setTokenType] = useState<"erc20" | "erc721">("erc20");
-  const [totalSupply, setTotalSupply] = useState<number>(1000000);
-  const [mintingType, setMintingType] = useState<"fixed" | "inflation" | "deflation">("fixed");
-  const [inflationRate, setInflationRate] = useState<number>(0);
-  const [deflationRate, setDeflationRate] = useState<number>(0);
+const AdvancedTokenCustomization: React.FC<{
+  initialState?: any;
+  onStateChange?: (state: any) => void;
+  showNav?: boolean;
+}> = ({
+  initialState,
+  onStateChange,
+  showNav = true,
+}) => {
+  // Accept external state if controlled
+  const [tokenName, setTokenName] = React.useState(initialState?.name || "");
+  const [tokenSymbol, setTokenSymbol] = React.useState(initialState?.symbol || "");
+  const [tokenType, setTokenType] = React.useState<"erc20" | "erc721">(initialState?.tokenType || "erc20");
+  const [totalSupply, setTotalSupply] = React.useState<number>(initialState?.totalSupply || 1000000);
+  const [mintingType, setMintingType] = React.useState<"fixed" | "inflation" | "deflation">(initialState?.mintingType || "fixed");
+  const [inflationRate, setInflationRate] = React.useState<number>(initialState?.inflationRate || 0);
+  const [deflationRate, setDeflationRate] = React.useState<number>(initialState?.deflationRate || 0);
 
   // Distribution (percentages must sum to 100)
-  const [distribution, setDistribution] = useState({
+  const [distribution, setDistribution] = React.useState(initialState?.distribution || {
     team: 20,
     treasury: 30,
     publicSale: 50,
   });
 
   // Vesting (simplified: months)
-  const [vesting, setVesting] = useState({
-    team: 12,      // months
-    early: 6,      // months
+  const [vesting, setVesting] = React.useState(initialState?.vesting || {
+    team: 12,
+    early: 6,
   });
 
-  // Utility: freeform text, checkboxes for common use cases
-  const [utility, setUtility] = useState({
+  // Utility
+  const [utility, setUtility] = React.useState(initialState?.utility || {
     governance: true,
     access: false,
     staking: false,
@@ -40,7 +47,24 @@ const AdvancedTokenCustomization: React.FC = () => {
   });
 
   // Step navigation
-  const [step, setStep] = useState(1);
+  const [step, setStep] = React.useState(1);
+
+  // Pass up state on any change
+  useEffect(() => {
+    onStateChange?.({
+      name: tokenName,
+      symbol: tokenSymbol,
+      tokenType,
+      totalSupply,
+      mintingType,
+      inflationRate,
+      deflationRate,
+      distribution,
+      vesting,
+      utility,
+    });
+    // eslint-disable-next-line
+  }, [tokenName, tokenSymbol, tokenType, totalSupply, mintingType, inflationRate, deflationRate, distribution, vesting, utility]);
 
   // For simulation preview step
   const canProceed = () => {
@@ -120,6 +144,7 @@ const AdvancedTokenCustomization: React.FC = () => {
           />
         }
       </div>
+      {!showNav && null}
     </div>
   );
 };

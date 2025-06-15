@@ -6,7 +6,6 @@ import FullWaveBackground from "@/components/FullWaveBackground";
 import { Web3WalletModule } from "@/components/Web3WalletModule";
 import { Wallet } from "lucide-react";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
-import AdvancedTokenCustomization from "@/components/AdvancedTokenCustomization/AdvancedTokenCustomization";
 import CreatorCarousel from "@/components/CreatorCarousel";
 import LiveCounterBar from "@/components/LiveCounterBar";
 import CrewSplitSliderDemo from "@/components/CrewSplitSliderDemo";
@@ -117,15 +116,6 @@ const Index: React.FC = () => {
         >
           <span className="inline-flex items-center gap-2">
             Launch a Drop
-          </span>
-        </AccentButton>
-        {/* NEW: Advanced Token Customization */}
-        <AccentButton
-          className="mt-2 px-8 py-3 text-base rounded-xl shadow-md bg-indigo-900/80 border-2 border-accent hover:bg-accent/90 transition"
-          onClick={() => setTokenModalOpen(true)}
-        >
-          <span className="inline-flex items-center gap-2">
-            Advanced Token Customization
           </span>
         </AccentButton>
         {/* CREATOR CAROUSEL */}

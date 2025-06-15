@@ -1,18 +1,58 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { X } from "lucide-react";
 import { WizardStep1Describe } from "./WizardStep1Describe";
 import WizardStep2Roles from "./WizardStep2Roles";
 import { WizardBudgetStep } from "./WizardBudgetStep";
 import { WizardStep4Success } from "./WizardStep4Success";
 import { useWizardState } from "@/hooks/useWizardState";
+import AdvancedTokenCustomization from "@/components/AdvancedTokenCustomization/AdvancedTokenCustomization";
 
-type WizardModalProps = {
+// NEW: Token Customization Confirmation Step
+function WizardStepTokenConfirm({
+  doAdvancedToken,
+  setDoAdvancedToken,
+  onNext,
+  onBack,
+}: {
+  doAdvancedToken: boolean,
+  setDoAdvancedToken: (v: boolean) => void,
+  onNext: () => void,
+  onBack: () => void,
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center h-full py-12">
+      <h2 className="text-xl font-bold mb-4">Customize Your Token?</h2>
+      <p className="max-w-md text-center mb-6 text-body-text/80">
+        Would you like to deeply customize your project's associated token—supply, distribution, vesting, and utility—or use a simple default token template? (Recommended for advanced users. <span className="text-gold">Optional</span>)
+      </p>
+      <div className="flex gap-4 mb-4">
+        <button
+          className={`accent-btn ${doAdvancedToken ? "" : "secondary"} px-6`}
+          onClick={() => setDoAdvancedToken(false)}
+        >
+          No, use default token
+        </button>
+        <button
+          className={`accent-btn ${doAdvancedToken ? "bg-accent" : ""} px-6`}
+          onClick={() => setDoAdvancedToken(true)}
+        >
+          Yes, customize token
+        </button>
+      </div>
+      <div className="flex justify-between mt-6 w-full max-w-xs">
+        <button className="accent-btn secondary" onClick={onBack}>← Back</button>
+        <button className="accent-btn" onClick={onNext}>Next</button>
+      </div>
+    </div>
+  );
+}
+
+export const WizardModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   walletAddress: string | null;
-};
-
-export const WizardModal: React.FC<WizardModalProps> = ({
+}> = ({
   isOpen,
   onClose,
   walletAddress,
@@ -27,22 +67,37 @@ export const WizardModal: React.FC<WizardModalProps> = ({
     saveExpense,
     removeExpense,
     loadDefaultRoles,
+    setTokenCustomization, // NEW
+    setDoAdvancedToken,    // NEW
   } = useWizardState();
+
+  // Local state to hold advanced token customization from AdvancedTokenCustomization (step 5)
+  const [tokenState, setTokenState] = useState<any>(null);
 
   if (!isOpen) return null;
 
+  // ADAPT: Step mapping
+  // 1 = describe, 2 = roles, 3 = budget, 4 = token confirm, 5 = advanced config, 6 = launch/success
+  const isFinalStep = () => state.step === (state.doAdvancedToken ? 6 : 5);
+
+  // Navigation logic
   const handleNext = () => {
-    if (state.step < 4) {
-      setStep((state.step + 1) as typeof state.step);
+    // If at token confirm, go to advanced or skip
+    if (state.step === 4) {
+      if (state.doAdvancedToken) setStep(5);
+      else setStep(6);
+    } else if (isFinalStep()) {
+      // stay
+    } else {
+      setStep((state.step + 1) as any);
     }
   };
-
   const handleBack = () => {
-    if (state.step > 1) {
-      setStep((state.step - 1) as typeof state.step);
-    }
+    // If at token confirm, go back to budget
+    if (state.step === 4) setStep(3);
+    else if (state.step === 5 && state.doAdvancedToken) setStep(4);
+    else if (state.step > 1) setStep((state.step - 1) as any);
   };
-
   const handleRestart = () => {
     setStep(1);
     setField("projectIdea", "");
@@ -50,22 +105,22 @@ export const WizardModal: React.FC<WizardModalProps> = ({
     setField("roles", []);
     setField("expenses", []);
     setField("pledgeUSDC", "");
+    setDoAdvancedToken(false);
+    setTokenCustomization(undefined);
   };
 
   const getStepTitle = () => {
-    switch (state.step) {
-      case 1: return "Describe Your Project";
-      case 2: return "Define Roles & Revenue Split";
-      case 3: return "Budget Breakdown";
-      case 4: return "Launch Your Drop";
-      default: return "Create Your Drop";
-    }
+    if (state.step === 1) return "Describe Your Project";
+    if (state.step === 2) return "Define Roles & Revenue Split";
+    if (state.step === 3) return "Budget Breakdown";
+    if (state.step === 4) return "Token Customization";
+    if (state.step === 5 && state.doAdvancedToken) return "Advanced Token Customization";
+    if (state.step === (state.doAdvancedToken ? 6 : 5)) return "Launch Your Drop";
+    return "Create Your Drop";
   };
 
-  const canProceedStep1 = state.projectIdea.trim().length > 0;
-  const canProceedStep2 = state.roles.length > 0 && 
-    Math.abs(state.roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0) - 100) < 0.1;
-  const canProceedStep3 = canProceedStep2 && Number(state.pledgeUSDC) > 0;
+  // Progress Indicator
+  const totalSteps = state.doAdvancedToken ? 6 : 5;
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -75,7 +130,7 @@ export const WizardModal: React.FC<WizardModalProps> = ({
           <div>
             <h2 className="text-2xl font-bold text-headline">{getStepTitle()}</h2>
             <div className="text-sm text-body-text/70 mt-1">
-              Step {state.step} of 4
+              Step {state.step} of {totalSteps}
             </div>
           </div>
           <button
@@ -85,11 +140,10 @@ export const WizardModal: React.FC<WizardModalProps> = ({
             <X size={24} />
           </button>
         </div>
-
         {/* Progress Indicator */}
         <div className="px-6 py-3 border-b border-border">
           <div className="flex gap-2">
-            {[1, 2, 3, 4].map((stepNum) => (
+            {Array.from({ length: totalSteps }, (_, i) => i + 1).map((stepNum) => (
               <div
                 key={stepNum}
                 className={`flex-1 h-2 rounded-full ${
@@ -103,7 +157,6 @@ export const WizardModal: React.FC<WizardModalProps> = ({
             ))}
           </div>
         </div>
-
         {/* Content */}
         <div className="flex-1 overflow-hidden">
           {state.step === 1 && (
@@ -112,11 +165,10 @@ export const WizardModal: React.FC<WizardModalProps> = ({
               projectType={state.projectType}
               onSetField={setField}
               onLoadDefaultRoles={loadDefaultRoles}
-              canProceed={canProceedStep1}
+              canProceed={state.projectIdea && !!state.projectIdea.trim()}
               onNext={handleNext}
             />
           )}
-
           {state.step === 2 && (
             <div className="h-full max-h-[calc(90vh-152px)] flex flex-col">
               <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4" style={{ scrollbarGutter: "stable" }}>
@@ -133,7 +185,6 @@ export const WizardModal: React.FC<WizardModalProps> = ({
               </div>
             </div>
           )}
-
           {state.step === 3 && (
             <WizardBudgetStep
               state={state}
@@ -141,12 +192,33 @@ export const WizardModal: React.FC<WizardModalProps> = ({
               onSaveExpense={saveExpense}
               onRemoveExpense={removeExpense}
               onSetField={setField}
+              onNext={() => setStep(4)}
+              onBack={handleBack}
+            />
+          )}
+          {/* NEW: Token customization branching step */}
+          {state.step === 4 && (
+            <WizardStepTokenConfirm
+              doAdvancedToken={!!state.doAdvancedToken}
+              setDoAdvancedToken={setDoAdvancedToken}
               onNext={handleNext}
               onBack={handleBack}
             />
           )}
-
-          {state.step === 4 && (
+          {/* NEW: Advanced config - only if chosen */}
+          {state.doAdvancedToken && state.step === 5 && (
+            <div className="overflow-y-auto px-6 py-4 h-full">
+              <AdvancedTokenCustomizationWrapper
+                state={state}
+                setTokenCustomization={setTokenCustomization}
+                setStep={setStep}
+                onBack={handleBack}
+                onNext={handleNext}
+              />
+            </div>
+          )}
+          {/* Final launch step */}
+          {state.step === (state.doAdvancedToken ? 6 : 5) && (
             <WizardStep4Success
               projectIdea={state.projectIdea}
               projectType={state.projectType}
@@ -154,6 +226,7 @@ export const WizardModal: React.FC<WizardModalProps> = ({
               expenses={state.expenses}
               pledgeUSDC={state.pledgeUSDC}
               walletAddress={walletAddress}
+              tokenCustomization={state.doAdvancedToken ? state.tokenCustomization : undefined}
               onRestart={handleRestart}
             />
           )}
@@ -162,3 +235,41 @@ export const WizardModal: React.FC<WizardModalProps> = ({
     </div>
   );
 };
+
+// --- NEW: wrap AdvancedTokenCustomization to save its state into Wizard context on completion ---
+function AdvancedTokenCustomizationWrapper({ state, setTokenCustomization, setStep, onBack, onNext }: any) {
+  // lift state into wizard context
+  const [local, setLocal] = React.useState(
+    state.tokenCustomization || {
+      name: "",
+      symbol: "",
+      tokenType: "erc20",
+      totalSupply: 1000000,
+      mintingType: "fixed",
+      inflationRate: 0,
+      deflationRate: 0,
+      distribution: { team: 20, treasury: 30, publicSale: 50 },
+      vesting: { team: 12, early: 6 },
+      utility: { governance: true, access: false, staking: false, custom: "" },
+    }
+  );
+  function handleDone() {
+    setTokenCustomization(local);
+    onNext();
+  }
+  return (
+    <div>
+      <AdvancedTokenCustomization
+        initialState={local}
+        onStateChange={setLocal}
+        showNav={false}
+      />
+      <div className="flex justify-between mt-6">
+        <button className="accent-btn secondary" onClick={onBack}>← Back</button>
+        <button className="accent-btn" type="button" onClick={handleDone}>
+          Next: Launch
+        </button>
+      </div>
+    </div>
+  );
+}

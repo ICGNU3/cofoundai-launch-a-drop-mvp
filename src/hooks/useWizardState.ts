@@ -3,7 +3,7 @@ import React from "react";
 // --- UPDATED: Add payoutType ---
 export type PayoutType = "immediate" | "uponOutcome";
 // Update WizardStep to allow 1, 2, 3, **4** (so step 4 'success' works)
-export type WizardStep = 1 | 2 | 3 | 4;
+export type WizardStep = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface Role {
   roleName: string;
@@ -25,7 +25,7 @@ export interface Expense {
 export type ProjectType = "Music" | "Film" | "Fashion" | "Art" | "Other";
 
 export interface WizardStateData {
-  step: WizardStep;
+  step: WizardStep; // We'll update the WizardStep type below
   projectIdea: string;
   projectType: ProjectType;
   roles: Role[];
@@ -35,7 +35,26 @@ export interface WizardStateData {
   pledgeUSDC: string;
   walletAddress: string | null;
   isWizardOpen: boolean;
-  coverBase64?: string | null; // ADDED: Uploaded cover art base64 string
+  coverBase64?: string | null;
+  // --- NEW: Token customization fields ---
+  doAdvancedToken?: boolean;
+  tokenCustomization?: {
+    name: string;
+    symbol: string;
+    tokenType: "erc20" | "erc721";
+    totalSupply: number;
+    mintingType: "fixed" | "inflation" | "deflation";
+    inflationRate: number;
+    deflationRate: number;
+    distribution: { team: number; treasury: number; publicSale: number };
+    vesting: { team: number; early: number };
+    utility: {
+      governance: boolean;
+      access: boolean;
+      staking: boolean;
+      custom: string;
+    };
+  };
 }
 
 const defaultIdea = "Lo-Fi Night Drive EP";
@@ -61,7 +80,10 @@ export function useWizardState() {
     pledgeUSDC: "",
     walletAddress: null,
     isWizardOpen: false,
-    coverBase64: null, // ADDED
+    coverBase64: null,
+    // --- NEW: Add advanced token customization defaults ---
+    doAdvancedToken: false,
+    tokenCustomization: undefined,
   });
 
   const setStep = (step: WizardStep) => setState(s => ({ ...s, step }));
@@ -212,6 +234,14 @@ export function useWizardState() {
   const openWizard = () => setField("isWizardOpen", true);
   const closeWizard = () => setField("isWizardOpen", false);
 
+  // NEW: Token customization state helpers
+  function setTokenCustomization(tc: WizardStateData["tokenCustomization"]) {
+    setState(s => ({ ...s, tokenCustomization: tc }));
+  }
+  function setDoAdvancedToken(val: boolean) {
+    setState(s => ({ ...s, doAdvancedToken: val }));
+  }
+
   return {
     state,
     setState,
@@ -225,5 +255,7 @@ export function useWizardState() {
     saveExpense,
     removeExpense,
     loadDefaultRoles,
+    setTokenCustomization,   // NEW
+    setDoAdvancedToken,      // NEW
   };
 }
