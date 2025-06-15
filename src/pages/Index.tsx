@@ -82,23 +82,7 @@ const Index: React.FC = () => {
   }
 
   // Optionally: carousel auto-scroll
-  useEffect(() => {
-    // CSS scroll
-    const el = carouselRef.current;
-    if (el && carousel.length > 1) {
-      let frame: number | undefined;
-      let dir = 1;
-      function scrollStep() {
-        let max = el.scrollWidth - el.clientWidth;
-        if (el.scrollLeft >= max) dir = -1;
-        if (el.scrollLeft <= 0) dir = 1;
-        el.scrollLeft += 0.3 * dir;
-        frame = requestAnimationFrame(scrollStep);
-      }
-      frame = requestAnimationFrame(scrollStep);
-      return () => frame && cancelAnimationFrame(frame);
-    }
-  }, [carousel.length]);
+  // (Removed - this logic is now handled inside CreatorCarousel, so no need for carouselRef here)
 
   return (
     <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-x-hidden">
