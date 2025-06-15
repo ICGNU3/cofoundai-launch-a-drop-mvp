@@ -10,6 +10,7 @@ type RoleManagementSectionProps = {
   onEditRole: (idx: number) => void;
   onRemoveRole: (idx: number) => void;
   onAddRole: () => void;
+  onUpdateRolePercent?: (idx: number, newPercent: number) => void;
 };
 
 export const RoleManagementSection: React.FC<RoleManagementSectionProps> = ({
@@ -17,6 +18,7 @@ export const RoleManagementSection: React.FC<RoleManagementSectionProps> = ({
   onEditRole,
   onRemoveRole,
   onAddRole,
+  onUpdateRolePercent,
 }) => {
   const sumPercent = roles.reduce((sum, r) => sum + r.percent, 0);
 
@@ -29,6 +31,7 @@ export const RoleManagementSection: React.FC<RoleManagementSectionProps> = ({
         onEditRole={onEditRole}
         onRemoveRole={onRemoveRole}
         onAddRole={onAddRole}
+        onUpdateRolePercent={onUpdateRolePercent}
       />
 
       <RolePercentageStatus sumPercent={sumPercent} />

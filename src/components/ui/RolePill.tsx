@@ -6,9 +6,10 @@ export type RolePillProps = {
   role: { roleName: string, percent: number; };
   onEdit?: () => void;
   onDelete?: () => void;
+  onPercentChange?: (newPercent: number) => void;
 };
 
-export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete }) => {
+export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete, onPercentChange }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [percentStr, setPercentStr] = useState(role.percent.toString());
 
@@ -22,9 +23,16 @@ export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete }) =>
 
   const handleBlur = () => {
     setIsEditing(false);
-    // Convert back to number and validate
-    const numValue = parseInt(percentStr) || 0;
-    setPercentStr(Math.min(100, Math.max(0, numValue)).toString());
+    const parsed = parseInt(percentStr, 10);
+    const final = isNaN(parsed) ? 0 : Math.min(parsed, 100);
+    
+    // Update the role's percent if we have a callback
+    if (onPercentChange) {
+      onPercentChange(final);
+    }
+    
+    // Sync string state
+    setPercentStr(final.toString());
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -36,6 +44,11 @@ export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete }) =>
       setIsEditing(false);
     }
   };
+
+  // Sync with role prop changes
+  React.useEffect(() => {
+    setPercentStr(role.percent.toString());
+  }, [role.percent]);
 
   return (
     <span

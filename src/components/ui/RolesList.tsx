@@ -8,6 +8,7 @@ type RolesListProps = {
   onEditRole: (idx: number) => void;
   onRemoveRole: (idx: number) => void;
   onAddRole: () => void;
+  onUpdateRolePercent?: (idx: number, newPercent: number) => void;
 };
 
 export const RolesList: React.FC<RolesListProps> = ({
@@ -15,6 +16,7 @@ export const RolesList: React.FC<RolesListProps> = ({
   onEditRole,
   onRemoveRole,
   onAddRole,
+  onUpdateRolePercent,
 }) => {
   return (
     <div className="mb-2 flex flex-wrap gap-2">
@@ -24,6 +26,7 @@ export const RolesList: React.FC<RolesListProps> = ({
           role={role}
           onEdit={() => onEditRole(i)}
           onDelete={() => onRemoveRole(i)}
+          onPercentChange={onUpdateRolePercent ? (newPercent) => onUpdateRolePercent(i, newPercent) : undefined}
         />
       ))}
       <button
