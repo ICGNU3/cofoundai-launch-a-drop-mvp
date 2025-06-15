@@ -1,8 +1,8 @@
-
 import React, { useState } from "react";
 import { Share2, Download, Copy, ExternalLink, BarChart3, Users, DollarSign, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AccentButton } from "./ui/AccentButton";
+import { Link } from "react-router-dom";
 
 interface ProjectLaunchHubProps {
   project: {
@@ -30,7 +30,14 @@ export const ProjectLaunchHub: React.FC<ProjectLaunchHubProps> = ({
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"overview" | "analytics" | "share">("overview");
 
-  const shareableText = `🚀 Just launched my new ${project.project_type.toLowerCase()} drop: "${project.project_idea}"!\n\nCheck it out: ${window.location.origin}/project/${project.id}${project.zora_coin_url ? `\n\n🎨 Mint on Zora: ${project.zora_coin_url}` : ""}`;
+  // Celebration logic
+  // Add simple animation/confetti
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const shareableText =
+    `🚀 Just launched my new ${project.project_type.toLowerCase()} drop: "${project.project_idea}"!\n\nCheck it out: ${window.location.origin}/project/${project.id}${project.zora_coin_url ? `\n\n🎨 Mint on Zora: ${project.zora_coin_url}` : ""}`;
 
   const handleCopyShareableText = () => {
     navigator.clipboard.writeText(shareableText);
@@ -76,166 +83,150 @@ export const ProjectLaunchHub: React.FC<ProjectLaunchHubProps> = ({
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6 space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="text-2xl font-bold text-headline">🎉 Drop Launched Successfully!</div>
-        <div className="text-body-text/70">Your project is now live and ready to share with the world</div>
+    <div className="bg-card border border-border rounded-lg p-0 shadow-xl max-w-3xl w-full overflow-hidden">
+      {/* Celebratory Header */}
+      <div className="bg-gradient-to-r from-purple-500 via-accent to-primary text-white py-8 px-4 text-center relative">
+        <div className="absolute left-0 right-0 flex justify-center -top-8">
+          <span className="text-7xl">🎉</span>
+        </div>
+        <h2 className="text-3xl font-headline font-bold mb-2 mt-6">All Systems Go!</h2>
+        <div className="text-lg font-medium">Your Drop Has Been Successfully Launched!</div>
       </div>
 
-      {/* Cover Art & Basic Info */}
-      <div className="flex flex-col md:flex-row items-center gap-6">
-        {project.cover_art_url && (
-          <div className="relative">
-            <img 
-              src={project.cover_art_url} 
-              alt="Cover Art" 
-              className="w-32 h-32 rounded-lg object-cover border border-border"
-            />
-            <button
-              onClick={handleDownloadCoverArt}
-              className="absolute -top-2 -right-2 w-8 h-8 bg-accent rounded-full flex items-center justify-center hover:bg-accent/80 transition"
-            >
-              <Download size={14} className="text-white" />
-            </button>
-          </div>
-        )}
-        
-        <div className="flex-1 text-center md:text-left">
-          <h3 className="text-xl font-semibold text-body-text mb-2">{project.project_idea}</h3>
-          <p className="text-body-text/70 mb-3">{project.project_type} Drop</p>
-          
-          {project.zora_coin_url && (
-            <a 
-              href={project.zora_coin_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-accent hover:text-accent/80 text-sm"
-            >
-              <ExternalLink size={14} />
-              View on Zora
-            </a>
-          )}
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="border-b border-border">
-        <div className="flex gap-6">
-          {[
-            { key: "overview", label: "Overview", icon: BarChart3 },
-            { key: "analytics", label: "Analytics", icon: TrendingUp },
-            { key: "share", label: "Share", icon: Share2 }
-          ].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
-              className={`flex items-center gap-2 px-4 py-2 border-b-2 transition ${
-                activeTab === tab.key
-                  ? "border-accent text-accent"
-                  : "border-transparent text-body-text/70 hover:text-body-text"
-              }`}
-            >
-              <tab.icon size={16} />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === "overview" && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-background/50 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-green-400">{analytics.views}</div>
-            <div className="text-sm text-body-text/70">Views</div>
-          </div>
-          <div className="bg-background/50 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-blue-400">{analytics.shares}</div>
-            <div className="text-sm text-body-text/70">Shares</div>
-          </div>
-          <div className="bg-background/50 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-purple-400">{analytics.collaborators}</div>
-            <div className="text-sm text-body-text/70">Collaborators</div>
-          </div>
-          <div className="bg-background/50 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-accent">{analytics.fundingProgress.toFixed(0)}%</div>
-            <div className="text-sm text-body-text/70">Funded</div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "analytics" && (
-        <div className="space-y-4">
-          <div className="bg-background/50 rounded-lg p-4">
-            <h4 className="font-semibold mb-3">Funding Progress</h4>
-            <div className="w-full bg-border rounded-full h-3">
-              <div 
-                className="bg-accent h-3 rounded-full transition-all duration-300" 
-                style={{ width: `${Math.min(analytics.fundingProgress, 100)}%` }}
+      <div className="p-8 flex flex-col gap-8">
+        {/* Zora Coin Link + Cover Art */}
+        <div className="flex flex-col md:flex-row items-center gap-8">
+          {project.cover_art_url && (
+            <div className="relative">
+              <img
+                src={project.cover_art_url}
+                alt="Drop Cover Art"
+                className="w-40 h-40 md:w-52 md:h-52 rounded-lg object-cover border-4 border-accent shadow-lg bg-white"
               />
+              <button
+                onClick={handleDownloadCoverArt}
+                className="absolute -top-2 -right-2 w-8 h-8 bg-accent rounded-full flex items-center justify-center hover:bg-accent/80 transition"
+                aria-label="Download Cover Art"
+              >
+                <Download size={14} className="text-white" />
+              </button>
             </div>
-            <div className="text-sm text-body-text/70 mt-2">
-              ${project.funding_total || 0} / ${project.funding_target} USDC
+          )}
+
+          <div className="flex-1 text-center md:text-left">
+            {project.zora_coin_url && (
+              <a
+                href={project.zora_coin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-lg text-accent hover:text-accent/80 font-semibold underline mb-2"
+              >
+                <ExternalLink size={20} />
+                View Your Coin on Zora
+              </a>
+            )}
+            <div className="mt-4 mb-2">
+              <span className="font-bold text-xl">{project.project_idea}</span>
+              <div className="text-sm text-body-text/70 mb-1">{project.project_type} Drop</div>
             </div>
-          </div>
-          
-          <div className="bg-background/50 rounded-lg p-4">
-            <h4 className="font-semibold mb-3">Recent Activity</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-body-text/70">Project launched</span>
-                <span className="text-green-400">Just now</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-body-text/70">Cover art generated</span>
-                <span className="text-blue-400">2 min ago</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-body-text/70">Token minted</span>
-                <span className="text-purple-400">3 min ago</span>
-              </div>
+            <div className="mb-3">
+              {project.funding_total ? (
+                <span className="font-mono text-accent text-lg">${Number(project.funding_total).toLocaleString()}</span>
+              ) : (
+                <span className="font-mono text-accent text-lg">$0</span>
+              )}
+              <span className="ml-2 text-sm text-body-text/70">funded of</span>
+              <span className="ml-2 font-mono">${Number(project.funding_target).toLocaleString()} USDC</span>
             </div>
           </div>
         </div>
-      )}
 
-      {activeTab === "share" && (
-        <div className="space-y-6">
-          {/* Shareable Text */}
-          <div className="space-y-3">
-            <h4 className="font-semibold">Shareable Copy</h4>
-            <div className="bg-background/50 border border-border rounded-lg p-4">
-              <pre className="text-sm text-body-text whitespace-pre-wrap font-sans">
-                {shareableText}
-              </pre>
-            </div>
-            <AccentButton onClick={handleCopyShareableText} className="w-full">
-              <Copy size={16} />
-              Copy Shareable Text
-            </AccentButton>
-          </div>
-
-          {/* Platform Sharing */}
-          <div className="space-y-3">
-            <h4 className="font-semibold">Share on Platforms</h4>
-            <div className="grid gap-3">
+        {/* Shareable Copy & Social */}
+        <div className="space-y-5">
+          <h4 className="font-semibold text-lg">Share Your Drop</h4>
+          <div className="bg-background/80 border border-border rounded-lg p-4 shadow-sm space-y-3">
+            <pre className="text-sm text-body-text whitespace-pre-wrap font-sans mb-3">{shareableText}</pre>
+            <div className="flex flex-col gap-2 md:flex-row md:gap-3">
+              <button
+                onClick={handleCopyShareableText}
+                className="flex items-center justify-center bg-accent text-white px-4 py-2 rounded-md font-medium gap-2 hover:bg-accent/80 transition"
+              >
+                <Copy size={16} />
+                Copy Shareable Text
+              </button>
               {platformShares.map(platform => (
                 <a
                   key={platform.name}
                   href={platform.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${platform.color} text-white px-4 py-3 rounded-lg hover:opacity-80 transition flex items-center justify-center gap-2`}
+                  className={`${platform.color} text-white px-4 py-2 rounded-md hover:opacity-80 transition flex items-center justify-center gap-2 font-medium`}
                 >
                   <Share2 size={16} />
-                  Share on {platform.name}
+                  {platform.name}
                 </a>
               ))}
             </div>
           </div>
         </div>
-      )}
+
+        {/* Project Details Summary */}
+        <div>
+          <h4 className="font-semibold text-lg mb-2">Project Overview</h4>
+          <div className="grid gap-2 md:grid-cols-2">
+            <div>
+              <div className="font-medium">Idea</div>
+              <div className="text-body-text/90 mb-2">{project.project_idea}</div>
+              <div className="font-medium">Type</div>
+              <div className="text-body-text/70 mb-2">{project.project_type}</div>
+            </div>
+            <div>
+              <div className="font-medium mb-1">Team Roles</div>
+              <ul className="flex flex-wrap gap-2">
+                {roles && roles.length > 0 ? (
+                  roles.map((role) => (
+                    <li
+                      key={role.id}
+                      className="bg-accent/10 rounded px-2 py-1 text-sm text-accent font-mono font-semibold"
+                    >
+                      {role.name}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-body-text/50">No roles defined.</li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Next Steps/CTA */}
+        <div className="space-y-3">
+          <h4 className="font-bold text-lg">Next Steps</h4>
+          <ul className="list-disc pl-6 text-body-text/90 space-y-1">
+            <li>
+              <span className="font-semibold text-accent">Share your Drop</span> on social media or with your team for more visibility.
+            </li>
+            <li>
+              <Link to={`/project/${project.id}/dashboard`} className="text-accent underline hover:text-accent/80">
+                View Drop Dashboard
+              </Link>
+              {" "} to monitor, manage, and update your Drop.
+            </li>
+            <li>
+              <Link to="/dashboard" className="text-accent underline hover:text-accent/80">
+                Go to My Projects
+              </Link>
+              {" "} to launch or review more Drops.
+            </li>
+            <li>
+              <a href="https://docs.lovable.dev/faq" target="_blank" rel="noopener noreferrer" className="text-accent underline hover:text-accent/80">
+                Explore the community FAQ / Get support
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };

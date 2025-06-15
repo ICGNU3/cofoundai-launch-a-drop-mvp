@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -122,15 +121,13 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
     }
   }, [projectId, currentStep]);
 
-  // Auto-navigate to project dashboard when minting is complete
+  // NEW: Redirect to Project Launch Hub after minting is complete
   useEffect(() => {
-    if (projectId && currentStep === "complete") {
-      const timer = setTimeout(() => {
-        navigate(`/project/${projectId}/dashboard`);
-      }, 2000);
-      return () => clearTimeout(timer);
+    if (projectRow && currentStep === "complete" && projectRow.id) {
+      // Remove delay: go directly to launch hub!
+      navigate(`/project/${projectRow.id}/launch`);
     }
-  }, [projectId, currentStep, navigate]);
+  }, [projectRow, currentStep, navigate]);
 
   // Share button handler
   const handleShareDrop = () => {

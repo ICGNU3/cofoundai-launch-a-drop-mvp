@@ -10,6 +10,7 @@ import ProjectOverview from "./pages/ProjectOverview";
 import ProjectDashboard from "./pages/ProjectDashboard";
 import ProjectWorkspace from "./pages/ProjectWorkspace";
 import NotFound from "./pages/NotFound";
+import { ProjectLaunchHubRoute } from "@/pages/ProjectLaunchHubRoute";
 
 // --- Wagmi imports for v2+ ---
 import { WagmiProvider, createConfig, http } from "wagmi";
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/project/:projectId" element={<ProjectOverview />} />
               <Route path="/project/:projectId/dashboard" element={<ProjectDashboard />} />
+              <Route path="/project/:projectId/launch" element={<ProjectLaunchHubRoute />} />
               <Route path="/workspace/:projectId" element={<ProjectWorkspace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
