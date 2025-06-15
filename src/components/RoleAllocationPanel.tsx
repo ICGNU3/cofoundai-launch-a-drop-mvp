@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Plus, Undo, Redo } from "lucide-react";
-import { ProgressBar } from "./ui/PercentBar";
+// Removed unused ProgressBar import
+// import { ProgressBar } from "./ui/PercentBar";
 import { cn } from "@/lib/utils";
 
-type Role = {
+export type Role = {
   id: string;
   name: string;
   wallet: string;
