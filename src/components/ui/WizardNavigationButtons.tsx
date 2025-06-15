@@ -4,7 +4,7 @@ import { AccentButton } from "./AccentButton";
 
 type WizardNavigationButtonsProps = {
   canProceed: boolean;
-  onBack: () => void;
+  onBack?: () => void;
   onNext: () => void;
   nextLabel?: string;
 };
@@ -17,16 +17,18 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
 }) => {
   return (
     <div className="flex gap-2">
+      {onBack && (
+        <AccentButton
+          secondary
+          className="w-1/2"
+          onClick={onBack}
+          type="button"
+        >
+          ← Back
+        </AccentButton>
+      )}
       <AccentButton
-        secondary
-        className="w-1/2"
-        onClick={onBack}
-        type="button"
-      >
-        ← Back
-      </AccentButton>
-      <AccentButton
-        className="w-1/2"
+        className={onBack ? "w-1/2" : "w-full"}
         disabled={!canProceed}
         onClick={onNext}
         type="button"

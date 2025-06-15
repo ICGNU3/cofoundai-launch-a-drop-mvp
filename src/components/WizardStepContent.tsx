@@ -51,19 +51,17 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
   switch (state.step) {
     case 1:
       return (
-        <div className="h-full overflow-y-auto px-6 py-4">
-          <WizardStep1Describe
-            projectIdea={state.projectIdea}
-            projectType={state.projectType}
-            mode={state.mode}
-            walletAddress={walletAddress}
-            onSetField={setField}
-            onSetMode={setMode}
-            onLoadDefaultRoles={loadDefaultRoles}
-            canProceed={state.projectIdea && !!state.projectIdea.trim()}
-            onNext={() => setStep(2)}
-          />
-        </div>
+        <WizardStep1Describe
+          projectIdea={state.projectIdea}
+          projectType={state.projectType}
+          mode={state.mode}
+          walletAddress={walletAddress}
+          onSetField={setField}
+          onSetMode={setMode}
+          onLoadDefaultRoles={loadDefaultRoles}
+          canProceed={state.projectIdea && !!state.projectIdea.trim()}
+          onNext={() => setStep(2)}
+        />
       );
     case 2:
       return (
@@ -83,17 +81,15 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
       );
     case 3:
       return (
-        <div className="h-full overflow-y-auto">
-          <WizardBudgetStep
-            state={state}
-            onUpdateRolePercent={updateRolePercent}
-            onSaveExpense={saveExpense}
-            onRemoveExpense={removeExpense}
-            onSetField={setField}
-            onNext={() => setStep(4)}
-            onBack={() => setStep(2)}
-          />
-        </div>
+        <WizardBudgetStep
+          state={state}
+          onUpdateRolePercent={updateRolePercent}
+          onSaveExpense={saveExpense}
+          onRemoveExpense={removeExpense}
+          onSetField={setField}
+          onNext={() => setStep(4)}
+          onBack={() => setStep(2)}
+        />
       );
     case 4:
       return (
