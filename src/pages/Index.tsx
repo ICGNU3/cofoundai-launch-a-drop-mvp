@@ -1,18 +1,30 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
 import { AccentButton } from "@/components/ui/AccentButton";
 import FullWaveBackground from "@/components/FullWaveBackground";
+import { Web3WalletModule } from "@/components/Web3WalletModule";
+import { Wallet } from "lucide-react";
 
 const Index: React.FC = () => {
   const wizard = useWizardState();
+  const [walletOpen, setWalletOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-body-text flex items-center justify-center relative overflow-x-hidden">
       <FullWaveBackground />
       <div className="w-full flex flex-col items-center px-2 z-10 relative">
         <div className="card flex flex-col items-center text-center mt-10 wizard-card shadow-lg bg-opacity-95 backdrop-blur-sm">
+          <div className="flex justify-end w-full pr-2 pt-2">
+            <button
+              onClick={() => setWalletOpen(true)}
+              className="rounded-lg p-2 bg-black/10 hover:bg-accent/20 text-accent transition-all"
+              aria-label="Open Wallet"
+            >
+              <Wallet size={20} />
+            </button>
+          </div>
           <h1 className="text-center font-headline font-bold text-[36px] leading-[1.2] text-headline py-8">
             <span className="bg-gradient-to-r from-[#5D5FEF] to-[#9A4DFF] bg-clip-text text-transparent">
               Launch a Drop
@@ -36,6 +48,7 @@ const Index: React.FC = () => {
         onClose={wizard.closeWizard}
         walletAddress={null}
       />
+      <Web3WalletModule open={walletOpen} onClose={() => setWalletOpen(false)} />
     </div>
   );
 };

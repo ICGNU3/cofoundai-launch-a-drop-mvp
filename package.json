@@ -44,6 +44,7 @@
     "@safe-global/safe-core-sdk": "^3.3.5",
     "@supabase/supabase-js": "^2.50.0",
     "@tanstack/react-query": "^5.56.2",
+    "@wagmi/core": "^2.17.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
