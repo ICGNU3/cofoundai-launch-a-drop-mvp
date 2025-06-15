@@ -1,9 +1,13 @@
+
 import React from "react";
 
 // --- UPDATED: Add payoutType ---
 export type PayoutType = "immediate" | "uponOutcome";
 // Update WizardStep to allow 1, 2, 3, **4** (so step 4 'success' works)
 export type WizardStep = 1 | 2 | 3 | 4 | 5 | 6;
+
+// Add mode type
+export type ProjectMode = "solo" | "team";
 
 export interface Role {
   roleName: string;
@@ -28,6 +32,7 @@ export interface WizardStateData {
   step: WizardStep; // We'll update the WizardStep type below
   projectIdea: string;
   projectType: ProjectType;
+  mode: ProjectMode; // NEW: solo or team mode
   roles: Role[];
   editingRoleIdx: number | null;
   expenses: Expense[];
@@ -73,6 +78,7 @@ export function useWizardState() {
     step: 1,
     projectIdea: defaultIdea,
     projectType: "Music",
+    mode: "team", // NEW: default to team mode
     roles: [defaultRole("Artist", 70), defaultRole("Producer", 30)],
     editingRoleIdx: null,
     expenses: [],
@@ -231,6 +237,20 @@ export function useWizardState() {
     setState(s => ({ ...s, roles: presets }));
   };
 
+  // NEW: Initialize roles based on mode
+  const setMode = (mode: ProjectMode, walletAddress?: string) => {
+    setState(s => {
+      let roles: Role[] = [];
+      if (mode === "solo") {
+        roles = [defaultRole("Creator", 100, walletAddress || "")];
+      } else {
+        // Team mode - start with empty roles so user can add custom ones
+        roles = [];
+      }
+      return { ...s, mode, roles };
+    });
+  };
+
   const openWizard = () => setField("isWizardOpen", true);
   const closeWizard = () => setField("isWizardOpen", false);
 
@@ -247,6 +267,7 @@ export function useWizardState() {
     setState,
     setStep,
     setField,
+    setMode, // NEW
     openWizard,
     closeWizard,
     saveRole,

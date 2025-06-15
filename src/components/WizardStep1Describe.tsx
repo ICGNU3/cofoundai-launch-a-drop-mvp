@@ -3,14 +3,18 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SecureTextarea } from "@/components/ui/SecureTextarea";
 import { ProjectTypeSelector } from "@/components/ui/ProjectTypeSelector";
+import { ModeSelector } from "@/components/ui/ModeSelector";
 import { useSecureForm } from "@/hooks/useSecureForm";
 import { projectContent } from "@/utils/contentSanitizer";
-import type { WizardStateData, ProjectType } from "@/hooks/useWizardState";
+import type { WizardStateData, ProjectType, ProjectMode } from "@/hooks/useWizardState";
 
 interface WizardStep1DescribeProps {
   projectIdea: string;
   projectType: ProjectType;
+  mode: ProjectMode;
+  walletAddress: string | null;
   onSetField: <K extends keyof WizardStateData>(k: K, v: WizardStateData[K]) => void;
+  onSetMode: (mode: ProjectMode, walletAddress?: string) => void;
   onLoadDefaultRoles: (type: ProjectType) => void;
   canProceed: boolean;
   onNext: () => void;
@@ -19,7 +23,10 @@ interface WizardStep1DescribeProps {
 const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
   projectIdea,
   projectType,
+  mode,
+  walletAddress,
   onSetField,
+  onSetMode,
   onLoadDefaultRoles,
   canProceed,
   onNext
@@ -53,8 +60,17 @@ const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
     onLoadDefaultRoles(type);
   };
 
+  const handleModeChange = (newMode: ProjectMode) => {
+    onSetMode(newMode, walletAddress || "");
+  };
+
   return (
     <div className="space-y-6">
+      <ModeSelector 
+        mode={mode}
+        onModeChange={handleModeChange}
+      />
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

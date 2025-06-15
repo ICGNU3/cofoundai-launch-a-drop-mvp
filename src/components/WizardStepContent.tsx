@@ -13,6 +13,7 @@ interface WizardStepContentProps {
   state: WizardStateData;
   setStep: (n: number) => void;
   setField: <K extends keyof WizardStateData>(k: K, v: WizardStateData[K]) => void;
+  setMode: (mode: any, walletAddress?: string) => void;
   saveRole: (role: any, idx: number | null) => void;
   removeRole: (idx: number) => void;
   updateRolePercent: (idx: number, newPercent: number) => void;
@@ -31,6 +32,7 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
   state,
   setStep,
   setField,
+  setMode,
   saveRole,
   removeRole,
   updateRolePercent,
@@ -52,7 +54,10 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
         <WizardStep1Describe
           projectIdea={state.projectIdea}
           projectType={state.projectType}
+          mode={state.mode}
+          walletAddress={walletAddress}
           onSetField={setField}
+          onSetMode={setMode}
           onLoadDefaultRoles={loadDefaultRoles}
           canProceed={state.projectIdea && !!state.projectIdea.trim()}
           onNext={() => setStep(2)}
@@ -66,6 +71,7 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
               roles={state.roles}
               editingRoleIdx={state.editingRoleIdx}
               projectType={state.projectType}
+              mode={state.mode}
               setField={setField}
               loadDefaultRoles={loadDefaultRoles}
               saveRole={saveRole}

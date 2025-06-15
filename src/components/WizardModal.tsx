@@ -1,3 +1,4 @@
+
 import React from "react";
 import { X } from "lucide-react";
 import WizardStep1Describe from "./WizardStep1Describe";
@@ -25,6 +26,7 @@ export const WizardModal: React.FC<{
     state,
     setStep,
     setField,
+    setMode,
     saveRole,
     removeRole,
     updateRolePercent,
@@ -66,6 +68,7 @@ export const WizardModal: React.FC<{
     setStep(1);
     setField("projectIdea", "");
     setField("projectType", "Music");
+    setField("mode", "team");
     setField("roles", []);
     setField("expenses", []);
     setField("pledgeUSDC", "");
@@ -124,6 +127,7 @@ export const WizardModal: React.FC<{
             state={state}
             setStep={setStep}
             setField={setField}
+            setMode={setMode}
             saveRole={saveRole}
             removeRole={removeRole}
             updateRolePercent={updateRolePercent}

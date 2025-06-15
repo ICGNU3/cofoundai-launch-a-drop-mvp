@@ -5,12 +5,13 @@ import { ProjectTypeSelector } from "./ui/ProjectTypeSelector";
 import { RoleTemplateManager } from "./ui/RoleTemplateManager";
 import { RoleManagementSection } from "./ui/RoleManagementSection";
 import { WizardNavigationButtons } from "./ui/WizardNavigationButtons";
-import type { Role, ProjectType } from "@/hooks/useWizardState";
+import type { Role, ProjectType, ProjectMode } from "@/hooks/useWizardState";
 
 type WizardRolesStepProps = {
   roles: Role[];
   editingRoleIdx: number | null;
   projectType: ProjectType;
+  mode: ProjectMode;
   setField: (field: keyof any, value: any) => void;
   loadDefaultRoles: (type: ProjectType) => void;
   saveRole: (role: Role, idx: number | null) => void;
@@ -22,6 +23,7 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
   roles,
   editingRoleIdx,
   projectType,
+  mode,
   setField,
   loadDefaultRoles,
   saveRole,
@@ -32,7 +34,7 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
 
   // Percent validation
   const sumPercent = roles.reduce((sum, r) => sum + r.percent, 0);
-  const canProceed = sumPercent === 100;
+  const canProceed = mode === "solo" ? true : sumPercent === 100;
 
   const handleEditRole = (idx: number) => {
     setField("editingRoleIdx", idx);
@@ -59,26 +61,52 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
 
   return (
     <div>
-      <h2 className="headline text-center mb-2">Crew &amp; Cut</h2>
+      <h2 className="headline text-center mb-2">
+        {mode === "solo" ? "Solo Creator" : "Crew & Cut"}
+      </h2>
       
       <div className="flex flex-col gap-2">
-        <ProjectTypeSelector
-          projectType={projectType}
-          onProjectTypeChange={handleProjectTypeChange}
-          onLoadDefaultRoles={loadDefaultRoles}
-        />
+        {mode === "team" && (
+          <>
+            <ProjectTypeSelector
+              projectType={projectType}
+              onProjectTypeChange={handleProjectTypeChange}
+              onLoadDefaultRoles={loadDefaultRoles}
+            />
 
-        <RoleTemplateManager
-          roles={roles}
-          onLoadTemplate={handleLoadTemplate}
-        />
+            <RoleTemplateManager
+              roles={roles}
+              onLoadTemplate={handleLoadTemplate}
+            />
 
-        <RoleManagementSection
-          roles={roles}
-          onEditRole={handleEditRole}
-          onRemoveRole={removeRole}
-          onAddRole={handleAddRole}
-        />
+            <RoleManagementSection
+              roles={roles}
+              onEditRole={handleEditRole}
+              onRemoveRole={removeRole}
+              onAddRole={handleAddRole}
+            />
+          </>
+        )}
+
+        {mode === "solo" && (
+          <div className="space-y-4">
+            <div className="bg-card border border-border rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-lg">Creator</span>
+                  <span className="text-green-500 font-mono">100%</span>
+                </div>
+                <div className="text-sm text-green-500 flex items-center gap-1">
+                  <span>✓</span>
+                  <span>Cuts balanced</span>
+                </div>
+              </div>
+              <div className="mt-2 text-sm text-body-text/60">
+                Full ownership and control of your project
+              </div>
+            </div>
+          </div>
+        )}
 
         <WizardNavigationButtons
           canProceed={canProceed}
@@ -87,13 +115,15 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
         />
       </div>
 
-      <AddRoleModal
-        open={roleModalOpen}
-        defaultRole={editingRoleIdx !== null ? roles[editingRoleIdx] : undefined}
-        onClose={() => setRoleModalOpen(false)}
-        onSave={handleSaveRole}
-        existingRoles={roles}
-      />
+      {mode === "team" && (
+        <AddRoleModal
+          open={roleModalOpen}
+          defaultRole={editingRoleIdx !== null ? roles[editingRoleIdx] : undefined}
+          onClose={() => setRoleModalOpen(false)}
+          onSave={handleSaveRole}
+          existingRoles={roles}
+        />
+      )}
     </div>
   );
 };
