@@ -4,6 +4,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AccentButton } from "./ui/AccentButton";
+import { useToast } from "@/hooks/use-toast";
 import type { Role, Expense, ProjectType } from "@/hooks/useWizardState";
 import { useNavigate } from "react-router-dom";
 
@@ -28,9 +29,12 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
 }) => {
   const { user } = usePrivy();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isMinting, setIsMinting] = useState(false);
   const [mintingStatus, setMintingStatus] = useState<string>("Ready to mint...");
   const [projectId, setProjectId] = useState<string | null>(null);
+  const [usdcxBalanceConfirmed, setUsdcxBalanceConfirmed] = useState(false);
+  const [isPollingBalance, setIsPollingBalance] = useState(false);
 
   // Calculate values
   const expenseSum = expenses.reduce((sum, exp) => sum + exp.amountUSDC, 0);
@@ -58,7 +62,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
           expense_sum: expenseSum,
           token_address: mintData.tokenAddress,
           tx_hash: mintData.txHash,
-          escrow_funded_amount: pledgeNum, // Initial funding from pledge
+          escrow_funded_amount: pledgeNum,
           streams_active: false,
         })
         .select()
@@ -102,27 +106,70 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
     onSuccess: (project) => {
       setProjectId(project.id);
       setMintingStatus("✅ Project saved to database!");
-      // Set flag for auto-navigation
       sessionStorage.setItem('autoNavigateToProject', project.id);
+      
+      // Start polling for USDCx balance
+      setIsPollingBalance(true);
+      pollUSDCxBalance();
     },
     onError: (error) => {
       console.error("Error saving project:", error);
       setMintingStatus("❌ Error saving project");
+      toast({
+        title: "Database Error",
+        description: "Failed to save project to database",
+        variant: "destructive",
+      });
     },
   });
 
-  // Simulate minting process
+  // Simulate polling for USDCx balance confirmation
+  const pollUSDCxBalance = async () => {
+    try {
+      // Simulate polling with delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // TODO: Replace with actual USDCx balance check
+      // const balance = await checkUSDCxBalance(walletAddress);
+      
+      setUsdcxBalanceConfirmed(true);
+      setIsPollingBalance(false);
+      toast({
+        title: "Balance Confirmed",
+        description: "USDCx balance increase detected",
+      });
+    } catch (error) {
+      console.error("Error polling balance:", error);
+      setIsPollingBalance(false);
+      toast({
+        title: "Balance Check Failed",
+        description: "Could not confirm USDCx balance increase",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Simulate minting process with error handling
   const handleMintAndFund = async () => {
     if (!walletAddress) return;
 
     setIsMinting(true);
-    setMintingStatus("🚀 Deploying token contract...");
+    setMintingStatus("🎨 Uploading metadata to Pinata...");
 
     try {
-      // Simulate blockchain interaction delays
+      // Simulate Pinata upload
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // TODO: Replace with actual Pinata call
+      // const metadataUrl = await uploadToPinata({...});
+      
+      setMintingStatus("🚀 Minting token on Zora...");
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // TODO: Replace with actual Zora call
+      // const zoraResult = await mintOnZora({...});
+      
       setMintingStatus("⛽ Confirming transaction...");
-
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Simulate successful mint with mock data
@@ -140,9 +187,37 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
       await new Promise(resolve => setTimeout(resolve, 1000));
       setMintingStatus("🎉 Drop launched successfully!");
 
+      toast({
+        title: "Mint Successful",
+        description: "Your drop has been launched successfully!",
+      });
+
     } catch (error) {
       console.error("Minting error:", error);
       setMintingStatus("❌ Minting failed");
+      
+      // Determine error type and show appropriate toast
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      
+      if (errorMessage.includes("Pinata")) {
+        toast({
+          title: "Pinata Upload Failed",
+          description: "Failed to upload metadata to Pinata",
+          variant: "destructive",
+        });
+      } else if (errorMessage.includes("Zora")) {
+        toast({
+          title: "Zora Mint Failed", 
+          description: "Failed to mint token on Zora",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Mint Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsMinting(false);
     }
@@ -159,7 +234,18 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   }, [projectId, isMinting, mintingStatus, navigate]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Loading Overlay */}
+      {isMinting && (
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
+          <div className="bg-card border border-border rounded-lg p-6 text-center">
+            <div className="animate-spin w-8 h-8 border-2 border-accent border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="text-lg font-semibold text-body-text">Minting...</div>
+            <div className="text-sm text-body-text/70 mt-2">{mintingStatus}</div>
+          </div>
+        </div>
+      )}
+
       <div className="text-center">
         <h2 className="headline mb-4">Ready to Launch! 🚀</h2>
         <div className="space-y-2 text-body-text">
@@ -177,9 +263,14 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
           <div className="text-lg font-semibold text-body-text mb-2">
             {mintingStatus}
           </div>
-          {isMinting && (
+          {(isMinting || isPollingBalance) && (
             <div className="w-full bg-background rounded-full h-2">
               <div className="bg-accent h-2 rounded-full animate-pulse" style={{ width: "60%" }}></div>
+            </div>
+          )}
+          {isPollingBalance && (
+            <div className="text-sm text-yellow-500 mt-2">
+              Checking USDCx balance...
             </div>
           )}
         </div>
@@ -215,23 +306,45 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
             onClick={handleMintAndFund}
             disabled={!walletAddress || isMinting}
           >
-            {isMinting ? "Processing..." : "🚀 Mint & Fund Drop"}
+            {isMinting ? "Minting..." : "🚀 Mint & Fund Drop"}
           </AccentButton>
         )}
         
         {projectId && (
-          <AccentButton
-            className="w-full"
-            onClick={() => navigate(`/project/${projectId}/dashboard`)}
-          >
-            View Project Dashboard
-          </AccentButton>
+          <>
+            <AccentButton
+              className="w-full"
+              onClick={() => navigate(`/project/${projectId}/dashboard`)}
+            >
+              View Project Dashboard
+            </AccentButton>
+            
+            <AccentButton
+              className="w-full"
+              disabled={!usdcxBalanceConfirmed}
+              onClick={() => {
+                toast({
+                  title: "Project Completed",
+                  description: "Project marked as complete!",
+                });
+              }}
+            >
+              {usdcxBalanceConfirmed ? "Mark Complete ✓" : "Confirming Balance..."}
+            </AccentButton>
+            
+            {!usdcxBalanceConfirmed && (
+              <div className="text-xs text-yellow-500 text-center">
+                Waiting for USDCx balance confirmation
+              </div>
+            )}
+          </>
         )}
 
         <AccentButton
           secondary
           className="w-full"
           onClick={onRestart}
+          disabled={isMinting}
         >
           Launch Another Drop
         </AccentButton>
