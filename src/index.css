@@ -1,4 +1,3 @@
-
 @import "./styles/fonts.css";
 
 @tailwind base;
@@ -13,9 +12,9 @@ body {
 
 /* Success palette Hero Section */
 .hero-title, h1.headline, h1 {
-  font-family: "Satoshi", sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
   font-size: 36px;
-  font-weight: 700;
   line-height: 1.2;
   color: #F9F9F9;
   padding-top: 24px;
@@ -29,9 +28,9 @@ body {
 
 /* Section headings */
 h2, .section-heading {
-  font-family: "Satoshi", sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bold;
   font-size: 20px;
-  font-weight: 600;
   color: #4ADE80;
   margin-bottom: 16px;
 }
@@ -297,4 +296,3 @@ a:focus-visible {
 .hover-scale:hover {
   transform: scale(1.04);
 }
-

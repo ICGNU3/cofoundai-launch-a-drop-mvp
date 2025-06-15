@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,7 +19,13 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				headline: ["Satoshi", "sans-serif"],
+				headline: [
+					"Helvetica Neue",
+					"Helvetica",
+					"Arial",
+					"sans-serif",
+					"Satoshi",
+				],
 				sans: ["Inter", "sans-serif"],
 			},
 			fontWeight: {
@@ -86,4 +91,3 @@ export default {
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-
