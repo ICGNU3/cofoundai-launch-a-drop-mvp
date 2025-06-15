@@ -136,7 +136,7 @@ const Index: React.FC = () => {
         </div>
         {/* HEADLINE */}
         <h1 className="text-center font-headline font-bold text-[2.3rem] md:text-[2.7rem] lg:text-[3rem] leading-[1.13] hero-title py-2 mt-2 max-w-3xl relative z-10">
-          Launch Creative Projects <span className="text-accent">With Almost No Money</span>
+          TALENT = MONEY
         </h1>
         {/* SUBHEADLINE */}
         <div className="text-lg text-[#e4f9ea] mt-4 max-w-xl mx-auto font-medium text-center mb-1">
