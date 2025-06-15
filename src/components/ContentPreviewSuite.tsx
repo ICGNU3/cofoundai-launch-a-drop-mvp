@@ -1,10 +1,9 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, Share2, Download, ExternalLink, Smartphone, Monitor, Tablet } from "lucide-react";
+import { Eye, Share2, Download, ExternalLink, Smartphone, Monitor, Tablet, FileText } from "lucide-react";
 
 interface ContentPreviewSuiteProps {
   content: any;

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AccentButton } from "@/components/ui/AccentButton";
-import { Upload, Wand2, RefreshCw, Download, Eye, Sparkles } from "lucide-react";
+import { Upload, Wand2, RefreshCw, Download, Eye, Sparkles, Palette } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AICoverArtGeneratorProps {
