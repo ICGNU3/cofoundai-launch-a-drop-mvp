@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ScrollArea } from "./ui/scroll-area";
 import { WizardNavigationButtons } from "./ui/WizardNavigationButtons";
@@ -28,19 +27,23 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   onNext,
   onBack,
 }) => {
-  // Compute sum only from role shares
+  // Compute sum including both role shares and all expenses
   const roleSum = state.roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
+  const expensesSum = state.expenses.reduce((sum, e) => sum + (e.amountUSDC || 0), 0);
+  // Add up all roles (by %) and all expenses (by amount); this is a simplification
+  // If the sum should be 100, just as before, that's the test
+  const sumPercent = roleSum + expensesSum;
   const epsilon = 0.1;
-  const isRoleBalanceValid = Math.abs(roleSum - 100) < epsilon;
+  const isRoleBalanceValid = Math.abs(sumPercent - 100) < epsilon;
 
   const pledgeAmount = Number(state.pledgeUSDC) || 0;
   const hasValidExpense = state.expenses.some(e => e.amountUSDC > 0);
 
-  // Enable proceed only if role shares balance or any expense/pledge is present
+  // Allow proceed if (1) role+expense split sums ~100% OR (2) any expense/pledge
   const canProceed = isRoleBalanceValid || hasValidExpense || pledgeAmount > 0;
 
   // Diagnostic logs for debugging
-  console.log('[WizardBudgetStep] roleSum:', roleSum, 'isRoleBalanceValid:', isRoleBalanceValid, 'hasValidExpense:', hasValidExpense, 'pledgeAmount:', pledgeAmount, 'canProceed:', canProceed);
+  console.log('[WizardBudgetStep] sumPercent:', sumPercent, 'isRoleBalanceValid:', isRoleBalanceValid, 'hasValidExpense:', hasValidExpense, 'pledgeAmount:', pledgeAmount, 'canProceed:', canProceed);
 
   const handleLoadScenario = (scenario: any) => {
     onSetField("roles", scenario.roles);
@@ -59,13 +62,12 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
 
       <ScrollArea className="flex-1">
         <div className="space-y-6 pr-4">
-          {/* Budget Validation Status: Pass only roleSum and ignore expenses for color/msg */}
+          {/* Budget Validation Status: Pass total sum including both shares and expenses */}
           <BudgetValidationStatus 
-            sumPercent={roleSum} 
+            sumPercent={sumPercent} 
             hasExpenses={state.expenses.length > 0} 
           />
 
-          {/* Interactive Budget Charts */}
           <InteractiveBudgetChart
             roles={state.roles}
             expenses={state.expenses}
@@ -73,7 +75,6 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
             pledgeAmount={pledgeAmount}
           />
 
-          {/* Budget Items List */}
           <BudgetItemsList
             roles={state.roles}
             expenses={state.expenses}
@@ -86,7 +87,6 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
             onUpdateRolePercent={onUpdateRolePercent}
           />
 
-          {/* Scenario Planner */}
           <ScenarioPlanner
             currentRoles={state.roles}
             currentExpenses={state.expenses}
@@ -95,7 +95,6 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
             onLoadScenario={handleLoadScenario}
           />
 
-          {/* Budget Optimizer */}
           <BudgetOptimizer
             roles={state.roles}
             expenses={state.expenses}
@@ -107,7 +106,6 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
         </div>
       </ScrollArea>
 
-      {/* Navigation Buttons - Fixed at bottom */}
       <div className="border-t border-border pt-4 mt-4">
         <WizardNavigationButtons
           canProceed={canProceed}
