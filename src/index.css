@@ -1,4 +1,3 @@
-
 @import "./styles/fonts.css";
 
 @tailwind base;
@@ -219,4 +218,60 @@ a:focus-visible {
   .card, .wizard-card {
     max-width: 98vw;
   }
+}
+
+/* Landing Page Hero/Card Enhancements for Mobile */
+.card.wizard-card {
+  width: 100%;
+  max-width: 420px;
+  margin-top: 8vw;
+  margin-bottom: 8vw;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .card.wizard-card {
+    padding: 1rem;
+    max-width: 97vw;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    margin-top: 18vw;
+    margin-bottom: 8vw;
+  }
+  .hero-title, h1.headline, h1 {
+    font-size: 1.6rem;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .hero-tagline, .tagline, p, .body-text {
+    font-size: 15px;
+    margin-bottom: 14px;
+    margin-top: 8px;
+  }
+  .accent-btn, button.accent-btn {
+    font-size: 16px;
+    padding: 12px;
+  }
+}
+@media (max-width: 370px) {
+  .card.wizard-card {
+    padding: 0.5rem;
+  }
+  .hero-title, h1.headline, h1 {
+    font-size: 1.1rem;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+}
+
+/* Button improvements for all devices */
+.accent-btn, button.accent-btn {
+  line-height: 1.25;
+  min-height: 44px;
+  min-width: 120px;
+}
+
+/* Ensure landing buttons stack nicely and never overflow */
+.card.wizard-card .accent-btn, .card.wizard-card button.accent-btn {
+  width: 100%;
+  max-width: 100%;
 }
