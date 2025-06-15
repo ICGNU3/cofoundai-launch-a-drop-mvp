@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { X } from "lucide-react";
 import { WizardStep1Describe } from "./WizardStep1Describe";
 import WizardStep2Roles from "./WizardStep2Roles";
@@ -8,6 +8,21 @@ import { WizardStep4Success } from "./WizardStep4Success";
 import { useWizardState } from "@/hooks/useWizardState";
 import { WizardStepTokenConfirm } from "./WizardStepTokenConfirm";
 import { AdvancedTokenCustomizationWrapper } from "./AdvancedTokenCustomizationWrapper";
+
+// Spinner loader for seamless skip
+function SkippingStepLoader() {
+  React.useEffect(() => {
+    // This will be called every render, which is fine as step will change and re-render
+  }, []);
+  return (
+    <div className="flex items-center justify-center h-full py-12">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-accent mb-4"></div>
+        <p className="text-lg text-muted-foreground">Skipping step…</p>
+      </div>
+    </div>
+  );
+}
 
 export const WizardModal: React.FC<{
   isOpen: boolean;
@@ -32,35 +47,33 @@ export const WizardModal: React.FC<{
     setDoAdvancedToken,
   } = useWizardState();
 
-  // If closed, render nothing.
   if (!isOpen) return null;
 
-  // Step logic: 1 = describe, 2 = roles, 3 = budget, 4 = token confirm, 5 = advanced config, 6 = launch/success
   const wantsAdvanced = !!state.doAdvancedToken;
   const totalSteps = wantsAdvanced ? 6 : 5;
   const lastStep = totalSteps;
   const progressStep = Math.max(1, Math.min(state.step, totalSteps));
 
-  // NEW LOGIC TO PREVENT BLANK STEP 5:
-  // - If NOT advanced, step 5 instantly skips ahead to step 6. Blank page is avoided by never rendering content in such case.
+  // Correction: Always render *something* at step 5—even if non-advanced—so hook order is *not* broken
+
+  // If user is at step 5 but didn't select advanced, auto-advance to launch with a safe effect.
   React.useEffect(() => {
-    // Defensive: auto-advance if user is on step 5 but did not choose advanced
     if (!state.doAdvancedToken && state.step === 5) {
-      setStep(6);
+      // Slight delay to ensure react does not skip a render pass,
+      // but safe to call immediately as it just changes state.
+      setTimeout(() => setStep(6), 0);
     }
   }, [state.doAdvancedToken, state.step, setStep]);
 
   const handleNext = () => {
-    // At Token Customization decision (step 4):
     if (state.step === 4) {
       if (state.doAdvancedToken) setStep(5);
       else setStep(6);
     } else if (state.step === 5 && !state.doAdvancedToken) {
-      setStep(6); // Defensive: shouldn't hit, but for safety
+      setStep(6); // Should never hit now, but just in case.
     } else if (state.step < lastStep) {
       setStep((state.step + 1) as any);
     }
-    // else, already at or past last step.
   };
 
   const handleBack = () => {
@@ -177,17 +190,21 @@ export const WizardModal: React.FC<{
             />
           )}
 
-          {/* Advanced config - only if chosen */}
-          {state.doAdvancedToken && state.step === 5 && (
-            <div className="overflow-y-auto px-6 py-4 h-full">
-              <AdvancedTokenCustomizationWrapper
-                state={state}
-                setTokenCustomization={setTokenCustomization}
-                setStep={setStep}
-                onBack={handleBack}
-                onNext={() => setStep(6)}
-              />
-            </div>
+          {/* Advanced config - only if chosen; always render something at step 5 */}
+          {state.step === 5 && (
+            state.doAdvancedToken ? (
+              <div className="overflow-y-auto px-6 py-4 h-full">
+                <AdvancedTokenCustomizationWrapper
+                  state={state}
+                  setTokenCustomization={setTokenCustomization}
+                  setStep={setStep}
+                  onBack={handleBack}
+                  onNext={() => setStep(6)}
+                />
+              </div>
+            ) : (
+              <SkippingStepLoader />
+            )
           )}
 
           {/* Final launch step */}
@@ -210,3 +227,4 @@ export const WizardModal: React.FC<{
 };
 
 // ... End of file. This WizardModal.tsx file is long. Consider breaking out additional steps or logic into their own files for even better maintainability!
+
