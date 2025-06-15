@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -123,7 +122,7 @@ const Index: React.FC = () => {
         </h1>
         {/* Sub-headline with social proof */}
         <div className="text-lg text-[#E0E0E0] mt-4 max-w-xl mx-auto font-medium">
-          Real funds stream to your crew the moment you ship — trusted by 120+ artists from Boiler Room, Mint Songs, and Indie Film Hub.
+          Build and fund creative projects with your team—experience instant streaming of funds as soon as you deliver.
         </div>
         {/* --- LIVE COUNTER BAR --- */}
         <div className="flex items-center justify-center w-full mt-5 mb-2 z-10" aria-live="polite">
