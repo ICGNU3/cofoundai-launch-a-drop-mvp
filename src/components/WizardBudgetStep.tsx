@@ -22,6 +22,7 @@ type WizardBudgetStepProps = {
   loadDefaultRoles: (type: ProjectType) => void;
   saveRole: (role: Role, idx: number | null) => void;
   removeRole: (idx: number) => void;
+  updateRolePercent?: (idx: number, newPercent: number) => void;
   saveExpense: (expense: Expense, idx: number | null) => void;
   removeExpense: (idx: number) => void;
   setStep: (s: 1 | 2 | 3) => void;
@@ -37,6 +38,7 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   loadDefaultRoles,
   saveRole,
   removeRole,
+  updateRolePercent,
   saveExpense,
   removeExpense,
   setStep,
@@ -57,37 +59,25 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   ];
 
   // Percent validation
-  const sumPercent = roles.reduce((sum, r) => sum + r.percent, 0);
+  const sumPercent = roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
   const percentColor = sumPercent === 100 ? "text-green-400" : "text-red-500";
-  const percentMsg = sumPercent < 100 
+  const percentMsg = sumPercent < 100 && expenses.length === 0
     ? `Need ${100 - sumPercent}% more` 
     : sumPercent > 100 
-    ? `Remove ${sumPercent - 100}% (over-allocated)` 
-    : "Percentages balanced ✓";
+    ? `Remove ${sumPercent - 100}%` 
+    : sumPercent === 100
+    ? "Percentages balanced ✓"
+    : `${100 - sumPercent}% remaining`;
 
   // Auto-rebalance percentages when adding new role
   const handleAddRole = (newRole: Role) => {
-    const currentSum = roles.reduce((sum, r) => sum + r.percent, 0);
-    const availablePercent = 100 - currentSum;
+    const roleWithPercent = {
+      ...newRole,
+      percentNum: newRole.percent || 10,
+      percentStr: (newRole.percent || 10).toString()
+    };
     
-    if (availablePercent <= 0) {
-      // Rebalance existing roles proportionally
-      const totalCurrent = roles.reduce((sum, r) => sum + r.percent, 0);
-      const factor = 90 / totalCurrent; // Leave 10% for new role
-      const rebalancedRoles = roles.map(role => ({
-        ...role,
-        percent: Math.round(role.percent * factor)
-      }));
-      
-      // Set remaining for new role
-      const newPercent = 100 - rebalancedRoles.reduce((sum, r) => sum + r.percent, 0);
-      
-      setField("roles", [...rebalancedRoles, { ...newRole, percent: newPercent }]);
-    } else {
-      // Use available percentage or cap at available
-      const assignedPercent = Math.min(newRole.percent, availablePercent);
-      saveRole({ ...newRole, percent: assignedPercent }, null);
-    }
+    saveRole(roleWithPercent, null);
   };
 
   const handleEditItem = (index: number, type: "role" | "expense") => {
@@ -251,6 +241,7 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
                   isRole ? roleIndex : expenseIndex,
                   isRole ? "role" : "expense"
                 )}
+                onPercentChange={isRole && updateRolePercent ? (newPercent) => updateRolePercent(roleIndex, newPercent) : undefined}
               />
             </div>
           );

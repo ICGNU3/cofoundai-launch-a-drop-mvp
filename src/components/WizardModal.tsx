@@ -14,6 +14,7 @@ export const WizardModal: React.FC<{
   close: () => void;
   saveRole: ReturnType<typeof useWizardState>["saveRole"];
   removeRole: ReturnType<typeof useWizardState>["removeRole"];
+  updateRolePercent?: ReturnType<typeof useWizardState>["updateRolePercent"];
   saveExpense: ReturnType<typeof useWizardState>["saveExpense"];
   removeExpense: ReturnType<typeof useWizardState>["removeExpense"];
   loadDefaultRoles: ReturnType<typeof useWizardState>["loadDefaultRoles"];
@@ -24,6 +25,7 @@ export const WizardModal: React.FC<{
   close,
   saveRole,
   removeRole,
+  updateRolePercent,
   saveExpense,
   removeExpense,
   loadDefaultRoles,
@@ -33,7 +35,7 @@ export const WizardModal: React.FC<{
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
 
   // Percent validation
-  const sumPercent = state.roles.reduce((sum, r) => sum + r.percent, 0);
+  const sumPercent = state.roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
   let percentMsg = "";
   let percentColor = "";
   if (sumPercent < 100)
@@ -146,6 +148,7 @@ export const WizardModal: React.FC<{
                 loadDefaultRoles={loadDefaultRoles}
                 saveRole={saveRole}
                 removeRole={removeRole}
+                updateRolePercent={updateRolePercent}
                 saveExpense={saveExpense}
                 removeExpense={removeExpense}
                 setStep={setStep}

@@ -38,6 +38,7 @@ const Index: React.FC = () => {
         close={wizard.closeWizard}
         saveRole={wizard.saveRole}
         removeRole={wizard.removeRole}
+        updateRolePercent={wizard.updateRolePercent}
         saveExpense={wizard.saveExpense}
         removeExpense={wizard.removeExpense}
         loadDefaultRoles={wizard.loadDefaultRoles}

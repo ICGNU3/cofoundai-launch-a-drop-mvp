@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Edit, X } from "lucide-react";
 
 export type RolePillProps = {
-  role: { roleName: string, percent: number; };
+  role: { roleName: string, percent: number; percentNum: number; percentStr: string; };
   onEdit?: () => void;
   onDelete?: () => void;
   onPercentChange?: (newPercent: number) => void;
@@ -11,11 +11,11 @@ export type RolePillProps = {
 
 export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete, onPercentChange }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [percentStr, setPercentStr] = useState(role.percent.toString());
+  const [percentStr, setPercentStr] = useState(role.percentStr || role.percent.toString());
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
-    // Allow empty or numeric digits only
+    // Allow empty or numeric digits only (up to 3 digits)
     if (v === '' || /^\d{0,3}$/.test(v)) {
       setPercentStr(v);
     }
@@ -40,15 +40,15 @@ export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete, onPe
       handleBlur();
     }
     if (e.key === 'Escape') {
-      setPercentStr(role.percent.toString());
+      setPercentStr(role.percentStr || role.percent.toString());
       setIsEditing(false);
     }
   };
 
   // Sync with role prop changes
   React.useEffect(() => {
-    setPercentStr(role.percent.toString());
-  }, [role.percent]);
+    setPercentStr(role.percentStr || role.percent.toString());
+  }, [role.percentStr, role.percent]);
 
   return (
     <span
@@ -72,7 +72,7 @@ export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete, onPe
           className="ml-1 font-mono tracking-tight cursor-pointer hover:bg-accent/10 px-1 rounded"
           onClick={() => setIsEditing(true)}
         >
-          {role.percent}%
+          {role.percentNum || role.percent}%
         </span>
       )}
       {onEdit && (

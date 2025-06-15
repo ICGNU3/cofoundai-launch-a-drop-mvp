@@ -20,7 +20,7 @@ export const RoleManagementSection: React.FC<RoleManagementSectionProps> = ({
   onAddRole,
   onUpdateRolePercent,
 }) => {
-  const sumPercent = roles.reduce((sum, r) => sum + r.percent, 0);
+  const sumPercent = roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
 
   return (
     <>
