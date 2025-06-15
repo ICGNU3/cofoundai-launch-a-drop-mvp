@@ -1,0 +1,127 @@
+
+import React, { useState } from "react";
+import { TokenNaming } from "./TokenNaming";
+import { SupplySchedule } from "./SupplySchedule";
+import { TokenTypeSelector } from "./TokenTypeSelector";
+import { DistributionVesting } from "./DistributionVesting";
+import { TokenUtility } from "./TokenUtility";
+import { TokenPreview } from "./TokenPreview";
+
+// Token customization master component (fits Zora V4 extensible principles)
+const AdvancedTokenCustomization: React.FC = () => {
+  // All token customization state
+  const [tokenName, setTokenName] = useState("");
+  const [tokenSymbol, setTokenSymbol] = useState("");
+  const [tokenType, setTokenType] = useState<"erc20" | "erc721">("erc20");
+  const [totalSupply, setTotalSupply] = useState<number>(1000000);
+  const [mintingType, setMintingType] = useState<"fixed" | "inflation" | "deflation">("fixed");
+  const [inflationRate, setInflationRate] = useState<number>(0);
+  const [deflationRate, setDeflationRate] = useState<number>(0);
+
+  // Distribution (percentages must sum to 100)
+  const [distribution, setDistribution] = useState({
+    team: 20,
+    treasury: 30,
+    publicSale: 50,
+  });
+
+  // Vesting (simplified: months)
+  const [vesting, setVesting] = useState({
+    team: 12,      // months
+    early: 6,      // months
+  });
+
+  // Utility: freeform text, checkboxes for common use cases
+  const [utility, setUtility] = useState({
+    governance: true,
+    access: false,
+    staking: false,
+    custom: "",
+  });
+
+  // Step navigation
+  const [step, setStep] = useState(1);
+
+  // For simulation preview step
+  const canProceed = () => {
+    return !!tokenName && !!tokenSymbol && totalSupply > 0 && Object.values(distribution).reduce((a, b) => a + b, 0) === 100;
+  };
+
+  return (
+    <div className="max-w-xl mx-auto p-6 bg-surface border border-border rounded-xl shadow-card-elevated mt-10 space-y-6">
+      <h1 className="text-2xl font-bold headline text-headline text-center mb-2">Advanced Token Customization</h1>
+      <div className="text-tagline text-center mb-4">
+        Customize your project's token with features inspired by Zora V4 modular standards. Each field has helpful guides!
+      </div>
+      <div className="mb-6">
+        {step === 1 &&
+          <TokenNaming
+            name={tokenName}
+            symbol={tokenSymbol}
+            onChangeName={setTokenName}
+            onChangeSymbol={setTokenSymbol}
+            onNext={() => setStep(2)}
+          />
+        }
+        {step === 2 &&
+          <TokenTypeSelector
+            tokenType={tokenType}
+            onChange={setTokenType}
+            onNext={() => setStep(3)}
+            onBack={() => setStep(1)}
+          />
+        }
+        {step === 3 &&
+          <SupplySchedule
+            supply={totalSupply}
+            onChangeSupply={setTotalSupply}
+            mintingType={mintingType}
+            onChangeMintingType={setMintingType}
+            inflationRate={inflationRate}
+            deflationRate={deflationRate}
+            onChangeInflationRate={setInflationRate}
+            onChangeDeflationRate={setDeflationRate}
+            onNext={() => setStep(4)}
+            onBack={() => setStep(2)}
+            tokenType={tokenType}
+          />
+        }
+        {step === 4 &&
+          <DistributionVesting
+            distribution={distribution}
+            onChange={setDistribution}
+            vesting={vesting}
+            onChangeVesting={setVesting}
+            onNext={() => setStep(5)}
+            onBack={() => setStep(3)}
+          />
+        }
+        {step === 5 &&
+          <TokenUtility
+            utility={utility}
+            onChange={setUtility}
+            onNext={() => setStep(6)}
+            onBack={() => setStep(4)}
+          />
+        }
+        {step === 6 &&
+          <TokenPreview
+            name={tokenName}
+            symbol={tokenSymbol}
+            tokenType={tokenType}
+            supply={totalSupply}
+            mintingType={mintingType}
+            inflationRate={inflationRate}
+            deflationRate={deflationRate}
+            distribution={distribution}
+            vesting={vesting}
+            utility={utility}
+            onBack={() => setStep(5)}
+          />
+        }
+      </div>
+    </div>
+  );
+};
+
+export default AdvancedTokenCustomization;
