@@ -1,23 +1,33 @@
 
 import { useToast } from "@/hooks/use-toast";
 
+// Use the full supabase edge function URL
 const SUPABASE_EDGE_FN_URL = "https://mwopsiduetlwehpcrkzg.functions.supabase.co/generate-content-ai";
+
+// Get the anon key from the environment (Vite injects it at build time)
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export function useAICopyGeneration() {
   const { toast } = useToast();
 
   const fetchAIContent = async (prompt: string, model = "gpt-4o-mini") => {
     try {
-      // Always use the full Supabase edge function URL
+      // Send the authorization header!
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (SUPABASE_ANON_KEY) {
+        headers["authorization"] = `Bearer ${SUPABASE_ANON_KEY}`;
+      }
+
       const res = await fetch(SUPABASE_EDGE_FN_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ prompt, model }),
       });
 
       // If response is HTML, treat as error
       const text = await res.text();
-      // Try to parse as JSON
       let data;
       try {
         data = JSON.parse(text);
@@ -49,4 +59,3 @@ export function useAICopyGeneration() {
 
   return { fetchAIContent };
 }
-
