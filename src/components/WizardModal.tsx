@@ -122,13 +122,12 @@ export const WizardModal: React.FC<WizardModalProps> = ({
             <WizardStep2Roles
               roles={state.roles}
               editingRoleIdx={state.editingRoleIdx}
-              onSaveRole={saveRole}
-              onRemoveRole={removeRole}
-              onUpdateRolePercent={updateRolePercent}
-              onSetField={setField}
-              canProceed={canProceedStep2}
-              onNext={handleNext}
-              onBack={handleBack}
+              projectType={state.projectType}
+              setField={setField}
+              loadDefaultRoles={loadDefaultRoles}
+              saveRole={saveRole}
+              removeRole={removeRole}
+              setStep={setStep}
             />
           )}
 
