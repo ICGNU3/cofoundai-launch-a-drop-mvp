@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -146,6 +145,7 @@ export const WizardModal: React.FC<{
                   editingRoleIdx={state.editingRoleIdx}
                   editingExpenseIdx={state.editingExpenseIdx}
                   projectType={state.projectType}
+                  pledgeUSDC={state.pledgeUSDC}
                   setField={setField}
                   loadDefaultRoles={loadDefaultRoles}
                   saveRole={saveRole}

@@ -7,6 +7,9 @@ import { ProjectTypeSelector } from "./ui/ProjectTypeSelector";
 import { RoleTemplateManager } from "./ui/RoleTemplateManager";
 import { BudgetItemsList } from "./ui/BudgetItemsList";
 import { BudgetValidationStatus } from "./ui/BudgetValidationStatus";
+import { InteractiveBudgetChart } from "./ui/InteractiveBudgetChart";
+import { ScenarioPlanner } from "./ui/ScenarioPlanner";
+import { BudgetOptimizer } from "./ui/BudgetOptimizer";
 import type { Role, Expense, ProjectType } from "@/hooks/useWizardState";
 
 type WizardBudgetStepProps = {
@@ -15,6 +18,7 @@ type WizardBudgetStepProps = {
   editingRoleIdx: number | null;
   editingExpenseIdx: number | null;
   projectType: ProjectType;
+  pledgeUSDC: string;
   setField: (field: keyof any, value: any) => void;
   loadDefaultRoles: (type: ProjectType) => void;
   saveRole: (role: Role, idx: number | null) => void;
@@ -31,6 +35,7 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   editingRoleIdx,
   editingExpenseIdx,
   projectType,
+  pledgeUSDC,
   setField,
   loadDefaultRoles,
   saveRole,
@@ -48,7 +53,8 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   const epsilon = 0.1;
   const canProceed = Math.abs(sumPercent - 100) < epsilon;
 
-  // Auto-rebalance percentages when adding new role
+  const pledgeAmount = Number(pledgeUSDC) || 0;
+
   const handleAddRole = (newRole: Role) => {
     const roleWithPercent: Role = {
       ...newRole,
@@ -84,26 +90,62 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
     setExpenseModalOpen(true);
   };
 
+  const handleLoadScenario = (scenario: any) => {
+    setField("roles", scenario.roles);
+    setField("expenses", scenario.expenses);
+    setField("pledgeUSDC", scenario.pledgeUSDC);
+  };
+
   return (
-    <div className="space-y-4">
-      <h2 className="headline text-center mb-4">Budget Breakdown</h2>
+    <div className="space-y-6">
+      <h2 className="headline text-center mb-6">Interactive Budget Hub</h2>
       
-      <ProjectTypeSelector
-        projectType={projectType}
-        onProjectTypeChange={(type) => setField("projectType", type)}
-        onLoadDefaultRoles={loadDefaultRoles}
-      />
+      {/* Project Configuration */}
+      <div className="space-y-4">
+        <ProjectTypeSelector
+          projectType={projectType}
+          onProjectTypeChange={(type) => setField("projectType", type)}
+          onLoadDefaultRoles={loadDefaultRoles}
+        />
 
-      <RoleTemplateManager
+        <RoleTemplateManager
+          roles={roles}
+          onLoadTemplate={handleLoadTemplate}
+        />
+      </div>
+
+      {/* Interactive Visualizations */}
+      <InteractiveBudgetChart
         roles={roles}
-        onLoadTemplate={handleLoadTemplate}
+        expenses={expenses}
+        onRolePercentChange={updateRolePercent || (() => {})}
+        pledgeAmount={pledgeAmount}
       />
 
+      {/* Scenario Planning */}
+      <ScenarioPlanner
+        currentRoles={roles}
+        currentExpenses={expenses}
+        currentPledge={pledgeUSDC}
+        projectType={projectType}
+        onLoadScenario={handleLoadScenario}
+      />
+
+      {/* Budget Optimization */}
+      <BudgetOptimizer
+        roles={roles}
+        expenses={expenses}
+        projectType={projectType}
+        pledgeAmount={pledgeAmount}
+      />
+
+      {/* Current Status */}
       <BudgetValidationStatus
         sumPercent={sumPercent}
         hasExpenses={expenses.length > 0}
       />
 
+      {/* Budget Items List */}
       <BudgetItemsList
         roles={roles}
         expenses={expenses}
@@ -114,30 +156,27 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
         onUpdateRolePercent={updateRolePercent}
       />
 
-      {/* Add Role Button */}
-      <div className="flex justify-center">
+      {/* Action Buttons */}
+      <div className="grid grid-cols-2 gap-3">
         <AccentButton
           secondary
           onClick={handleAddRoleClick}
-          className="w-full max-w-xs"
+          className="w-full"
         >
           + Add Role
         </AccentButton>
-      </div>
-
-      {/* Add Expense Button */}
-      <div className="flex justify-center">
+        
         <AccentButton
           secondary
           onClick={handleAddExpenseClick}
-          className="w-full max-w-xs"
+          className="w-full"
         >
           + Add Expense
         </AccentButton>
       </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex gap-3 mt-6">
+      {/* Navigation */}
+      <div className="flex gap-3 mt-8">
         <AccentButton
           secondary
           className="flex-1"
@@ -154,6 +193,7 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
         </AccentButton>
       </div>
 
+      {/* Modals */}
       <AddRoleModal
         open={roleModalOpen}
         defaultRole={editingRoleIdx !== null ? roles[editingRoleIdx] : undefined}
