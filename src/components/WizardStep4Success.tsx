@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Wand2 } from "lucide-react";
+import { Sparkles, Wand2, Share } from "lucide-react";
 import type { Role, Expense, ProjectType } from "@/hooks/useWizardState";
 import { useMintingProcess } from "@/hooks/useMintingProcess";
 import { useProjectSave } from "@/hooks/useProjectSave";
@@ -13,6 +13,8 @@ import { ProjectSummaryCard } from "./ProjectSummaryCard";
 import { ProjectPreviewCard } from "./ProjectPreviewCard";
 import { ProjectActionButtons } from "./ProjectActionButtons";
 import { AIContentGenerationHub } from "./AIContentGenerationHub";
+import Confetti from "react-confetti";
+import { useToast } from "@/hooks/use-toast";
 
 interface WizardStep4SuccessProps {
   projectIdea: string;
@@ -37,6 +39,9 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   const [projectId, setProjectId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("summary");
   const [generatedContent, setGeneratedContent] = useState<any>({});
+  const [showConfetti, setShowConfetti] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const { 
     isMinting, 
@@ -85,6 +90,17 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
     }
   };
 
+  // Show confetti when projectId exists and minting is "complete"
+  useEffect(() => {
+    if (projectId && currentStep === "complete") {
+      setShowConfetti(true);
+      const timeout = setTimeout(() => setShowConfetti(false), 4000);
+      return () => clearTimeout(timeout);
+    } else {
+      setShowConfetti(false);
+    }
+  }, [projectId, currentStep]);
+
   // Auto-navigate to project dashboard when minting is complete
   useEffect(() => {
     if (projectId && currentStep === "complete") {
@@ -95,8 +111,39 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
     }
   }, [projectId, currentStep, navigate]);
 
+  // Share button handler
+  const handleShareDrop = () => {
+    if (!projectId) return;
+    const url = `${window.location.origin}/project/${projectId}/dashboard`;
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        toast({
+          title: "Drop link copied!",
+          description: "Share your drop’s dashboard with collaborators.",
+        });
+      })
+      .catch(() => {
+        toast({
+          title: "Oops!",
+          description: "Couldn’t copy the link. Please try again.",
+          variant: "destructive",
+        });
+      });
+  };
+
   return (
-    <div className="space-y-6 relative">
+    <div className="space-y-6 relative" ref={containerRef}>
+      {/* Confetti celebration effect */}
+      {showConfetti && (
+        <Confetti
+          width={typeof window !== "undefined" ? window.innerWidth : 600}
+          height={typeof window !== "undefined" ? window.innerHeight : 400}
+          numberOfPieces={220}
+          recycle={false}
+          gravity={0.24}
+        />
+      )}
+
       <MintingLoadingOverlay 
         isVisible={isMinting} 
         status={mintingStatus}
@@ -125,6 +172,20 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
             expenseSum={expenseSum}
             fundingTarget={fundingTarget}
           />
+
+          {/* Show Share button after successful launch */}
+          {projectId && currentStep === "complete" && (
+            <div className="flex justify-center">
+              <Button
+                className="gap-2 border transition-all hover:shadow-lg [&_svg]:shrink-0 bg-surface"
+                variant="outline"
+                onClick={handleShareDrop}
+              >
+                <Share size={18} />
+                Share your Drop
+              </Button>
+            </div>
+          )}
 
           <MintingStatusCard
             status={mintingStatus}
