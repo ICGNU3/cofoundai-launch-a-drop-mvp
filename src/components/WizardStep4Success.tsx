@@ -68,9 +68,6 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   // Keep track of latest cover IPFS
   const [coverIpfs, setCoverIpfs] = useState<string | null>(null);
 
-  // Store projectId when created so we can query it later
-  const [projectId, setProjectId] = useState<string | null>(null);
-
   // Fetch project from DB after mint
   const { data: projectRow, isLoading: isProjectLoading } = useProjectById(projectId);
 
