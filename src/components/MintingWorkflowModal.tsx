@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Loader, ArrowUp, Check, ArrowDown } from "lucide-react";
@@ -71,7 +70,14 @@ export const MintingWorkflowModal: React.FC<Props> = ({
   const [gasSpeed, setGasSpeed] = useState<"slow"|"standard"|"fast">("standard");
   const [txHash, setTxHash] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  // Enhanced error state
+  const [errorInfo, setErrorInfo] = useState<{
+    message: string;
+    code?: string;
+    txHash?: string;
+    isUserRejection?: boolean;
+  } | null>(null);
+
   const { gasFees, loading: gasLoading } = useGasEstimator(chainId);
 
   useEffect(() => {
@@ -80,7 +86,7 @@ export const MintingWorkflowModal: React.FC<Props> = ({
       setTxHash(null);
       setProgress(0);
       setGasSpeed("standard");
-      setErrorMsg(null);
+      setErrorInfo(null);
     }
   }, [open]);
 
@@ -103,18 +109,73 @@ export const MintingWorkflowModal: React.FC<Props> = ({
     if (stage === "wallet-sign") setProgress(20);
   }, [stage]);
 
+  const identifyErrorType = (rawMsg: string) => {
+    if (
+      /user (denied|rejected)/i.test(rawMsg) ||
+      /rejected by user/i.test(rawMsg)
+    )
+      return { isUserRejection: true, code: "USER_REJECTED" };
+    if (/insufficient/i.test(rawMsg)) return { code: "INSUFFICIENT_FUNDS" };
+    if (/gas/i.test(rawMsg)) return { code: "GAS_ERROR" };
+    if (/network/i.test(rawMsg)) return { code: "NETWORK" };
+    if (/contract|smart contract/i.test(rawMsg)) return { code: "CONTRACT" };
+    return { code: "SYSTEM" };
+  };
+
   // Handler to start minting after user confirms tx
   const handleStartMint = async () => {
     setStage("wallet-sign");
     const res = await onStartMint({ gasSpeed });
-    if (res.error) {
+    if (res && res.error) {
+      // Error was detected in workflow, parse type/suggestions:
+      const errType = identifyErrorType(res.error || "");
+      setErrorInfo({
+        message: res.error,
+        code: errType.code,
+        txHash: res.txHash,
+        isUserRejection: !!errType.isUserRejection,
+      });
+      setTxHash(res.txHash || null);
       setStage("error");
-      setErrorMsg(res.error);
+      // Log for analytics/debugging:
+      if (typeof window !== "undefined") {
+        window.console?.error?.(
+          "[MINTING_ERROR_LOG]", 
+          {
+            reason: res.error,
+            txHash: res.txHash,
+            type: errType.code,
+            when: new Date().toISOString(),
+          }
+        );
+      }
     } else {
-      if (res.txHash) setTxHash(res.txHash);
+      if (res && res.txHash) setTxHash(res.txHash);
       setStage("txn-pending");
     }
   };
+
+  // Support resources:
+  const faqLink = "https://docs.lovable.dev/faq";
+  const discordLink = "https://discord.gg/62tKPEwDrp";
+  const contactLink = "mailto:support@lovable.dev";
+
+  // Custom error suggestion logic:
+  function getErrorSuggestion(code?: string, userRej?: boolean) {
+    if (userRej) return "You rejected the transaction in your wallet. To try again, please confirm the next time the wallet opens.";
+    switch (code) {
+      case "INSUFFICIENT_FUNDS":
+        return "Your wallet doesn't have enough funds to complete this transaction. Please check your balance and add more, then try again.";
+      case "GAS_ERROR":
+        return "There may be a problem with gas price or fees. Try a higher gas option, or try again later.";
+      case "NETWORK":
+        return "Network congestion or issues detected. Wait a few moments, then try again.";
+      case "CONTRACT":
+        return "A smart contract error occurred. Double-check your transaction details, or contact support.";
+      default:
+        return "Something went wrong! Please review the info below, try again, or reach out to support if the problem persists.";
+    }
+  }
 
   // Compose Drop details preview
   function renderSummary() {
@@ -192,13 +253,73 @@ export const MintingWorkflowModal: React.FC<Props> = ({
   }
 
   function renderStepContent() {
-    // Error
     if (stage === "error")
       return (
-        <div className="text-center py-8">
-          <div className="text-red-400 mb-2 font-bold text-lg">Minting Failed</div>
-          <div className="text-body-text/70">{errorMsg}</div>
-          <Button onClick={onClose} className="mt-4">Close</Button>
+        <div className="text-center py-8 space-y-4">
+          <div className="text-red-400 mb-1 font-bold text-lg">
+            Minting Failed
+          </div>
+          <div className="text-body-text/90 font-semibold">
+            {errorInfo?.isUserRejection
+              ? "Transaction Rejected"
+              : errorInfo?.code === "INSUFFICIENT_FUNDS"
+              ? "Insufficient Funds"
+              : errorInfo?.code === "NETWORK"
+              ? "Network Error"
+              : errorInfo?.code === "GAS_ERROR"
+              ? "Gas Fee Error"
+              : errorInfo?.code === "CONTRACT"
+              ? "Smart Contract Error"
+              : "Unknown Error"}
+          </div>
+          <div className="text-body-text/70 leading-relaxed">{getErrorSuggestion(errorInfo?.code, errorInfo?.isUserRejection)}</div>
+          <div className="my-2 text-xs text-body-text/60 break-words">
+            <span className="font-medium">Reason:</span>{" "}
+            {errorInfo?.message || "—"}
+          </div>
+          {errorInfo?.txHash && (
+            <div className="flex flex-col items-center mt-2 w-full">
+              <span className="text-accent text-xs mb-1">Transaction Hash:</span>
+              <a
+                href={getExplorerUrl(chainId, errorInfo.txHash)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="break-all font-mono bg-background border rounded px-3 py-1 text-xs hover:bg-accent/10"
+                tabIndex={0}
+              >
+                {errorInfo.txHash.slice(0, 10)}...{errorInfo.txHash.slice(-8)}
+              </a>
+            </div>
+          )}
+          <div className="flex flex-col gap-2 items-center mt-4">
+            <a
+              href={faqLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs underline text-muted-foreground hover:text-accent"
+            >
+              View our FAQ
+            </a>
+            <a
+              href={discordLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs underline text-muted-foreground hover:text-accent"
+            >
+              Ask for help in Discord
+            </a>
+            <a
+              href={contactLink}
+              className="text-xs underline text-muted-foreground hover:text-accent"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Contact Support
+            </a>
+          </div>
+          <Button onClick={onClose} className="mt-4">
+            Dismiss
+          </Button>
         </div>
       );
 

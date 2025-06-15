@@ -37,6 +37,13 @@ export function useMintingWorkflow({
   const { usdcxBalanceConfirmed, isPollingBalance, pollUSDCxBalance } = useUSDCxBalance();
   const saveProjectMutation = useProjectSave();
 
+  // Enhanced error state/logging
+  const [lastError, setLastError] = useState<{
+    message: string;
+    code?: string;
+    txHash?: string;
+  } | null>(null);
+
   // Modal controller (for useWizardStep4 and modal open/close)
   const [mintModalOpen, setMintModalOpen] = useState(false);
 
@@ -80,7 +87,51 @@ export function useMintingWorkflow({
       return { txHash: mintData.txHash, step: "txn-pending" as const };
     } catch (error: any) {
       setLoadingMint(false);
-      return { error: error?.message || "An error occurred", step: "error" as const };
+
+      // Classify error:
+      let code: string | undefined;
+      let isUserRejection: boolean | undefined = false;
+      let txHash: string | undefined = undefined;
+      let errMsg = error?.message || "An error occurred";
+      if (
+        /user (denied|rejected)/i.test(errMsg) ||
+        /rejected by user/i.test(errMsg)
+      ) {
+        code = "USER_REJECTED";
+        isUserRejection = true;
+      } else if (/insufficient/i.test(errMsg)) {
+        code = "INSUFFICIENT_FUNDS";
+      } else if (/gas/i.test(errMsg)) {
+        code = "GAS_ERROR";
+      } else if (/network/i.test(errMsg)) {
+        code = "NETWORK";
+      } else if (/contract|smart contract/i.test(errMsg)) {
+        code = "CONTRACT";
+      } else {
+        code = "SYSTEM";
+      }
+      // Try to get txHash if it's on error object
+      if (error?.txHash) txHash = error.txHash;
+
+      setLastError({
+        message: errMsg,
+        code,
+        txHash,
+      });
+
+      // Log error for analytics
+      if (typeof window !== "undefined") {
+        window.console?.error?.(
+          "[MINTING_ERROR_LOG]",
+          {
+            message: errMsg,
+            code,
+            txHash,
+            date: new Date().toISOString(),
+          }
+        );
+      }
+      return { error: errMsg, code, txHash, step: "error" as const, isUserRejection };
     }
   };
 
@@ -100,5 +151,6 @@ export function useMintingWorkflow({
     usdcxBalanceConfirmed,
     isPollingBalance,
     setProjectId,
+    lastError, // for external monitoring if needed
   };
 }
