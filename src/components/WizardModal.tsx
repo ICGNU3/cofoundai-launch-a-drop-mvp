@@ -7,6 +7,8 @@ import { ExpensePill } from "./ui/ExpensePill";
 import { AddExpenseModal } from "./ui/AddExpenseModal";
 import { PercentBar } from "./ui/PercentBar";
 import { WizardRolesStep } from "./WizardRolesStep";
+import { Framework } from "@superfluid-finance/sdk-core";
+import { ethers } from "ethers";
 
 const projectTypes = ["Music", "Film", "Fashion", "Art", "Other"] as const;
 
@@ -74,6 +76,8 @@ Bind its response JSON fields to variables: tokenName, tokenSymbol, tokenSupply,
     throw new Error("Failed to parse OpenAI response: " + (e as Error).message);
   }
 }
+
+const ESCROW_ADDRESS = "0xESCROW_ADDRESS_REPLACE_ME"; // replace with real escrow address
 
 export const WizardModal: React.FC<{
   state: ReturnType<typeof useWizardState>["state"];
@@ -203,8 +207,35 @@ export const WizardModal: React.FC<{
   const [ipfsHash, setIpfsHash] = useState<string | null>(null);
   const [tokenAddress, setTokenAddress] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [escrowTxHash, setEscrowTxHash] = useState<string | null>(null);
 
   // Handler for Mint & Fund button (calls OpenAI, binds fields)
+  const [walletProvider, setWalletProvider] = useState<any>(null);
+  const [signer, setSigner] = useState<ethers.Signer | null>(null);
+
+  async function handleConnectWallet() {
+    if ((window as any).ethereum) {
+      try {
+        await (window as any).ethereum.request({ method: "eth_requestAccounts" });
+        const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any");
+        setWalletProvider(provider);
+        const net = await provider.getNetwork();
+        if (net.chainId !== 84532) {
+          alert("Please switch your wallet to Base Sepolia (chainId 84532).");
+          return;
+        }
+        const signer = provider.getSigner();
+        setSigner(signer);
+        const address = await signer.getAddress();
+        setField("walletAddress", address);
+      } catch (err) {
+        alert("Failed to connect wallet.");
+      }
+    } else {
+      alert("MetaMask or compatible wallet not installed.");
+    }
+  }
+
   const handleMintAndFund = async () => {
     setOpenaiFields({});
     setError(null);
@@ -212,6 +243,7 @@ export const WizardModal: React.FC<{
     setIpfsHash(null);
     setTokenAddress(null);
     setTxHash(null);
+    setEscrowTxHash(null);
 
     try {
       // 1. Call OpenAI Chat API, get metadata fields
@@ -252,6 +284,46 @@ export const WizardModal: React.FC<{
       const zoraData = await zoraRes.json();
       setTokenAddress(zoraData.tokenAddress ?? null);
       setTxHash(zoraData.txHash ?? null);
+
+      // 6. Superfluid: If funding (upfront + pledge) > 0, upgrade and send
+      const fundAmount = expenseSum + pledgeNum;
+      if (fundAmount > 0) {
+        if (!signer) throw new Error("No wallet signer found. Connect wallet first.");
+        // USDC/USDCx addresses (Base Sepolia testnet, may need adjustment)
+        const USDC = "0xd35CceEAD182dcee0F148EbaC9447DA2c4D449c4";
+        const USDCX = "0x4086eBf75233e8492bA044F4b5632F3A63fC25bA";
+        const sf = await Framework.create({
+          chainId: 84532,
+          provider: signer.provider,
+        });
+
+        // Approve USDC -> USDCx if necessary
+        const usdc = new ethers.Contract(
+          USDC, // testnet USDC
+          [
+            "function approve(address guy, uint256 wad) public returns (bool)"
+          ],
+          signer
+        );
+        const upgradeAmt = ethers.utils.parseUnits(fundAmount.toString(), 6); // USDC: 6 decimals
+        await usdc.approve(USDCX, upgradeAmt);
+
+        // Upgrade USDC to USDCx
+        const usdcx = sf.tokens.USDCx;
+        // Perform upgrade (wrap) from USDC to USDCx
+        const upgradeOp = usdcx.upgrade({
+          amount: upgradeAmt.toString()
+        });
+        await upgradeOp.exec(signer);
+
+        // Send USDCx to pre-deployed escrow
+        const sendOp = usdcx.transfer({
+          receiver: ESCROW_ADDRESS,
+          amount: upgradeAmt.toString(),
+        });
+        const txResponse = await sendOp.exec(signer);
+        setEscrowTxHash(txResponse.hash);
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -373,13 +445,13 @@ export const WizardModal: React.FC<{
                   value={pinataJwt}
                   onChange={e => setPinataJwt(e.target.value)}
                 />
-                {/* Simulate Connect Wallet as button */}
+                {/* Updated Connect Wallet */}
                 {!state.walletAddress ? (
                   <AccentButton
                     className="w-full"
-                    onClick={() => setField("walletAddress", "0x1234...5678")}
+                    onClick={handleConnectWallet}
                   >
-                    Connect Wallet (Demo)
+                    Connect Wallet (Base Sepolia)
                   </AccentButton>
                 ) : (
                   <div className="rounded border border-accent px-4 py-3 text-accent mb-2 text-center font-mono text-sm">
@@ -434,6 +506,12 @@ export const WizardModal: React.FC<{
                 {txHash && (
                   <div className="mt-1 p-2 border border-indigo-600 bg-indigo-900/10 text-indigo-100 rounded text-xs font-mono">
                     <b>Zora Tx Hash:</b> <span className="break-all">{txHash}</span>
+                  </div>
+                )}
+                {/* Escrow funding tx hash */}
+                {escrowTxHash && (
+                  <div className="mt-3 p-2 border border-amber-600 bg-amber-900/20 text-yellow-300 rounded text-xs font-mono">
+                    <b>Escrow Funding Tx:</b> <span className="break-all">{escrowTxHash}</span>
                   </div>
                 )}
                 <AccentButton
