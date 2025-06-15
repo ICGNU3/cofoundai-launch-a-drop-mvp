@@ -71,7 +71,7 @@ export const useMintingProcess = () => {
       setMintingStatus("⚡ Creating Zora V4 coin...");
       setProgress(55);
 
-      // Compose Zora body
+      // Compose Zora body as in your instructions
       const zoraBody = {
         chainId: 84532,
         name: tokenName,
