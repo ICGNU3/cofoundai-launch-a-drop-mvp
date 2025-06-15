@@ -13,8 +13,8 @@ body {
 .hero-title, h1.headline, h1 {
   font-family: 'Neue Montreal','Montserrat','Inter',system-ui,sans-serif;
   font-weight: 700;
-  font-size: 36px;
-  line-height: 1.17;
+  font-size: 54px;
+  line-height: 1.13;
   color: #F9F9F9;
   padding-top: 24px;
   padding-bottom: 24px;
@@ -25,6 +25,21 @@ body {
           text-fill-color: transparent;
   letter-spacing: -0.01em;
   text-shadow: 0 2px 24px rgba(34, 197, 94, 0.11), 0 2px 4px #353ad03a;
+}
+
+@media (max-width: 1024px) {
+  .hero-title, h1.headline, h1 {
+    font-size: 42px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+}
+@media (max-width: 640px) {
+  .hero-title, h1.headline, h1 {
+    font-size: 32px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
 }
 
 h2, .section-heading {
