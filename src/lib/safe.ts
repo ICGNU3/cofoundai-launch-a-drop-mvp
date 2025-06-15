@@ -1,18 +1,14 @@
-// src/lib/safe.ts
 
 import { ethers } from 'ethers';
-import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit';
+import SafeFactory, { SafeAccountConfig } from '@safe-global/protocol-kit';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
 const RPC_URL = 'https://sepolia.base.org';
 
 export async function createSafe(owner: string): Promise<string> {
-  // 1. Set up JSON-RPC provider and signer
+  // 1. Set up JSON-RPC provider and signer for the owner
   const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-  // If you're in-browser with MetaMask:
-  // const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
-  // Otherwise, fall back to provider signer (ensure private key handling if needed):
-  const signer = provider.getSigner();
+  const signer   = provider.getSigner(owner);
 
   // 2. Initialize the Ethers adapter
   const ethAdapter = new EthersAdapter({
@@ -20,15 +16,12 @@ export async function createSafe(owner: string): Promise<string> {
     signerOrProvider: signer,
   });
 
-  // 3. Create the Safe factory via the static method
-  const factory = await SafeFactory.create({ ethAdapter });
+  // 3. Create the Safe factory (constructor, NOT static create method)
+  const factory = new SafeFactory({ ethAdapter });
 
   // 4. Deploy a new Safe with a single owner
-  const safeAccountConfig: SafeAccountConfig = {
-    owners: [owner],
-    threshold: 1,
-  };
-  const safeSdk = await factory.deploySafe({ safeAccountConfig });
+  const config: SafeAccountConfig = { owners: [owner], threshold: 1 };
+  const safeSdk = await factory.deploySafe({ safeAccountConfig: config });
 
   // 5. Return the new Safe address
   return safeSdk.getAddress();
