@@ -1,7 +1,6 @@
 
 import { getDefaultProvider, ethers } from "ethers";
-import EthersAdapter from "@safe-global/protocol-kit";
-import SafeFactory, { SafeAccountConfig } from "@safe-global/protocol-kit";
+import { EthersAdapter, SafeFactory, type SafeAccountConfig } from "@safe-global/protocol-kit";
 
 // Creates a Safe wallet and returns its address
 export async function createSafe(owner: `0x${string}`): Promise<string> {
