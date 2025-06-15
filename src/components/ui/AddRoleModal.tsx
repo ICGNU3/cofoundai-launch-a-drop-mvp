@@ -18,22 +18,31 @@ export const AddRoleModal: React.FC<AddRoleModalProps> = ({
 }) => {
   const [roleName, setRoleName] = useState(defaultRole?.roleName || "");
   const [walletAddress, setWalletAddress] = useState(defaultRole?.walletAddress || "");
-  const [percent, setPercent] = useState(defaultRole?.percent ?? 0);
+  const [percentStr, setPercentStr] = useState(
+    defaultRole && typeof defaultRole.percent === "number"
+      ? defaultRole.percent.toString()
+      : ""
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setRoleName(defaultRole?.roleName || "");
     setWalletAddress(defaultRole?.walletAddress || "");
-    setPercent(defaultRole?.percent ?? 0);
+    setPercentStr(
+      defaultRole && typeof defaultRole.percent === "number"
+        ? defaultRole.percent.toString()
+        : ""
+    );
     setError(null);
   }, [open, defaultRole]);
 
   function handleSave() {
     if (!roleName.trim()) return setError("Role name required");
     if (!walletAddress.trim()) return setError("Wallet address required");
-    if (percent <= 0 || percent > 100) return setError("Percent must be 1–100");
-    const sumOther = existingRoles.reduce((a, r) => a + r.percent, 0) - (defaultRole ? defaultRole.percent : 0);
-    if (sumOther + percent > 100) return setError("Total exceeds 100%");
+    // Allow empty for now, treat as 0 (let rebalancer sort it out)
+    let percent = percentStr === "" ? 0 : Number(percentStr);
+    // Clamp percent between 0 and 100
+    if (Number.isNaN(percent) || percent < 0 || percent > 100) return setError("Percent must be 0–100");
     onSave({ roleName: roleName.trim(), walletAddress: walletAddress.trim(), percent });
   }
 
@@ -58,15 +67,22 @@ export const AddRoleModal: React.FC<AddRoleModalProps> = ({
         <input
           className="w-full mb-2 p-2 rounded bg-[#232323] border border-border text-body-text"
           type="number"
-          min={1}
+          min={0}
           max={100}
           placeholder="Percent"
-          value={percent}
-          onChange={e => setPercent(Number(e.target.value))}
+          value={percentStr}
+          onChange={e => {
+            // Accept any numeric input up to 3 digits, can be blank, but not negative
+            const v = e.target.value;
+            if (v === "" || (/^\d{0,3}$/.test(v) && Number(v) >= 0 && Number(v) <= 100)) {
+              setPercentStr(v);
+            }
+          }}
+          onFocus={() => setPercentStr(percentStr === "0" ? "" : percentStr)}
         />
         {error && <div className="text-red-500 text-[13px] mb-1">{error}</div>}
         <button className="accent-btn w-full mt-2" onClick={handleSave}>Save Role</button>
       </div>
     </div>
-  )
+  );
 };
