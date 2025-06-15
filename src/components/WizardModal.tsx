@@ -43,27 +43,30 @@ export const WizardModal: React.FC<{
 
   console.log("[WizardModal] Step:", state.step, "wantsAdvanced:", wantsAdvanced, "totalSteps:", totalSteps);
 
-  // Fixed: Auto-skip step 5 if user doesn't want advanced customization - use useRef to prevent infinite loops
+  // Auto-skip step 5 if user doesn't want advanced customization, only if a further step exists
   const hasSkippedStep5 = React.useRef(false);
   
   React.useEffect(() => {
-    if (state.step === 5 && !state.doAdvancedToken && !hasSkippedStep5.current) {
+    if (
+      state.step === 5 &&
+      !state.doAdvancedToken &&
+      lastStep > 5 &&                // <--- Only auto-skip if skipping to a further step.
+      !hasSkippedStep5.current
+    ) {
       console.log("[WizardModal] Auto-skipping step 5, going to step", lastStep);
       hasSkippedStep5.current = true;
       setStep(lastStep);
     }
-    
-    // Reset the skip flag when not on step 5
+    // Reset skip flag when off step 5
     if (state.step !== 5) {
       hasSkippedStep5.current = false;
     }
   }, [state.step, state.doAdvancedToken, lastStep, setStep]);
 
-  // Move the early return AFTER all hooks have been called
   if (!isOpen) return null;
 
   const handleRestart = () => {
-    hasSkippedStep5.current = false; // Reset skip flag
+    hasSkippedStep5.current = false;
     setStep(1);
     setField("projectIdea", "");
     setField("projectType", "Music");
