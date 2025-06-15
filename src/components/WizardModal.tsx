@@ -85,11 +85,10 @@ export const WizardModal: React.FC<{
     return "Create Your Drop";
   };
 
-  // Only show skipping loader if skipping ahead to a NEW lastStep (e.g., totalSteps > 5)
+  // Show skipping loader only if auto-skipping to a future step (step 6)
   if (
     state.step === 5 &&
     !state.doAdvancedToken &&
-    totalSteps > 5 &&
     lastStep > 5
   ) {
     return (
@@ -107,6 +106,51 @@ export const WizardModal: React.FC<{
           />
           <div className="flex-1 overflow-hidden">
             <SkippingStepLoader />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If on step 5, advanced not wanted, and this is the last step (no more steps) -- show final step content
+  if (
+    state.step === 5 &&
+    !state.doAdvancedToken &&
+    lastStep === 5
+  ) {
+    // "Render" step 5 as if it's the final (success) step
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
+          <WizardHeader 
+            title="Launch Your Drop" 
+            currentStep={progressStep} 
+            totalSteps={totalSteps} 
+            onClose={onClose} 
+          />
+          <WizardProgressBar 
+            totalSteps={totalSteps} 
+            progressStep={progressStep}
+          />
+          <div className="flex-1 overflow-hidden">
+            <WizardStepContent
+              state={state}
+              setStep={setStep}
+              setField={setField}
+              setMode={setMode}
+              saveRole={saveRole}
+              removeRole={removeRole}
+              updateRolePercent={updateRolePercent}
+              saveExpense={saveExpense}
+              removeExpense={removeExpense}
+              loadDefaultRoles={loadDefaultRoles}
+              setTokenCustomization={setTokenCustomization}
+              setDoAdvancedToken={setDoAdvancedToken}
+              handleRestart={handleRestart}
+              walletAddress={walletAddress}
+              wantsAdvanced={wantsAdvanced}
+              lastStep={lastStep}
+            />
           </div>
         </div>
       </div>
