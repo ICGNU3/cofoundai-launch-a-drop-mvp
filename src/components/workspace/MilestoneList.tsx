@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { milestoneSchema, sanitize } from "@/utils/validation";
 
 type MilestoneListProps = {
   projectId: string;
@@ -31,13 +32,19 @@ export const MilestoneList: React.FC<MilestoneListProps> = ({ projectId }) => {
 
   const addMilestone = useMutation({
     mutationFn: async (f: typeof form) => {
+      const validated = milestoneSchema.safeParse(f);
+      if (!validated.success) throw new Error("Invalid input. Please check your fields.");
+      const clean = {
+        ...validated.data,
+        title: sanitize(validated.data.title),
+        description: sanitize(validated.data.description),
+      };
       const { error } = await supabase.from("project_milestones").insert({
         project_id: projectId,
-        title: f.title,
-        description: f.description,
-        due_date: f.due_date ? f.due_date : null,
+        ...clean,
+        due_date: clean.due_date ? clean.due_date : null,
       });
-      if (error) throw error;
+      if (error) throw new Error("Failed to save milestone.");
     },
     onSuccess: () => {
       toast({ title: "Milestone Added" });
@@ -45,7 +52,7 @@ export const MilestoneList: React.FC<MilestoneListProps> = ({ projectId }) => {
       setForm({ title: "", description: "", due_date: "" });
       queryClient.invalidateQueries({ queryKey: ["milestones", projectId] });
     },
-    onError: () => toast({ title: "Failed to add milestone", variant: "destructive" }),
+    onError: () => toast({ title: "Failed to add milestone. Please check your fields.", variant: "destructive" }),
   });
 
   const completeMilestone = useMutation({

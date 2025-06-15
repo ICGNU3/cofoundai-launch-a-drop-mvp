@@ -1,9 +1,9 @@
-
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { taskSchema, sanitize } from "@/utils/validation";
 
 export type Task = {
   id: string;
@@ -41,14 +41,19 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ projectId }) => {
 
   const addTask = useMutation({
     mutationFn: async (t: typeof form) => {
+      const validated = taskSchema.safeParse(t);
+      if (!validated.success) throw new Error("Invalid task input.");
+      const clean = {
+        ...validated.data,
+        title: sanitize(validated.data.title),
+        description: sanitize(validated.data.description),
+      };
       const { error } = await supabase.from("project_tasks").insert({
         project_id: projectId,
-        title: t.title,
-        description: t.description,
-        deadline: t.deadline ? t.deadline : null,
-        status: t.status,
+        ...clean,
+        deadline: clean.deadline ? clean.deadline : null,
       });
-      if (error) throw error;
+      if (error) throw new Error("Failed to create task.");
     },
     onSuccess: () => {
       toast({ title: "Task Created" });
@@ -56,7 +61,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ projectId }) => {
       setForm({ title: "", description: "", deadline: "", status: "todo" });
       queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
     },
-    onError: () => toast({ title: "Failed to create task", variant: "destructive" }),
+    onError: () => toast({ title: "Failed to create task. Please check input.", variant: "destructive" }),
   });
 
   const setTaskStatus = useMutation({

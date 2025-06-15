@@ -1,9 +1,9 @@
-
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { fileSchema, sanitize } from "@/utils/validation";
 
 type ProjectFilesProps = {
   projectId: string;
@@ -31,14 +31,19 @@ export const ProjectFiles: React.FC<ProjectFilesProps> = ({ projectId }) => {
 
   const addFile = useMutation({
     mutationFn: async (f: typeof form) => {
+      const validated = fileSchema.safeParse(f);
+      if (!validated.success) throw new Error("Invalid file input.");
+      const clean = {
+        ...validated.data,
+        filename: sanitize(validated.data.filename),
+        description: sanitize(validated.data.description),
+      };
       const { error } = await supabase.from("project_files").insert({
         project_id: projectId,
-        filename: f.filename,
-        url: f.url,
-        description: f.description,
-        file_type: "", // extend as needed for real file uploads
+        ...clean,
+        file_type: "", // adjust logic for file_type as needed
       });
-      if (error) throw error;
+      if (error) throw new Error("Failed to add file/link.");
     },
     onSuccess: () => {
       toast({ title: "File Added" });
@@ -46,7 +51,7 @@ export const ProjectFiles: React.FC<ProjectFilesProps> = ({ projectId }) => {
       setForm({ filename: "", url: "", description: "" });
       queryClient.invalidateQueries({ queryKey: ["files", projectId] });
     },
-    onError: () => toast({ title: "Failed to add file", variant: "destructive" }),
+    onError: () => toast({ title: "Failed to add file/link. Please check the fields.", variant: "destructive" }),
   });
 
   return (

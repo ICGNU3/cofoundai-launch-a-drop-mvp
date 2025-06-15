@@ -1,9 +1,9 @@
-
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { threadSchema, sanitize } from "@/utils/validation";
 
 type DiscussionThreadsProps = {
   projectId: string;
@@ -44,19 +44,26 @@ export const DiscussionThreads: React.FC<DiscussionThreadsProps> = ({ projectId 
 
   const addThread = useMutation({
     mutationFn: async (f: typeof form) => {
+      const validated = threadSchema.safeParse(f);
+      if (!validated.success) throw new Error("Invalid thread input.");
+      const clean = {
+        ...validated.data,
+        title: sanitize(validated.data.title),
+        content: sanitize(validated.data.content),
+      };
       const { data, error } = await supabase
         .from("project_discussion_threads")
         .insert({
           project_id: projectId,
-          title: f.title,
+          title: clean.title,
         })
         .select()
         .single();
       if (error) throw error;
-      if (f.content) {
+      if (clean.content) {
         await supabase.from("project_discussion_messages").insert({
           thread_id: data.id,
-          content: f.content,
+          content: clean.content,
         });
       }
       return data;
@@ -68,22 +75,24 @@ export const DiscussionThreads: React.FC<DiscussionThreadsProps> = ({ projectId 
       queryClient.invalidateQueries({ queryKey: ["threads", projectId] });
       queryClient.invalidateQueries({ queryKey: ["thread-messages", projectId] });
     },
-    onError: () => toast({ title: "Thread creation failed", variant: "destructive" }),
+    onError: () => toast({ title: "Thread creation failed. Please check your fields.", variant: "destructive" }),
   });
 
   const addReply = useMutation({
     mutationFn: async ({ threadId, content }: { threadId: string; content: string }) => {
+      const cleanContent = sanitize(content);
+      if (!cleanContent || cleanContent.length > 1000) throw new Error("Invalid reply length.");
       const { error } = await supabase.from("project_discussion_messages").insert({
         thread_id: threadId,
-        content,
+        content: cleanContent,
       });
-      if (error) throw error;
+      if (error) throw new Error("Failed to post reply.");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["thread-messages", projectId] });
       toast({ title: "Reply posted" });
     },
-    onError: () => toast({ title: "Failed to post reply", variant: "destructive" }),
+    onError: () => toast({ title: "Failed to post reply. Please check your content.", variant: "destructive" }),
   });
 
   return (
