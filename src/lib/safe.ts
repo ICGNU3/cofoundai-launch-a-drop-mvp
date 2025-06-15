@@ -1,12 +1,7 @@
 
 import { ethers } from 'ethers';
-
-// Import Safe-related types only
-import type { SafeAccountConfig } from '@safe-global/protocol-kit';
-
-// Import the default export to access the factory
-import SafeFactory from '@safe-global/protocol-kit';
-
+// Import from top-level: Safe, SafeFactory, SafeAccountConfig
+import Safe, { SafeFactory, SafeAccountConfig } from '@safe-global/protocol-kit';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
 const RPC = 'https://sepolia.base.org'; // Base Sepolia
@@ -22,7 +17,7 @@ export async function createSafe(owner: `0x${string}`) {
     signerOrProvider: signer
   });
 
-  // 3. Safe factory (via default import)
+  // 3. Safe factory (via named export, using create)
   const safeFactory = await SafeFactory.create({ ethAdapter });
 
   // 4. Deploy a 1-owner Safe
