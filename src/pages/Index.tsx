@@ -7,6 +7,9 @@ import { Web3WalletModule } from "@/components/Web3WalletModule";
 import { Wallet } from "lucide-react";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
 import AdvancedTokenCustomization from "@/components/AdvancedTokenCustomization/AdvancedTokenCustomization";
+import CreatorCarousel from "@/components/CreatorCarousel";
+import LiveCounterBar from "@/components/LiveCounterBar";
+import CrewSplitSliderDemo from "@/components/CrewSplitSliderDemo";
 
 // Import Avatar for carousel
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -21,11 +24,6 @@ const Index: React.FC = () => {
 
   // Latest projects for creator carousel
   const [carousel, setCarousel] = useState<any[]>([]);
-  const carouselRef = useRef<HTMLDivElement>(null);
-
-  // CountUp.js ref (for bar)
-  const countUpDollarRef = useRef<HTMLSpanElement>(null);
-  const countUpDropRef = useRef<HTMLSpanElement>(null);
 
   // Fetch stats (Edge function) and projects (from supabase)
   useEffect(() => {
@@ -125,31 +123,9 @@ const Index: React.FC = () => {
           Build and fund creative projects with your team—experience instant streaming of funds as soon as you deliver.
         </div>
         {/* --- LIVE COUNTER BAR --- */}
-        <div className="flex items-center justify-center w-full mt-5 mb-2 z-10" aria-live="polite">
-          <div className="bg-[#242349] px-4 py-1 rounded-sm text-sm font-mono flex gap-2 shadow-lg border border-accent items-center min-w-[300px] justify-center" style={{ letterSpacing: '0.03em' }}>
-            <span ref={countUpDollarRef} id="counterDollar" className="tabular-nums font-bold text-gold text-base"></span>
-            <span className="text-[#b89cff] mx-1">streamed •</span>
-            <span ref={countUpDropRef} id="counterDrop" className="tabular-nums font-bold text-indigo-300 text-base"></span>
-            <span className="text-[#b89cff]">drops funded</span>
-          </div>
-        </div>
+        <LiveCounterBar counter={counter} />
         {/* MICRO SLIDER DEMO */}
-        <div className="demo flex items-center gap-4 justify-center mt-6" aria-label="Demo splitting value between artist and producer">
-          <label className="text-sm text-gold">Artist</label>
-          <input
-            type="range"
-            id="demoSlider"
-            min={0}
-            max={100}
-            defaultValue={50}
-            className="w-48 accent-[#5D5FEF] focus:ring-2 focus:ring-gold"
-            onInput={handleSliderChange}
-            aria-valuenow={50}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          />
-          <label className="text-sm text-indigo-400">Producer</label>
-        </div>
+        <CrewSplitSliderDemo />
         {/* HERO CTA BUTTON */}
         <AccentButton
           className="hero-cta mt-6 sm:mt-7 px-8 py-4 text-lg rounded-xl shadow-lg hover:scale-105 transition-all font-bold z-20"
@@ -171,35 +147,7 @@ const Index: React.FC = () => {
           </span>
         </AccentButton>
         {/* CREATOR CAROUSEL */}
-        <div className="carousel flex gap-6 overflow-x-auto py-8 hide-scrollbar w-full max-w-5xl" ref={carouselRef} role="list">
-          {carousel.length === 0 && (
-            <div className="opacity-70 text-sm italic text-neutral-400 p-8">
-              Recent creator drops will appear here soon!
-            </div>
-          )}
-          {carousel.map((proj, i) => (
-            <div
-              className="card w-56 flex-shrink-0 bg-[#1E1E1E] rounded shadow-inner border border-accent/20 focus-visible:ring-2 focus-visible:ring-gold"
-              key={proj.id || i}
-              role="listitem"
-              tabIndex={0}
-              aria-label={`Drop: ${proj.project_idea?.slice(0, 40)}`}
-            >
-              <img
-                src={proj.cover_art_url || "/placeholder.svg"}
-                alt={proj.project_idea?.slice(0, 40) || "Cover Art"}
-                className="rounded-t w-full h-36 object-cover"
-              />
-              <div className="p-4 text-sm">
-                “{proj.project_idea?.slice(0, 45) || "Exciting project..." }”
-                <br />
-                <span className="text-[#9A4DFF] font-mono">
-                  @{(proj.wallet_address && proj.wallet_address.slice(0, 8) + '…') || "creator"}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <CreatorCarousel carousel={carousel} />
       </section>
 
       {/* FEATURES SECTION */}
