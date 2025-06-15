@@ -6,7 +6,6 @@ import FullWaveBackground from "@/components/FullWaveBackground";
 import { Web3WalletModule } from "@/components/Web3WalletModule";
 import { Wallet } from "lucide-react";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
-import HeroMotionCanvas from "@/components/HeroMotionCanvas";
 
 const Index: React.FC = () => {
   const wizard = useWizardState();
@@ -17,8 +16,6 @@ const Index: React.FC = () => {
       <FullWaveBackground />
       {/* --- HERO SECTION --- */}
       <div className="w-full pt-24 pb-10 px-4 z-10 relative flex flex-col items-center">
-        {/* --- Hero Canvas Animation Layer (custom canvas, not SVG) --- */}
-        <HeroMotionCanvas />
         {/* Wallet button right-aligned (desktop), mobile top-right */}
         <div className="w-full max-w-5xl flex justify-end">
           <button
