@@ -18,6 +18,7 @@ import { TeamDirectory } from "@/components/TeamManagement/TeamDirectory";
 import { RolePermissionsPanel } from "@/components/TeamManagement/RolePermissionsPanel";
 import { ProjectChat } from "@/components/TeamManagement/ProjectChat";
 import UnifiedPeopleSection from "@/components/UnifiedPeopleSection";
+import { useProjectFullData } from "@/hooks/useProjectFullData";
 
 type ProjectWithDetails = {
   id: string;
@@ -47,35 +48,7 @@ const ProjectDashboard: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const { user } = usePrivy();
 
-  const { data: project, isLoading, refetch } = useQuery({
-    queryKey: ["project-dashboard", projectId],
-    queryFn: async () => {
-      if (!projectId) throw new Error("Project ID required");
-      
-      // Get project details
-      const { data: projectData, error: projectError } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("id", projectId)
-        .single();
-
-      if (projectError) throw projectError;
-
-      // Get project roles
-      const { data: rolesData, error: rolesError } = await supabase
-        .from("project_roles")
-        .select("*")
-        .eq("project_id", projectId);
-
-      if (rolesError) throw rolesError;
-
-      return {
-        ...projectData,
-        roles: rolesData || []
-      } as ProjectWithDetails;
-    },
-    enabled: !!projectId,
-  });
+  const { data: project, isLoading, refetch } = useProjectFullData(projectId);
 
   if (isLoading) {
     return (
@@ -93,10 +66,10 @@ const ProjectDashboard: React.FC = () => {
     );
   }
 
-  const activeStreams = project.roles.filter(role => role.stream_active);
-  const totalFlowRate = activeStreams.reduce((sum, role) => sum + (role.stream_flow_rate || 0), 0);
+  const activeStreams = project.roles.filter((role: any) => role.stream_active);
+  const totalFlowRate = activeStreams.reduce((sum: number, role: any) => sum + (role.stream_flow_rate || 0), 0);
 
-  const isNewlyLaunched = project.minted_at && 
+  const isNewlyLaunched = project.minted_at &&
     Date.now() - new Date(project.minted_at).getTime() < 10 * 60 * 1000;
 
   return (
@@ -108,8 +81,8 @@ const ProjectDashboard: React.FC = () => {
         {/* The rest of the dashboard remains as before */}
         {isNewlyLaunched && (
           <div className="mb-8">
-            <ProjectLaunchHub 
-              project={project} 
+            <ProjectLaunchHub
+              project={project}
               roles={project.roles}
             />
           </div>
