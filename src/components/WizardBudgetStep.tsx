@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ScrollArea } from "./ui/scroll-area";
 import { WizardNavigationButtons } from "./ui/WizardNavigationButtons";
@@ -27,19 +28,19 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   onNext,
   onBack,
 }) => {
-  const sumPercent = state.roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
-  const epsilon = 0.5; // Allow slightly more numerical tolerance
-  const isRoleBalanceValid = Math.abs(sumPercent - 100) < epsilon;
+  // Compute sum only from role shares
+  const roleSum = state.roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
+  const epsilon = 0.1;
+  const isRoleBalanceValid = Math.abs(roleSum - 100) < epsilon;
 
   const pledgeAmount = Number(state.pledgeUSDC) || 0;
   const hasValidExpense = state.expenses.some(e => e.amountUSDC > 0);
 
-  // ALLOW: If (1) role split sums ~100% OR (2) any expense or pledge is provided
+  // Enable proceed only if role shares balance or any expense/pledge is present
   const canProceed = isRoleBalanceValid || hasValidExpense || pledgeAmount > 0;
 
-  // Add diagnostic logs for debugging
-  // Remove or comment these lines in production!
-  console.log('[WizardBudgetStep] sumPercent:', sumPercent, 'isRoleBalanceValid:', isRoleBalanceValid, 'hasValidExpense:', hasValidExpense, 'pledgeAmount:', pledgeAmount, 'canProceed:', canProceed);
+  // Diagnostic logs for debugging
+  console.log('[WizardBudgetStep] roleSum:', roleSum, 'isRoleBalanceValid:', isRoleBalanceValid, 'hasValidExpense:', hasValidExpense, 'pledgeAmount:', pledgeAmount, 'canProceed:', canProceed);
 
   const handleLoadScenario = (scenario: any) => {
     onSetField("roles", scenario.roles);
@@ -58,9 +59,9 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
 
       <ScrollArea className="flex-1">
         <div className="space-y-6 pr-4">
-          {/* Budget Validation Status */}
+          {/* Budget Validation Status: Pass only roleSum and ignore expenses for color/msg */}
           <BudgetValidationStatus 
-            sumPercent={sumPercent} 
+            sumPercent={roleSum} 
             hasExpenses={state.expenses.length > 0} 
           />
 
