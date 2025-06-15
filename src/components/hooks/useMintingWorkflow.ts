@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useMintingProcess } from "@/hooks/useMintingProcess";
 import { useUSDCxBalance } from "@/hooks/useUSDCxBalance";
@@ -66,7 +65,7 @@ export function useMintingWorkflow({
         projectType,
         roles,
         expenses,
-        pledgeUSDC,
+        pledgeUSDC: pledgeUSDC.toString(), // Ensure string for type safety
         walletAddress,
         fundingTarget,
         expenseSum,
