@@ -10,7 +10,7 @@ const features = [
       </div>
     ),
     title: "Instant Creation",
-    desc: "Describe your drop and launch in under 2 minutes—no bureaucracy, no code.",
+    desc: "Describe your drop and launch in under 2 minutes. No bureaucracy, no code.",
   },
   {
     icon: (
@@ -28,7 +28,7 @@ const features = [
       </div>
     ),
     title: "Fund & Mint in One Tap",
-    desc: "Collect funds, mint, and distribute—all from a single powerful tool.",
+    desc: "Collect funds, mint, and distribute - all from a single powerful tool.",
   },
 ];
 
