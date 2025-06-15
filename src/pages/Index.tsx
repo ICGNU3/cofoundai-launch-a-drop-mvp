@@ -3,8 +3,6 @@ import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
 import { AccentButton } from "@/components/ui/AccentButton";
 import FullWaveBackground from "@/components/FullWaveBackground";
-import { Web3WalletModule } from "@/components/Web3WalletModule";
-import { Wallet } from "lucide-react";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
 import CreatorCarousel from "@/components/CreatorCarousel";
 import LiveCounterBar from "@/components/LiveCounterBar";
@@ -47,7 +45,7 @@ const Index: React.FC = () => {
     // Add CountUp.js if missing
     if (!window.CountUp) {
       const c = document.createElement("script");
-      c.src = "https://cdn.jsdelivr.net/npm/countup.js@2.6.2/dist/countUp.min.js";
+      c.src = "https://cdn.jsdelivr.net/npm/countUp.js@2.6.2/dist/countUp.min.js";
       c.onload = () => {
         if (window.CountUp) runCounter();
       };
@@ -125,7 +123,8 @@ const Index: React.FC = () => {
       <section className="relative w-full pt-16 md:pt-20 pb-10 px-4 z-10 flex flex-col items-center pb-24">
         {/* HERO GRADIENT */}
         <div className="hero-gradient pointer-events-none" aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 80%,rgba(154,77,255,.18) 0%,transparent 72%)', zIndex: 0 }} />
-        <div className="w-full max-w-5xl flex justify-end">
+        {/* REMOVE WALLET BUTTON */}
+        {/* <div className="w-full max-w-5xl flex justify-end">
           <button
             onClick={() => setWalletOpen(true)}
             className="rounded-lg p-2 bg-gold/15 hover:bg-accent/30 text-accent transition-all"
@@ -133,7 +132,7 @@ const Index: React.FC = () => {
           >
             <Wallet size={20} color="#FFD700" />
           </button>
-        </div>
+        </div> */}
         {/* HEADLINE */}
         <h1 className="text-center font-headline font-bold text-[2.3rem] md:text-[2.7rem] lg:text-[3rem] leading-[1.13] hero-title py-2 mt-2 max-w-3xl relative z-10 font-playfair tracking-tight drop-shadow">
           TALENT = MONEY
@@ -218,7 +217,8 @@ const Index: React.FC = () => {
         onClose={wizard.closeWizard}
         walletAddress={null}
       />
-      <Web3WalletModule open={walletOpen} onClose={() => setWalletOpen(false)} />
+      {/* REMOVE THE WEB3 WALLET MODULE */}
+      {/* <Web3WalletModule open={walletOpen} onClose={() => setWalletOpen(false)} /> */}
 
       {/* FOOTER */}
       <footer className="py-8 border-t border-border bg-[#101910] w-full text-center mt-auto z-[5]">
