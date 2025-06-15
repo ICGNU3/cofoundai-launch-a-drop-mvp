@@ -19,15 +19,37 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				headline: [
-					'"Playfair Display"',
-					"Helvetica Neue",
-					"Helvetica",
-					"Arial",
-					"sans-serif",
+				// UI, Headlines
+				neue: [
+					'"Neue Montreal"',
+					'Montserrat',
+					'Inter',
+					'system-ui',
+					'sans-serif'
 				],
-				playfair: ['"Playfair Display"', "serif"],
-				sans: ["Inter", "sans-serif"],
+				// Body
+				satoshi: [
+					'"Satoshi"',
+					'Inter',
+					'Montserrat',
+					'system-ui',
+					'sans-serif'
+				],
+				// Aliases for legacy utility classes
+				headline: [
+					'"Neue Montreal"',
+					'Montserrat',
+					'Inter',
+					'system-ui',
+					'sans-serif'
+				],
+				sans: [
+					'"Satoshi"',
+					'Inter',
+					'Montserrat',
+					'system-ui',
+					'sans-serif'
+				],
 			},
 			fontWeight: {
 				semi: 500,

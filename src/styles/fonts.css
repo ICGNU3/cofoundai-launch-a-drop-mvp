@@ -1,3 +1,45 @@
 
-/* Import Playfair Display for professional, premium headlines, and Inter for UI text */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400&display=swap');
+/* Neue Montreal and Satoshi Font Stacks (web3 standard 2025) */
+/* Place your .woff2 files in ./fonts and uncomment src:url(...) to use real commercial fonts! */
+@font-face {
+  font-family: "Neue Montreal";
+  src: local("Neue Montreal"), /* Uncomment and add path to your font file if available:
+    url('./fonts/NeueMontreal-Regular.woff2') format('woff2'),
+    url('./fonts/NeueMontreal-Regular.woff') format('woff') 
+  */ ;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Neue Montreal";
+  src: local("Neue Montreal"), /* Uncomment and add path to your font file:
+    url('./fonts/NeueMontreal-Bold.woff2') format('woff2'),
+    url('./fonts/NeueMontreal-Bold.woff') format('woff')
+  */ ;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: local("Satoshi"), /* Uncomment and add path to your font file if available:
+    url('./fonts/Satoshi-Regular.woff2') format('woff2'),
+    url('./fonts/Satoshi-Regular.woff') format('woff')
+  */ ;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: local("Satoshi"), /* Uncomment and add path to your font file:
+    url('./fonts/Satoshi-Bold.woff2') format('woff2'),
+    url('./fonts/Satoshi-Bold.woff') format('woff')
+  */ ;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* Fallback to Inter and system-ui if fonts are not available */
