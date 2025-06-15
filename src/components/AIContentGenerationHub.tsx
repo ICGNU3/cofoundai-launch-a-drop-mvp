@@ -1,7 +1,8 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Palette, FileText, Sparkles, Wand2 } from "lucide-react";
+import { FileText, Sparkles, Wand2 } from "lucide-react";
 import { AICopyGenerator } from "./AICopyGenerator";
 import { ContentRefinementTools } from "./ContentRefinementTools";
 import { ContentPreviewSuite } from "./ContentPreviewSuite";
@@ -17,9 +18,8 @@ export const AIContentGenerationHub: React.FC<AIContentGenerationHubProps> = ({
   projectType,
   onContentGenerated,
 }) => {
-  const [activeTab, setActiveTab] = useState("cover-art");
+  const [activeTab, setActiveTab] = useState("copy");
   const [generatedContent, setGeneratedContent] = useState<{
-    coverArt?: any;
     copy?: any;
     refinements?: any;
   }>({});
@@ -42,7 +42,7 @@ export const AIContentGenerationHub: React.FC<AIContentGenerationHubProps> = ({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="copy" className="flex items-center gap-2">
             <FileText size={16} />
             Marketing Copy

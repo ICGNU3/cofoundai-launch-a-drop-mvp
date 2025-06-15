@@ -14,6 +14,11 @@ export const WizardStepTokenConfirm: React.FC<WizardStepTokenConfirmProps> = ({
   onNext,
   onBack,
 }) => {
+  const handleNext = () => {
+    console.log("[WizardStepTokenConfirm] Proceeding with doAdvancedToken:", doAdvancedToken);
+    onNext();
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-full py-12">
       <h2 className="text-xl font-bold mb-4">Customize Your Token?</h2>
@@ -22,25 +27,31 @@ export const WizardStepTokenConfirm: React.FC<WizardStepTokenConfirmProps> = ({
       </p>
       <div className="flex gap-4 mb-4">
         <button
-          className={`accent-btn px-6 ${!doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text"}`}
+          className={`accent-btn px-6 transition-all ${!doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text hover:bg-accent/10"}`}
           type="button"
           aria-pressed={!doAdvancedToken}
-          onClick={() => setDoAdvancedToken(false)}
+          onClick={() => {
+            console.log("[WizardStepTokenConfirm] Setting doAdvancedToken to false");
+            setDoAdvancedToken(false);
+          }}
         >
           No, use default token
         </button>
         <button
-          className={`accent-btn px-6 ${doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text"}`}
+          className={`accent-btn px-6 transition-all ${doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text hover:bg-accent/10"}`}
           type="button"
           aria-pressed={doAdvancedToken}
-          onClick={() => setDoAdvancedToken(true)}
+          onClick={() => {
+            console.log("[WizardStepTokenConfirm] Setting doAdvancedToken to true");
+            setDoAdvancedToken(true);
+          }}
         >
           Yes, customize token
         </button>
       </div>
       <div className="flex justify-between mt-6 w-full max-w-xs">
         <button className="accent-btn secondary" type="button" onClick={onBack}>← Back</button>
-        <button className="accent-btn" type="button" onClick={onNext}>
+        <button className="accent-btn" type="button" onClick={handleNext}>
           Next
         </button>
       </div>

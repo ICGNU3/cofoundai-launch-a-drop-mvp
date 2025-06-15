@@ -44,7 +44,8 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
   wantsAdvanced,
   lastStep,
 }) => {
-  // Only render something if not skipping step 5 (the parent will skip it outside render!)
+  console.log("[WizardStepContent] Current step:", state.step, "doAdvancedToken:", state.doAdvancedToken);
+
   switch (state.step) {
     case 1:
       return (
@@ -91,7 +92,14 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
         <WizardStepTokenConfirm
           doAdvancedToken={!!state.doAdvancedToken}
           setDoAdvancedToken={setDoAdvancedToken}
-          onNext={() => (state.doAdvancedToken ? setStep(5) : setStep(6))}
+          onNext={() => {
+            console.log("[WizardStepContent] Step 4 onNext, doAdvancedToken:", state.doAdvancedToken);
+            if (state.doAdvancedToken) {
+              setStep(5);
+            } else {
+              setStep(lastStep);
+            }
+          }}
           onBack={() => setStep(3)}
         />
       );
@@ -104,13 +112,13 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
               setTokenCustomization={setTokenCustomization}
               setStep={setStep}
               onBack={() => setStep(4)}
-              onNext={() => setStep(6)}
+              onNext={() => setStep(lastStep)}
             />
           </div>
         );
       } else {
-        // This should never render (skipped outside), but fallback just in case
-        return <></>;
+        // Show loading if somehow we end up here without advanced token selected
+        return <SkippingStepLoader />;
       }
     case lastStep:
       return (
@@ -126,6 +134,7 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
         />
       );
     default:
+      console.warn("[WizardStepContent] Unknown step:", state.step);
       return null;
   }
 };

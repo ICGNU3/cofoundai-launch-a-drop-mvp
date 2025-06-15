@@ -1,3 +1,4 @@
+
 import React from "react";
 import { X } from "lucide-react";
 import { WizardStep1Describe } from "./WizardStep1Describe";
@@ -42,14 +43,15 @@ export const WizardModal: React.FC<{
   const lastStep = totalSteps;
   const progressStep = Math.max(1, Math.min(state.step, totalSteps));
 
-  // -------------------------------------------------------------------
-  // !!! CRITICAL: SKIP STEP 5 OUTSIDE OF RENDER !!!
-  // If user is on step 5 but didn't select advanced, immediately redirect to step 6 BEFORE rendering.
-  // -------------------------------------------------------------------
-  if (state.step === 5 && !state.doAdvancedToken) {
-    setStep(6);
-    return null;
-  }
+  console.log("[WizardModal] Step:", state.step, "wantsAdvanced:", wantsAdvanced, "totalSteps:", totalSteps);
+
+  // Auto-skip step 5 if user doesn't want advanced customization
+  React.useEffect(() => {
+    if (state.step === 5 && !state.doAdvancedToken) {
+      console.log("[WizardModal] Auto-skipping step 5, going to step", lastStep);
+      setStep(lastStep);
+    }
+  }, [state.step, state.doAdvancedToken, lastStep, setStep]);
 
   const handleRestart = () => {
     setStep(1);
@@ -71,6 +73,29 @@ export const WizardModal: React.FC<{
     if (state.step === lastStep) return "Launch Your Drop";
     return "Create Your Drop";
   };
+
+  // Show skipping loader when auto-transitioning step 5
+  if (state.step === 5 && !state.doAdvancedToken) {
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
+          <WizardHeader 
+            title="Skipping Advanced Customization" 
+            currentStep={progressStep} 
+            totalSteps={totalSteps} 
+            onClose={onClose} 
+          />
+          <WizardProgressBar 
+            totalSteps={totalSteps} 
+            progressStep={progressStep}
+          />
+          <div className="flex-1 overflow-hidden">
+            <SkippingStepLoader />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
