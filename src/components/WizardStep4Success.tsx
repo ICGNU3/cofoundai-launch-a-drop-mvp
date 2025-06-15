@@ -33,7 +33,16 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   const navigate = useNavigate();
   const [projectId, setProjectId] = useState<string | null>(null);
 
-  const { isMinting, mintingStatus, simulateMinting, completeMinting } = useMintingProcess();
+  const { 
+    isMinting, 
+    currentStep, 
+    mintingStatus, 
+    progress, 
+    mintingSteps, 
+    simulateMinting, 
+    completeMinting 
+  } = useMintingProcess();
+  
   const { usdcxBalanceConfirmed, isPollingBalance, pollUSDCxBalance } = useUSDCxBalance();
   const saveProjectMutation = useProjectSave();
 
@@ -71,19 +80,25 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
     }
   };
 
-  // Auto-navigate to project dashboard when available
+  // Auto-navigate to project dashboard when minting is complete
   useEffect(() => {
-    if (projectId && !isMinting && mintingStatus.includes("successfully")) {
+    if (projectId && currentStep === "complete") {
       const timer = setTimeout(() => {
         navigate(`/project/${projectId}/dashboard`);
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [projectId, isMinting, mintingStatus, navigate]);
+  }, [projectId, currentStep, navigate]);
 
   return (
     <div className="space-y-6 relative">
-      <MintingLoadingOverlay isVisible={isMinting} status={mintingStatus} />
+      <MintingLoadingOverlay 
+        isVisible={isMinting} 
+        status={mintingStatus}
+        currentStep={currentStep}
+        progress={progress}
+        mintingSteps={mintingSteps}
+      />
 
       <ProjectSummaryCard
         projectIdea={projectIdea}

@@ -1,10 +1,10 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "../integrations/supabase/client";
 import { usePrivy } from "@privy-io/react-auth";
 import { ProjectFundingProgress } from "@/components/ProjectOverviewParts";
+import { ProjectLaunchHub } from "@/components/ProjectLaunchHub";
 
 type ProjectWithDetails = {
   id: string;
@@ -82,13 +82,29 @@ const ProjectDashboard: React.FC = () => {
   const activeStreams = project.roles.filter(role => role.stream_active);
   const totalFlowRate = activeStreams.reduce((sum, role) => sum + (role.stream_flow_rate || 0), 0);
 
+  // Check if this is a newly launched project (minted in last 10 minutes)
+  const isNewlyLaunched = project.minted_at && 
+    Date.now() - new Date(project.minted_at).getTime() < 10 * 60 * 1000;
+
   return (
     <div className="min-h-screen bg-background px-4 py-8">
       <div className="max-w-4xl mx-auto">
+        {/* Show Launch Hub for newly launched projects */}
+        {isNewlyLaunched && (
+          <div className="mb-8">
+            <ProjectLaunchHub 
+              project={project} 
+              roles={project.roles}
+            />
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-headline">Project Dashboard</h1>
+            <h1 className="text-3xl font-bold text-headline">
+              {isNewlyLaunched ? "Project Launch Hub" : "Project Dashboard"}
+            </h1>
             <button
               onClick={() => refetch()}
               className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/80 transition"
@@ -102,6 +118,7 @@ const ProjectDashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* Rest of the existing dashboard content */}
         {/* Status Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Token Minted Status */}
