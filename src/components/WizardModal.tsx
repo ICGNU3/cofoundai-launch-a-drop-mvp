@@ -5,53 +5,8 @@ import WizardStep2Roles from "./WizardStep2Roles";
 import { WizardBudgetStep } from "./WizardBudgetStep";
 import { WizardStep4Success } from "./WizardStep4Success";
 import { useWizardState } from "@/hooks/useWizardState";
-import AdvancedTokenCustomization from "@/components/AdvancedTokenCustomization/AdvancedTokenCustomization";
-
-// NEW: Token Customization Confirmation Step
-function WizardStepTokenConfirm({
-  doAdvancedToken,
-  setDoAdvancedToken,
-  onNext,
-  onBack,
-}: {
-  doAdvancedToken: boolean,
-  setDoAdvancedToken: (v: boolean) => void,
-  onNext: () => void,
-  onBack: () => void,
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center h-full py-12">
-      <h2 className="text-xl font-bold mb-4">Customize Your Token?</h2>
-      <p className="max-w-md text-center mb-6 text-body-text/80">
-        Would you like to deeply customize your project's associated token—supply, distribution, vesting, and utility—or use a simple default token template? <span className="text-gold">Optional</span>
-      </p>
-      <div className="flex gap-4 mb-4">
-        <button
-          className={`accent-btn px-6 ${!doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text"}`}
-          type="button"
-          aria-pressed={!doAdvancedToken}
-          onClick={() => setDoAdvancedToken(false)}
-        >
-          No, use default token
-        </button>
-        <button
-          className={`accent-btn px-6 ${doAdvancedToken ? "bg-accent border-accent text-background" : "bg-secondary border-border text-body-text"}`}
-          type="button"
-          aria-pressed={doAdvancedToken}
-          onClick={() => setDoAdvancedToken(true)}
-        >
-          Yes, customize token
-        </button>
-      </div>
-      <div className="flex justify-between mt-6 w-full max-w-xs">
-        <button className="accent-btn secondary" type="button" onClick={onBack}>← Back</button>
-        <button className="accent-btn" type="button" onClick={onNext}>
-          Next
-        </button>
-      </div>
-    </div>
-  );
-}
+import { WizardStepTokenConfirm } from "./WizardStepTokenConfirm";
+import { AdvancedTokenCustomizationWrapper } from "./AdvancedTokenCustomizationWrapper";
 
 export const WizardModal: React.FC<{
   isOpen: boolean;
@@ -72,29 +27,32 @@ export const WizardModal: React.FC<{
     saveExpense,
     removeExpense,
     loadDefaultRoles,
-    setTokenCustomization, // NEW
-    setDoAdvancedToken,    // NEW
+    setTokenCustomization,
+    setDoAdvancedToken,
   } = useWizardState();
 
-  // Local state to hold advanced token customization from AdvancedTokenCustomization (step 5)
+  // Local state for advanced token customization (kept for completeness)
   const [tokenState, setTokenState] = useState<any>(null);
 
   if (!isOpen) return null;
 
-  // ADAPT: Step mapping
+  // Corrected step mapping & navigation
   // 1 = describe, 2 = roles, 3 = budget, 4 = token confirm, 5 = advanced config, 6 = launch/success
-  const isFinalStep = () => state.step === (state.doAdvancedToken ? 6 : 5);
+  const wantsAdvanced = !!state.doAdvancedToken;
+  const lastStep = wantsAdvanced ? 6 : 5;
+  const isFinalStep = () => state.step === lastStep;
 
-  // Navigation logic
   const handleNext = () => {
-    // Only allow progress to valid step numbers!
-    // At token confirm...
+    // Token customization decision step logic
     if (state.step === 4) {
       if (state.doAdvancedToken) {
-        setStep(5); // Go to advanced
+        setStep(5); // Choose advanced
       } else {
         setStep(6); // Skip to launch
       }
+    } else if (state.step === 5 && !state.doAdvancedToken) {
+      // Shouldn't happen, but for safety: skip extra advanced step if not requested
+      setStep(6);
     } else if (isFinalStep()) {
       // stay at final
     } else {
@@ -122,15 +80,13 @@ export const WizardModal: React.FC<{
     if (state.step === 2) return "Define Roles & Revenue Split";
     if (state.step === 3) return "Budget Breakdown";
     if (state.step === 4) return "Token Customization";
-    if (state.doAdvancedToken && state.step === 5) return "Advanced Token Customization";
-    if (state.step === (state.doAdvancedToken ? 6 : 5)) return "Launch Your Drop";
+    if (wantsAdvanced && state.step === 5) return "Advanced Token Customization";
+    if (state.step === lastStep) return "Launch Your Drop";
     return "Create Your Drop";
   };
 
-  // Progress Indicator
-  const totalSteps = state.doAdvancedToken ? 6 : 5;
-
-  // Define the correct step count based on decision
+  // Step counter (fix "6 of 5" issue)
+  const totalSteps = wantsAdvanced ? 6 : 5;
   const progressStep = Math.max(1, Math.min(state.step, totalSteps));
 
   return (
@@ -207,7 +163,7 @@ export const WizardModal: React.FC<{
               onBack={handleBack}
             />
           )}
-          {/* Token branching step */}
+          {/* Token customization branching */}
           {state.step === 4 && (
             <WizardStepTokenConfirm
               doAdvancedToken={!!state.doAdvancedToken}
@@ -229,7 +185,7 @@ export const WizardModal: React.FC<{
             </div>
           )}
           {/* Final launch step */}
-          {state.step === (state.doAdvancedToken ? 6 : 5) && (
+          {state.step === lastStep && (
             <WizardStep4Success
               projectIdea={state.projectIdea}
               projectType={state.projectType}
@@ -246,41 +202,3 @@ export const WizardModal: React.FC<{
     </div>
   );
 };
-
-// --- NEW: wrap AdvancedTokenCustomization to save its state into Wizard context on completion ---
-function AdvancedTokenCustomizationWrapper({ state, setTokenCustomization, setStep, onBack, onNext }: any) {
-  // lift state into wizard context
-  const [local, setLocal] = React.useState(
-    state.tokenCustomization || {
-      name: "",
-      symbol: "",
-      tokenType: "erc20",
-      totalSupply: 1000000,
-      mintingType: "fixed",
-      inflationRate: 0,
-      deflationRate: 0,
-      distribution: { team: 20, treasury: 30, publicSale: 50 },
-      vesting: { team: 12, early: 6 },
-      utility: { governance: true, access: false, staking: false, custom: "" },
-    }
-  );
-  function handleDone() {
-    setTokenCustomization(local);
-    onNext();
-  }
-  return (
-    <div>
-      <AdvancedTokenCustomization
-        initialState={local}
-        onStateChange={setLocal}
-        showNav={false}
-      />
-      <div className="flex justify-between mt-6">
-        <button className="accent-btn secondary" onClick={onBack}>← Back</button>
-        <button className="accent-btn" type="button" onClick={handleDone}>
-          Next: Launch
-        </button>
-      </div>
-    </div>
-  );
-}
