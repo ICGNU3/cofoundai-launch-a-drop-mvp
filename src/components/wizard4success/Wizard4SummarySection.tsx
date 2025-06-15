@@ -6,12 +6,15 @@ import { ProjectSummaryCard } from "../ProjectSummaryCard";
 import { MintingStatusCard } from "../MintingStatusCard";
 import { ProjectPreviewCard } from "../ProjectPreviewCard";
 import { ProjectActionButtons } from "../ProjectActionButtons";
+// Import ProjectType for strict typing
+import type { ProjectType } from "@/hooks/useWizardState";
 
+// Fix props type: projectType is ProjectType (not string)
 interface Wizard4SummarySectionProps {
   coverBase64: string | null | undefined;
   coverIpfs: string | null;
   projectIdea: string;
-  projectType: string;
+  projectType: ProjectType;
   roles: any[];
   expenses: any[];
   expenseSum: number;
@@ -145,3 +148,4 @@ export const Wizard4SummarySection: React.FC<Wizard4SummarySectionProps> = ({
     />
   </div>
 );
+
