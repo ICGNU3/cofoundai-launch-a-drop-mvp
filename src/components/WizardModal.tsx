@@ -177,16 +177,17 @@ export const WizardModal: React.FC<{
         );
         await usdc.approve(USDCX, upgradeAmt);
 
-        // Replace any former: await usdcx.upgrade({ amount: ... })
-        // Use the Framework's upgradeSuperToken helper instead
-        await sf.upgradeSuperToken({
-          superToken: usdcx.address,
-          amount: upgradeAmt.toString(),
-          sender: state.walletAddress,
-        });
+        // Upgrade USDC to USDCx
+        const upgradeOp = usdcx.upgrade({ amount: upgradeAmt.toString() });
+        await upgradeOp.exec(signer);
 
-        // Send to ESCROW_ADDRESS (replace any previous .transfer or similar)
-        await usdcx.connect(signer).transfer(ESCROW_ADDRESS, upgradeAmt.toString());
+        // Transfer USDCx to ESCROW_ADDRESS
+        const usdcxERC20 = new ethers.Contract(
+          usdcx.address,
+          ["function transfer(address to, uint256 amount) public returns (bool)"],
+          signer
+        );
+        await usdcxERC20.transfer(ESCROW_ADDRESS, upgradeAmt.toString());
       }
     } catch (e) {
       setError((e as Error).message);

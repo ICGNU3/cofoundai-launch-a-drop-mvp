@@ -1,6 +1,7 @@
 
 import { ethers } from 'ethers';
-import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit';
+import Safe, { SafeAccountConfig } from '@safe-global/protocol-kit';
+import SafeFactory from '@safe-global/protocol-kit';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
 const RPC = 'https://sepolia.base.org'; // Base Sepolia

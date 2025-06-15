@@ -33,17 +33,19 @@ export async function upgradeUSDCx({
     provider,
   });
 
-  // Upgrade USDC to USDCx using the Framework's helper
-  await sf.upgradeSuperToken({
-    superToken: usdcxAddress,
-    amount,
-    sender: userAddress,
-  });
-
   // Load USDCx SuperToken contract
   const usdcx = await sf.loadSuperToken(usdcxAddress);
 
-  // Transfer upgraded USDCx to the escrowAddress
-  await usdcx.connect(signer).transfer(escrowAddress, amount);
+  // Upgrade: use operation then exec with signer
+  const upgradeOp = usdcx.upgrade({ amount });
+  await upgradeOp.exec(signer);
+
+  // Transfer USDCx to escrow using ERC20 ABI and signer
+  const usdcxERC20 = new ethers.Contract(
+    usdcx.address,
+    ["function transfer(address to, uint256 amount) public returns (bool)"],
+    signer
+  );
+  await usdcxERC20.transfer(escrowAddress, amount);
 }
 
