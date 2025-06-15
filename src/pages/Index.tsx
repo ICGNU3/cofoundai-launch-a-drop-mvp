@@ -108,8 +108,6 @@ const Index: React.FC = () => {
         </div>
         {/* --- LIVE COUNTER BAR --- */}
         <LiveCounterBar counter={counter} />
-        {/* MICRO SLIDER DEMO */}
-        <CrewSplitSliderDemo />
         {/* HERO CTA BUTTON */}
         <AccentButton
           className="hero-cta mt-6 sm:mt-7 px-8 py-4 text-lg rounded-xl shadow-lg hover:scale-105 transition-all font-bold z-20"
