@@ -22,10 +22,7 @@ const AccentButton = React.forwardRef<HTMLButtonElement, AccentButtonProps>(
       onAnimationStart,
       onAnimationEnd,
       onAnimationIteration,
-      onTransitionStart,
       onTransitionEnd,
-      onTransitionRun,
-      onTransitionCancel,
       ...buttonProps
     } = rest;
 
