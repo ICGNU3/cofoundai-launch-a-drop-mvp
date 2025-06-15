@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -11,9 +10,6 @@ import HeroSection from "@/components/landing/HeroSection";
 import LandingFooter from "@/components/landing/LandingFooter";
 import AdvancedTokenCustomizationModal from "@/components/landing/AdvancedTokenCustomizationModal";
 import SignInButton from "@/components/ui/SignInButton";
-import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
-import { AIProjectKickoffModal } from "../components/AIProjectKickoffModal";
 
 const Index: React.FC = () => {
   const wizard = useWizardState();
@@ -28,9 +24,6 @@ const Index: React.FC = () => {
   // === AI Kickoff Integration ===
   // Hold AI modal desired wizard prefill info
   const [wizardPrefill, setWizardPrefill] = useState<any>(null);
-
-  // State for showing the AI Launch Modal from the new section
-  const [showAIModal, setShowAIModal] = useState(false);
 
   // Pass to HeroSection for AI modal (now unused, remains for compat)
   const handleAIKickoffFinish = (aiData: {
@@ -135,32 +128,6 @@ const Index: React.FC = () => {
         <LandingFeaturesSection />
       </div>
 
-      {/* === NEW: AI Launch Tools Section === */}
-      <section className="w-full max-w-5xl mx-auto my-12 py-10 px-4 bg-card border border-accent/30 rounded-2xl shadow-lg flex flex-col items-center justify-center text-center">
-        <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-accent to-yellow bg-clip-text text-transparent mb-3">
-          AI Launch Tools
-        </h2>
-        <p className="text-body-text/80 mb-5 max-w-2xl mx-auto">
-          Use our AI tools to kickstart your next creative or collaborative project. Instantly generate a project plan, see typical role splits, and get setup in seconds.
-        </p>
-        <Button
-          onClick={() => setShowAIModal(true)}
-          variant="default"
-          size="lg"
-          className="rounded-xl font-bold px-8 py-4 bg-gradient-to-l from-accent to-yellow text-white shadow-md hover:from-yellow hover:to-accent transition-all"
-        >
-          <Sparkles className="mr-2 animate-bounce" size={20} />
-          Try AI Project Planner
-        </Button>
-      </section>
-      
-      {/* AI Project Kickoff Modal shown from the AI Launch Tools button */}
-      <AIProjectKickoffModal
-        isOpen={showAIModal}
-        onClose={() => setShowAIModal(false)}
-        onContinueToWizard={handleAIKickoffFinish}
-      />
-
       <AdvancedTokenCustomizationModal isOpen={tokenModalOpen} onClose={() => setTokenModalOpen(false)} />
       <WizardModal
         isOpen={wizard.state.isWizardOpen}
@@ -173,4 +140,3 @@ const Index: React.FC = () => {
 };
 
 export default Index;
-
