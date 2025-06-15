@@ -53,6 +53,10 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
     setRoleModalOpen(false);
   };
 
+  const handleLoadTemplate = (templateRoles: Role[]) => {
+    setField("roles", templateRoles);
+  };
+
   return (
     <div>
       <h2 className="headline text-center mb-2">Crew &amp; Cut</h2>
@@ -61,12 +65,12 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
         <ProjectTypeSelector
           projectType={projectType}
           onProjectTypeChange={handleProjectTypeChange}
-          loadDefaultRoles={loadDefaultRoles}
+          onLoadDefaultRoles={loadDefaultRoles}
         />
 
         <RoleTemplateManager
           roles={roles}
-          setField={setField}
+          onLoadTemplate={handleLoadTemplate}
         />
 
         <RoleManagementSection
