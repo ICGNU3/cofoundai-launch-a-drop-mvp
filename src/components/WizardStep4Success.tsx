@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,6 +19,7 @@ import { useProjectById } from "@/hooks/useProjectById";
 import { Wizard4MintingOverlaySection } from "./wizard4success/Wizard4MintingOverlaySection";
 import { Wizard4SummarySection } from "./wizard4success/Wizard4SummarySection";
 import { Wizard4AIContentSection } from "./wizard4success/Wizard4AIContentSection";
+import { MintingWorkflowModal } from "./MintingWorkflowModal";
 
 // --- TokenCustomization type for prop typing ---
 type TokenCustomization = {
@@ -71,6 +71,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [loadingMint, setLoadingMint] = useState(false);
   const { toast } = useToast();
+  const [mintModalOpen, setMintModalOpen] = useState(false);
 
   const {
     isMinting,
@@ -96,15 +97,22 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   // Fetch project from DB after mint
   const { data: projectRow, isLoading: isProjectLoading } = useProjectById(projectId);
 
-  // Mint handler: sets loading, disables button, and saves project in DB with status 'minted'
+  // Replace old handleMintAndFund logic with new modal UI workflow.
   const handleMintAndFund = async () => {
-    if (!walletAddress) return;
+    setMintModalOpen(true);
+  };
+
+  // Controller for modal minting step logic
+  const handleMintFlow = async ({ gasSpeed }: { gasSpeed: "slow"|"standard"|"fast" }) => {
     setLoadingMint(true);
     try {
+      // 1. simulate minting step: wallet-sign -> sending-transaction -> txn-pending, etc.
+      // (simulate real-time clicking in wallet, then getting a tx hash)
+      setTimeout(() => {}, 10); // Dummy delay for UX
+      // Here, call simulateMinting with gas config (pass gasSpeed if supported downstream)
       const tokenSymbol = "DROP";
       const tokenName = "Drop";
       const tokenSupply = 1000000;
-      // userWallet = walletAddress
       const mintData = await simulateMinting({
         coverBase64,
         tokenSymbol,
@@ -127,13 +135,13 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
       });
       setProjectId(project.id);
       sessionStorage.setItem('autoNavigateToProject', project.id);
-
       completeMinting();
       pollUSDCxBalance();
-    } catch (error) {
-      console.error("Mint and fund error:", error);
-    } finally {
       setLoadingMint(false);
+      return { txHash: mintData.txHash, step: "txn-pending" as const };
+    } catch (error: any) {
+      setLoadingMint(false);
+      return { error: error?.message || "An error occurred", step: "error" as const };
     }
   };
 
@@ -217,6 +225,21 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
         currentStep={currentStep}
         progress={progress}
         mintingSteps={mintingSteps}
+      />
+
+      {/* MINTING MODAL: pops up on "Mint & Fund" */}
+      <MintingWorkflowModal
+        open={mintModalOpen}
+        onClose={() => setMintModalOpen(false)}
+        projectIdea={projectIdea}
+        roles={roles}
+        expenses={expenses}
+        coverBase64={coverBase64}
+        onStartMint={handleMintFlow}
+        walletConnected={!!walletAddress}
+        walletAddress={walletAddress}
+        estNetwork="Zora"
+        chainId={84532}
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
