@@ -161,25 +161,32 @@ export const WizardModal: React.FC<{
         // USDC/USDCx addresses (Base Sepolia testnet, may need adjustment)
         const USDC = "0xd35CceEAD182dcee0F148EbaC9447DA2c4D449c4";
         const USDCX = "0x4086eBf75233e8492bA044F4b5632F3A63fC25bA";
-
-        // Ensure provider param is ethers.providers.Web3Provider or JsonRpcProvider
         const provider = signer.provider as ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
         const sf = await getSuperfluidFramework(84532, provider);
         const usdcx = await loadSuperToken(sf, USDCX);
 
+        const upgradeAmt = ethers.utils.parseUnits(fundAmount.toString(), 6); // USDC: 6 decimals
+
         // Approve USDC -> USDCx if necessary
         const usdc = new ethers.Contract(
-          USDC, // testnet USDC
+          USDC,
           [
             "function approve(address guy, uint256 wad) public returns (bool)"
           ],
           signer
         );
-        const upgradeAmt = ethers.utils.parseUnits(fundAmount.toString(), 6); // USDC: 6 decimals
         await usdc.approve(USDCX, upgradeAmt);
 
-        await upgradeToSuperToken(sf, usdcx, upgradeAmt.toString(), signer);
-        await transferSuperToken(usdcx, ESCROW_ADDRESS, upgradeAmt.toString(), signer);
+        // Replace any former: await usdcx.upgrade({ amount: ... })
+        // Use the Framework's upgradeSuperToken helper instead
+        await sf.upgradeSuperToken({
+          superToken: usdcx.address,
+          amount: upgradeAmt.toString(),
+          sender: state.walletAddress,
+        });
+
+        // Send to ESCROW_ADDRESS (replace any previous .transfer or similar)
+        await usdcx.connect(signer).transfer(ESCROW_ADDRESS, upgradeAmt.toString());
       }
     } catch (e) {
       setError((e as Error).message);

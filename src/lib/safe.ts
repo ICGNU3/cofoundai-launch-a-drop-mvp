@@ -1,6 +1,6 @@
 
 import { ethers } from 'ethers';
-import Safe, { SafeAccountConfig } from '@safe-global/protocol-kit';
+import Safe, { SafeAccountConfig, SafeFactory } from '@safe-global/protocol-kit';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
 const RPC = 'https://sepolia.base.org'; // Base Sepolia
@@ -16,15 +16,10 @@ export async function createSafe(owner: `0x${string}`) {
     signerOrProvider: signer,
   });
 
-  // 3. Safe factory (must use static create method; default import)
-  // The workaround: SafeFactory is the default export AND has the static create method
-  const SafeFactoryModule = await import('@safe-global/protocol-kit');
-  const SafeFactory = SafeFactoryModule.default;
-  const safeFactory = await SafeFactory.create({ ethAdapter });
-
-  // 4. Deploy a 1-owner Safe
+  // 3. Create SafeFactory and deploy new Safe
+  const factory = await SafeFactory.create({ ethAdapter });
   const config: SafeAccountConfig = { owners: [owner], threshold: 1 };
-  const safeSdk = await safeFactory.deploySafe({ safeAccountConfig: config });
+  const sdk: Safe = await factory.deploySafe({ safeAccountConfig: config });
 
-  return await safeSdk.getAddress(); // Smart-wallet address
+  return await sdk.getAddress(); // Smart-wallet address
 }
