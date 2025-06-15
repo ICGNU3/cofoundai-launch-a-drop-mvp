@@ -8,6 +8,8 @@ type HeroSectionProps = {
   onCtaClick: () => void;
   countUpDollarRef: React.RefObject<HTMLSpanElement>;
   countUpDropRef: React.RefObject<HTMLSpanElement>;
+  // New! allows parent to handle AI wizard handoff
+  onAIFinish?: (aiData: { projectIdea: string; projectType: string; roleSplits?: Array<{ role: string; percent: number }> }) => void;
 };
 
 const steps = [
@@ -33,8 +35,15 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   onCtaClick,
   countUpDollarRef,
   countUpDropRef,
+  onAIFinish, // NEW PROP
 }) => {
   const [showAIModal, setShowAIModal] = useState(false);
+
+  // Handler called from inside modal when AI kicks off wizard
+  const handleAIContinueWizard = (aiData: { projectIdea: string; projectType: string; roleSplits?: Array<{ role: string; percent: number }> }) => {
+    setShowAIModal(false);
+    if (onAIFinish) onAIFinish(aiData);
+  };
 
   return (
     <div className="w-full text-center">
@@ -71,6 +80,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         <AIProjectKickoffModal
           isOpen={showAIModal}
           onClose={() => setShowAIModal(false)}
+          onContinueToWizard={handleAIContinueWizard} // Pass handler for AI wizard
         />
       </div>
       {/* HOW IT WORKS */}

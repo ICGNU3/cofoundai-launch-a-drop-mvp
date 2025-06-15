@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { X, Sparkles, Users, Loader2, BarChart3, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,7 +39,8 @@ const PROJECT_TYPES = Object.keys(TYPICAL_SPLITS);
 export const AIProjectKickoffModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+  onContinueToWizard?: (aiData: { projectIdea: string; projectType: string; roleSplits?: Array<{ role: string; percent: number }> }) => void; // NEW
+}> = ({ isOpen, onClose, onContinueToWizard }) => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [idea, setIdea] = useState("");
   const [projectType, setProjectType] = useState("Music");
@@ -190,7 +190,19 @@ Output:
                 <Button variant="outline" onClick={() => setStep(2)}>
                   ← Back
                 </Button>
-                <Button variant="default" onClick={onClose} className="px-6">
+                <Button 
+                  variant="default"
+                  onClick={() => {
+                    if (onContinueToWizard) {
+                      onContinueToWizard({
+                        projectIdea: idea,
+                        projectType,
+                        roleSplits: TYPICAL_SPLITS[projectType],
+                      });
+                    }
+                  }}
+                  className="px-6"
+                >
                   Continue to Full Wizard
                 </Button>
               </div>

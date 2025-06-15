@@ -21,6 +21,39 @@ const Index: React.FC = () => {
   // Latest projects for creator carousel
   const [carousel, setCarousel] = useState<any[]>([]);
 
+  // === AI Kickoff Integration ===
+  // Hold AI modal desired wizard prefill info
+  const [wizardPrefill, setWizardPrefill] = useState<any>(null);
+
+  // Pass to HeroSection for AI modal
+  const handleAIKickoffFinish = (aiData: {
+    projectIdea: string;
+    projectType: string;
+    roleSplits?: Array<{role: string; percent: number}>;
+  }) => {
+    setWizardPrefill(aiData);
+    wizard.openWizard();
+  };
+
+  // When wizard is opened with prefill, populate initial fields
+  useEffect(() => {
+    if (wizardPrefill && wizard.state.isWizardOpen) {
+      // Prefill wizard state (projectIdea, projectType, roles)
+      if (wizardPrefill.projectIdea) wizard.setField("projectIdea", wizardPrefill.projectIdea);
+      if (wizardPrefill.projectType) wizard.setField("projectType", wizardPrefill.projectType);
+      if (wizardPrefill.roleSplits && wizardPrefill.roleSplits.length > 0) {
+        // Convert AI roles to wizard role format
+        const rolesArr = wizardPrefill.roleSplits.map(r => ({
+          name: r.role,
+          percent: r.percent,
+          address: "", // left blank for user to fill
+        }));
+        wizard.setField("roles", rolesArr);
+      }
+      setWizardPrefill(null); // Prevent repeat
+    }
+  }, [wizardPrefill, wizard]);
+
   // Fetch stats (Edge function) and projects (from supabase)
   useEffect(() => {
     fetch("/functions/v1/stats")
@@ -80,6 +113,7 @@ const Index: React.FC = () => {
             onCtaClick={wizard.openWizard}
             countUpDollarRef={countUpDollarRef}
             countUpDropRef={countUpDropRef}
+            onAIFinish={handleAIKickoffFinish} // NEW PROP
           />
         </div>
         <div className="w-full flex items-center justify-center mt-6 mb-2">
