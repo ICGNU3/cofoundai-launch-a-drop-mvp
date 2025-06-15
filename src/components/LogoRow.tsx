@@ -17,8 +17,14 @@ const logos = [
   {
     name: "OpenAI",
     href: "https://openai.com",
-    img: "/lovable-uploads/538a6b52-4c16-4c36-ab12-1af13a60d234.png",
-    alt: "OpenAI logo"
+    img: "/lovable-uploads/3b1c7e06-2f28-4c0a-9263-5f164a961c43.png",
+    alt: "OpenAI logo (white)"
+  },
+  {
+    name: "OP",
+    href: "https://www.optimism.io/",
+    img: "/lovable-uploads/c7aefce3-bb2f-4d9f-a99e-ac29f2e62013.png",
+    alt: "OP logo"
   }
 ];
 
