@@ -2,34 +2,33 @@
 import { ethers } from 'ethers';
 
 import Safe, {
-  SafeAccountConfig,
-  SafeFactory
+  SafeAccountConfig
 } from '@safe-global/protocol-kit';
+
+// Import SafeFactory from the correct location
+import SafeFactory from '@safe-global/protocol-kit/dist/src/factory';
 
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
 const RPC = 'https://sepolia.base.org'; // Base Sepolia
 
 export async function createSafe(owner: `0x${string}`) {
-  /* 1. Provider + signer for owner */
+  // 1. Provider + signer for owner
   const provider = new ethers.providers.JsonRpcProvider(RPC);
   const signer   = provider.getSigner(owner);
 
-  /* 2. Ethers adapter */
+  // 2. Ethers adapter
   const ethAdapter = new EthersAdapter({
     ethers,
     signerOrProvider: signer
   });
 
-  /* 3. Safe factory */
+  // 3. Safe factory (default export from factory module)
   const safeFactory = await SafeFactory.create({ ethAdapter });
 
-  /* 4. Deploy a 1-owner Safe */
-  const safeAccountConfig: SafeAccountConfig = {
-    owners:    [owner],
-    threshold: 1
-  };
-  const safeSdk: Safe = await safeFactory.deploySafe({ safeAccountConfig });
+  // 4. Deploy a 1-owner Safe
+  const config: SafeAccountConfig = { owners: [owner], threshold: 1 };
+  const safeSdk: Safe = await safeFactory.deploySafe({ safeAccountConfig: config });
 
-  return safeSdk.getAddress(); // returns Smart-Wallet address
+  return safeSdk.getAddress(); // Smart-wallet address
 }
