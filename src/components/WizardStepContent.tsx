@@ -1,4 +1,3 @@
-
 import React from "react";
 import WizardStep1Describe from "./WizardStep1Describe";
 import WizardStep2Roles from "./WizardStep2Roles";
@@ -110,6 +109,22 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = ({
         </div>
       );
     case 5:
+      if (!state.doAdvancedToken && state.step === lastStep) {
+        return (
+          <div className="h-full overflow-y-auto px-6 py-4">
+            <WizardStep4Success
+              projectIdea={state.projectIdea}
+              projectType={state.projectType}
+              roles={state.roles}
+              expenses={state.expenses}
+              pledgeUSDC={state.pledgeUSDC}
+              walletAddress={walletAddress}
+              tokenCustomization={state.doAdvancedToken ? state.tokenCustomization : undefined}
+              onRestart={handleRestart}
+            />
+          </div>
+        );
+      }
       if (state.doAdvancedToken) {
         return (
           <div className="h-full overflow-y-auto px-6 py-4">
