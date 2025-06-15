@@ -13,10 +13,11 @@ const Index: React.FC = () => {
       <FullWaveBackground />
       <div className="w-full flex flex-col items-center px-2 z-10 relative">
         <div className="card flex flex-col items-center text-center mt-10 wizard-card shadow-lg bg-opacity-95 backdrop-blur-sm">
-          <h1 className="hero-title headline mb-1">Launch a Drop in 60 seconds.</h1>
+          <h1 className="hero-title headline mb-1">
+            Drop a project in 90 seconds.
+          </h1>
           <div className="hero-tagline tagline">
-            Type your project idea, add each role & expense, press Mint & Fund.<br />
-            Your drop mints with Zora Coins, generative cover, and share-ready copy in under 60 seconds.
+            Type your idea, assign every role and expense, tap Mint &amp; Fund.
           </div>
           <AccentButton className="mt-4 w-full max-w-xs" onClick={wizard.openWizard}>
             Launch Wizard
@@ -40,4 +41,3 @@ const Index: React.FC = () => {
 };
 
 export default Index;
-
