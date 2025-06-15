@@ -56,15 +56,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         Invite your team, share your idea, and let anyone back your project.<br />
         You don't need a big budget or any wallet know-how to get started.
       </div>
-      {/* LIVE METRICS */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-3 text-success font-mono text-sm md:text-lg font-bold mb-1 select-none px-4">
-        <span className="sm:border-r sm:border-[#45e36e88] pr-0 sm:pr-4 text-center">
-          <span ref={countUpDollarRef}>${counter.total.toLocaleString()}</span> funded by everyday creators
-        </span>
-        <span className="pl-0 sm:pl-4 text-center">
-          <span ref={countUpDropRef}>{counter.drops}</span> drops launched
-        </span>
-      </div>
       {/* CTA */}
       <div className="flex justify-center mt-7 px-4">
         <AccentButton
@@ -101,3 +92,4 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 };
 
 export default HeroSection;
+
