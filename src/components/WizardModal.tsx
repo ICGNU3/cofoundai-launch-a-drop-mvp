@@ -178,16 +178,19 @@ export const WizardModal: React.FC<{
         await usdc.approve(USDCX, upgradeAmt);
 
         // Upgrade USDC to USDCx
-        const upgradeOp = usdcx.upgrade({ amount: upgradeAmt.toString() });
-        await upgradeOp.exec(signer);
-
-        // Transfer USDCx to ESCROW_ADDRESS
-        const usdcxERC20 = new ethers.Contract(
+        const USDCX_ABI = [
+          "function upgrade(uint256 amount) external",
+          "function transfer(address to, uint256 amount) public returns (bool)",
+        ];
+        const usdcxContract = new ethers.Contract(
           usdcx.address,
-          ["function transfer(address to, uint256 amount) public returns (bool)"],
+          USDCX_ABI,
           signer
         );
-        await usdcxERC20.transfer(ESCROW_ADDRESS, upgradeAmt.toString());
+        await usdcxContract.upgrade(upgradeAmt.toString());
+
+        // Transfer USDCx to ESCROW_ADDRESS
+        await usdcxContract.transfer(ESCROW_ADDRESS, upgradeAmt.toString());
       }
     } catch (e) {
       setError((e as Error).message);

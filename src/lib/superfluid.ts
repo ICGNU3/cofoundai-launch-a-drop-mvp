@@ -1,4 +1,3 @@
-
 // Utility for Superfluid upgrades using latest SDK methods
 import { Framework } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
@@ -27,25 +26,24 @@ export async function upgradeUSDCx({
   userAddress: string,
   escrowAddress: string
 }) {
-  // Create Superfluid framework
   const sf = await Framework.create({
     chainId: 84532,
     provider,
   });
 
-  // Load USDCx SuperToken contract
+  // Load USDCx SuperToken contract address (we need the raw address)
   const usdcx = await sf.loadSuperToken(usdcxAddress);
 
-  // Upgrade: use operation then exec with signer
-  const upgradeOp = usdcx.upgrade({ amount });
-  await upgradeOp.exec(signer);
+  // Use ABI for upgrade on USDCx contract
+  const USDCX_ABI = [
+    "function upgrade(uint256 amount) external",
+    "function transfer(address to, uint256 amount) public returns (bool)",
+  ];
+  const usdcxContract = new ethers.Contract(usdcxAddress, USDCX_ABI, signer);
 
-  // Transfer USDCx to escrow using ERC20 ABI and signer
-  const usdcxERC20 = new ethers.Contract(
-    usdcx.address,
-    ["function transfer(address to, uint256 amount) public returns (bool)"],
-    signer
-  );
-  await usdcxERC20.transfer(escrowAddress, amount);
+  // Perform the upgrade (from USDC → USDCx)
+  await usdcxContract.upgrade(amount);
+
+  // Transfer upgraded USDCx to the escrow
+  await usdcxContract.transfer(escrowAddress, amount);
 }
-
