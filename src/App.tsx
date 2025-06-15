@@ -6,7 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { createSafe } from "@/lib/safe";
 
 // Define the Base Sepolia chain object in the correct format for Privy and wagmi
 const baseSepoliaChain = {
