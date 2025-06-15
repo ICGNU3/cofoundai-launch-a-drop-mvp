@@ -32,6 +32,7 @@ export default {
 				base: ['16px', '1.5'],
 				'hero': ['36px', '1.2'],
 				'pill': ['14px', '1.4'],
+				'section': ['20px', '1.4'],
 			},
 			borderRadius: {
 				lg: '16px', 
@@ -41,8 +42,8 @@ export default {
 			colors: {
 				background: "#0A0A0A",
 				surface: "#1A1A1A",
-				card: "#161616",
-				cardnew: "#1A1A1A",
+				card: "#1E1E1E",
+				cardnew: "#1E1E1E",
 				border: "#2A2A2A",
 				accent: "#5D5FEF",
 				"accent-start": "#9A4DFF",
@@ -62,20 +63,21 @@ export default {
 				"slider-thumb": "0 2px 12px 0 #5D5FEF66",
 				btn: "0 3px #4445A2",
 				"card-inner": "inset 0 0 4px 0 #2226",
+				"card-elevated": "0 4px 12px rgba(0, 0, 0, 0.5)",
 			},
 			keyframes: {
 				"btn-raise": {
 					"0%": { transform: "scale(1)" },
-					"100%": { transform: "scale(1.04)" },
+					"100%": { transform: "scale(1.05)" },
 				},
 				"btn-press": {
-					"0%": { transform: "scale(1.04)" },
-					"100%": { transform: "scale(0.97)" },
+					"0%": { transform: "scale(1.05)" },
+					"100%": { transform: "scale(0.95)" },
 				},
 			},
 			animation: {
 				"btn-raise": "btn-raise 0.15s cubic-bezier(.23,1.03,.65,1.19) forwards",
-				"btn-press": "btn-press 0.95s cubic-bezier(.4,0,.6,1) forwards",
+				"btn-press": "btn-press 0.15s cubic-bezier(.4,0,.6,1) forwards",
 			},
 		}
 	},

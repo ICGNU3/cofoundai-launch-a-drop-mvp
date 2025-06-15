@@ -1,5 +1,6 @@
 
 import React from "react";
+import { motion } from "framer-motion";
 
 type PercentBarProps = {
   used: number;
@@ -18,11 +19,12 @@ export const PercentBar: React.FC<PercentBarProps> = ({ used, max = 100 }) => {
         <span className="text-xs ml-auto font-semibold">{remaining}% left</span>
       </div>
       <div className="w-full bg-gray-800 h-2 rounded overflow-hidden mt-1">
-        <div
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${Math.min((used / max) * 100, 100)}%` }}
+          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
           style={{
-            width: `${Math.min((used / max) * 100, 100)}%`,
-            background: used > max ? "#ef4444" : "#6366f1",
-            transition: "width 0.2s"
+            background: used > max ? "#ef4444" : "linear-gradient(90deg, #9A4DFF 0%, #5D5FEF 100%)",
           }}
           className="h-2"
         />
