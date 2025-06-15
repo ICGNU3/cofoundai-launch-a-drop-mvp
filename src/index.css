@@ -275,3 +275,18 @@ a:focus-visible {
   width: 100%;
   max-width: 100%;
 }
+
+/* Extra: Slight margin for features grid at smaller sizes */
+@media (max-width: 640px) {
+  .landing-features-section {
+    padding: 1rem 0.5rem;
+  }
+}
+
+/* Easy hover scale for features cards */
+.hover-scale {
+  transition: transform 0.18s cubic-bezier(.23,1.03,.65,1.19);
+}
+.hover-scale:hover {
+  transform: scale(1.04);
+}

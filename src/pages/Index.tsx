@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -5,43 +6,44 @@ import { AccentButton } from "@/components/ui/AccentButton";
 import FullWaveBackground from "@/components/FullWaveBackground";
 import { Web3WalletModule } from "@/components/Web3WalletModule";
 import { Wallet } from "lucide-react";
+import LandingFeaturesSection from "@/components/LandingFeaturesSection";
 
 const Index: React.FC = () => {
   const wizard = useWizardState();
   const [walletOpen, setWalletOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-body-text flex items-center justify-center relative overflow-x-hidden">
+    <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-x-hidden">
       <FullWaveBackground />
-      <div className="w-full flex flex-col items-center px-2 z-10 relative">
-        <div className="card flex flex-col items-center text-center mt-10 wizard-card shadow-lg bg-opacity-95 backdrop-blur-sm w-full max-w-[420px] sm:max-w-[540px] md:max-w-[620px]">
-          <div className="flex justify-end w-full pr-2 pt-2">
-            <button
-              onClick={() => setWalletOpen(true)}
-              className="rounded-lg p-2 bg-black/10 hover:bg-accent/20 text-accent transition-all"
-              aria-label="Open Wallet"
-            >
-              <Wallet size={20} />
-            </button>
-          </div>
-          <h1 className="text-center font-headline font-bold text-[2.1rem] sm:text-[2.4rem] md:text-[36px] leading-[1.2] text-headline py-4 sm:py-8">
-            <span className="bg-gradient-to-r from-[#5D5FEF] to-[#9A4DFF] bg-clip-text text-transparent">
-              Launch a Drop
-            </span>{" "}
-            in 90 seconds.
-          </h1>
-          <div className="hero-tagline tagline mb-2 sm:mb-4 text-base sm:text-lg">
-            Type your idea, assign every role and expense, tap Mint &amp; Fund.
-          </div>
-          <AccentButton 
-            className="w-full mt-4 sm:mt-6 transform transition-transform duration-200 hover:scale-105 py-3 text-base sm:text-lg"
-            onClick={wizard.openWizard}
+      {/* HERO SECTION */}
+      <div className="w-full pt-24 pb-10 px-4 z-10 relative flex flex-col items-center">
+        {/* Wallet button right-aligned (desktop), mobile top-right */}
+        <div className="w-full max-w-5xl flex justify-end">
+          <button
+            onClick={() => setWalletOpen(true)}
+            className="rounded-lg p-2 bg-black/10 hover:bg-accent/20 text-accent transition-all"
+            aria-label="Open Wallet"
           >
-            Launch a Drop
-          </AccentButton>
+            <Wallet size={20} />
+          </button>
         </div>
+        <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.15] text-headline py-4 mt-4 max-w-3xl bg-gradient-to-r from-[#5D5FEF] to-[#9A4DFF] bg-clip-text text-transparent">
+          Launch Music, Art, or Ideas — with a single tap.
+        </h1>
+        <div className="hero-tagline tagline mb-4 max-w-xl text-lg md:text-xl">
+          Type your idea, assign roles and expenses, tap Launch. Mint, fund, and collaborate instantly with anyone.
+        </div>
+        <AccentButton
+          className="mt-4 sm:mt-6 px-8 py-4 text-lg rounded-xl shadow-lg hover:scale-105 transition-all"
+          onClick={wizard.openWizard}
+        >
+          Launch a Drop
+        </AccentButton>
       </div>
-      
+
+      {/* FEATURES SECTION */}
+      <LandingFeaturesSection />
+
       <WizardModal
         isOpen={wizard.state.isWizardOpen}
         onClose={wizard.closeWizard}
