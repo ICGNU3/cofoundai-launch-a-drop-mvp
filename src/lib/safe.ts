@@ -1,7 +1,7 @@
 // src/lib/safe.ts
 
 import { ethers } from 'ethers';
-import { SafeFactory } from '@safe-global/protocol-kit';
+import SafeFactory from '@safe-global/protocol-kit';
 import type { SafeAccountConfig } from '@safe-global/protocol-kit';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
@@ -21,8 +21,8 @@ export async function createSafe(owner: string): Promise<string> {
     signerOrProvider: signer,
   });
 
-  // 3. Create the Safe factory via constructor (no static create method)
-  const factory = new SafeFactory({ ethAdapter });
+  // 3. Create the Safe factory via the static async create method (no constructor args)
+  const factory = await SafeFactory.create({ ethAdapter });
 
   // 4. Deploy a new Safe with a single owner
   const safeAccountConfig: SafeAccountConfig = {
