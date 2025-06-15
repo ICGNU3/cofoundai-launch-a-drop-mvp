@@ -1,6 +1,6 @@
 
 import { getDefaultProvider, ethers } from "ethers";
-import EthersAdapter from "@safe-global/protocol-kit/dist/src/adapters/ethers";
+import EthersAdapter from "@safe-global/protocol-kit";
 import SafeFactory, { SafeAccountConfig } from "@safe-global/protocol-kit";
 
 // Creates a Safe wallet and returns its address
