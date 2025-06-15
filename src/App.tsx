@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +8,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import ProjectOverview from "./pages/ProjectOverview";
 import ProjectDashboard from "./pages/ProjectDashboard";
+import ProjectWorkspace from "./pages/ProjectWorkspace";
 import NotFound from "./pages/NotFound";
 
 // --- Wagmi imports for v2+ ---
@@ -54,6 +54,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/project/:projectId" element={<ProjectOverview />} />
               <Route path="/project/:projectId/dashboard" element={<ProjectDashboard />} />
+              <Route path="/workspace/:projectId" element={<ProjectWorkspace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
@@ -64,4 +65,3 @@ const App = () => (
 );
 
 export default App;
-

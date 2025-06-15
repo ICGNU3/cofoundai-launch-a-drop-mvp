@@ -16,5 +16,11 @@ export const NavigationSection = () => (
     >
       Launch New Drop
     </Link>
+    <Link
+      to="/workspace/demo-project-id"
+      className="px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-700 transition"
+    >
+      Try Collaborative Workspace
+    </Link>
   </div>
 );
