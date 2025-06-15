@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useWizardState } from "@/hooks/useWizardState";
 import { AccentButton } from "./ui/AccentButton";
@@ -9,6 +10,71 @@ import { PercentBar } from "./ui/PercentBar";
 import { WizardRolesStep } from "./WizardRolesStep";
 
 const projectTypes = ["Music", "Film", "Fashion", "Art", "Other"] as const;
+
+// --- OpenAI Chat API call helper ---
+async function fetchTokenMetadata(projectIdea: string) {
+  const OPENAI_API_KEY = ""; // TODO: Insert your OpenAI API key here, or inject via environment/Supabase in production!
+  const apiUrl = "https://api.openai.com/v1/chat/completions";
+  const prompt = `Return exactly this JSON:  
+{  
+  "name": "...",  
+  "symbol": "...",  
+  "totalSupply": ...,  
+  "imagePrompt": "...",  
+  "launchCopy": "..."  
+}  
+For the user’s idea: ${projectIdea}
+Bind its response JSON fields to variables: tokenName, tokenSymbol, tokenSupply, imagePrompt, launchCopy.`;
+
+  const res = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.2,
+      max_tokens: 350,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`OpenAI Error: ${await res.text()}`);
+  }
+
+  const data = await res.json();
+
+  // Extract content, find the JSON in the model's completion (assuming OpenAI returns it at top-level)
+  let text = "";
+  try {
+    // Find the completion content (for both OpenAI v1 and v1/chat/completions)
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      text = data.choices[0].message.content;
+    } else {
+      throw new Error("OpenAI did not return a completion.");
+    }
+    // Strip code blocks if present
+    text = text.trim().replace(/^```(json)?/i, "").replace(/```$/, "").trim();
+    // Parse the JSON block
+    const parsed = JSON.parse(text);
+    return {
+      tokenName: parsed.name,
+      tokenSymbol: parsed.symbol,
+      tokenSupply: parsed.totalSupply,
+      imagePrompt: parsed.imagePrompt,
+      launchCopy: parsed.launchCopy,
+    };
+  } catch (e) {
+    throw new Error("Failed to parse OpenAI response: " + (e as Error).message);
+  }
+}
 
 export const WizardModal: React.FC<{
   state: ReturnType<typeof useWizardState>["state"];
@@ -35,6 +101,17 @@ export const WizardModal: React.FC<{
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
 
+  // OpenAI chat state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [openaiFields, setOpenaiFields] = useState<{
+    tokenName?: string;
+    tokenSymbol?: string;
+    tokenSupply?: number;
+    imagePrompt?: string;
+    launchCopy?: string;
+  }>({});
+
   // Percent validation
   const sumPercent = state.roles.reduce((sum, r) => sum + r.percent, 0);
   let percentMsg = "";
@@ -54,6 +131,21 @@ export const WizardModal: React.FC<{
   const outcomeSum = uponOutcomeExpenses.reduce((sum, x) => sum + x.amountUSDC, 0);
   const pledgeNum = Number(state.pledgeUSDC) || 0;
   const totalNeeded = expenseSum + pledgeNum;
+
+  // Handler for Mint & Fund button (calls OpenAI, binds fields)
+  const handleMintAndFund = async () => {
+    setOpenaiFields({});
+    setError(null);
+    setLoading(true);
+    try {
+      const fields = await fetchTokenMetadata(state.projectIdea);
+      setOpenaiFields(fields);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return !state.isWizardOpen ? null : (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm transition">
@@ -176,11 +268,23 @@ export const WizardModal: React.FC<{
                 )}
                 <AccentButton
                   className="w-full"
-                  disabled={!state.walletAddress}
-                  onClick={() => {/* Automations next step coming soon */}}
+                  disabled={!state.walletAddress || loading}
+                  onClick={handleMintAndFund}
                 >
-                  Mint &amp; Fund
+                  {loading ? "Calling OpenAI..." : "Mint & Fund"}
                 </AccentButton>
+                {error && (
+                  <div className="mt-2 text-red-500 text-center text-xs">{error}</div>
+                )}
+                {Object.keys(openaiFields).length > 0 && (
+                  <div className="mt-3 p-2 border border-green-600 bg-green-900/30 text-green-300 rounded text-xs font-mono space-y-1">
+                    <div><b>Token Name:</b> {openaiFields.tokenName}</div>
+                    <div><b>Symbol:</b> {openaiFields.tokenSymbol}</div>
+                    <div><b>Supply:</b> {openaiFields.tokenSupply}</div>
+                    <div><b>Image Prompt:</b> {openaiFields.imagePrompt}</div>
+                    <div><b>Launch Copy:</b> {openaiFields.launchCopy}</div>
+                  </div>
+                )}
                 <AccentButton
                   secondary
                   className="w-full"
