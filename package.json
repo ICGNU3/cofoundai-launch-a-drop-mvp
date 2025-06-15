@@ -43,6 +43,7 @@
     "@safe-global/protocol-kit": "^6.0.5",
     "@safe-global/safe-core-sdk": "^3.3.5",
     "@safe-global/safe-ethers-lib": "^1.9.4",
+    "@supabase/supabase-js": "^2.50.0",
     "@tanstack/react-query": "^5.56.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
