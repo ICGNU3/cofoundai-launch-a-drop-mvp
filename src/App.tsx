@@ -33,7 +33,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <PrivyProvider
-    appId="cm4z8rrpv09c7bkwvwtkiqwse"
+    appId="cmbwrcdqp00sijy0mx4wx4aew"
     config={{
       appearance: {
         theme: 'dark',
