@@ -199,19 +199,26 @@ export const WizardModal: React.FC<{
     return data.IpfsHash as string;
   }
 
+  // --- NEW STATE ---
+  const [ipfsHash, setIpfsHash] = useState<string | null>(null);
+  const [tokenAddress, setTokenAddress] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
+
   // Handler for Mint & Fund button (calls OpenAI, binds fields)
   const handleMintAndFund = async () => {
     setOpenaiFields({});
     setError(null);
     setLoading(true);
     setIpfsHash(null);
+    setTokenAddress(null);
+    setTxHash(null);
 
     try {
       // 1. Call OpenAI Chat API, get metadata fields
       const fields = await fetchTokenMetadata(state.projectIdea);
       setOpenaiFields(fields);
 
-      // 2. Call DALL·E 3 if modelChoice=OpenAI (we will assume so here)
+      // 2. Call DALL·E 3 (modelChoice always "OpenAI" for now)
       const openaiApiKey = ""; // <--- TODO: Supply your OpenAI API Key here
       if (!openaiApiKey) throw new Error("OpenAI API Key required");
       const imageUrl = await generateImageDalle3(fields.imagePrompt, openaiApiKey);
@@ -223,6 +230,28 @@ export const WizardModal: React.FC<{
       if (!pinataJwt) throw new Error("Pinata JWT required (see below)");
       const hash = await pinToPinata(base64, ext, pinataJwt);
       setIpfsHash(hash);
+
+      // 5. POST to Zora API for minting
+      const zoraRes = await fetch("https://api.zora.co/v4/coins/testnet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chainId: 84532,
+          name: fields.tokenName,
+          symbol: fields.tokenSymbol,
+          totalSupply: fields.tokenSupply,
+          uri: "ipfs://" + hash,
+          creatorAddress: state.walletAddress
+        })
+      });
+      if (!zoraRes.ok) {
+        throw new Error('Zora API Error: ' + (await zoraRes.text()));
+      }
+      const zoraData = await zoraRes.json();
+      setTokenAddress(zoraData.tokenAddress ?? null);
+      setTxHash(zoraData.txHash ?? null);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -367,6 +396,7 @@ export const WizardModal: React.FC<{
                 {error && (
                   <div className="mt-2 text-red-500 text-center text-xs">{error}</div>
                 )}
+                {/* AI fields (after OpenAI) */}
                 {Object.keys(openaiFields).length > 0 && (
                   <div className="mt-3 p-2 border border-green-600 bg-green-900/30 text-green-300 rounded text-xs font-mono space-y-1">
                     <div><b>Token Name:</b> {openaiFields.tokenName}</div>
@@ -376,9 +406,11 @@ export const WizardModal: React.FC<{
                     <div><b>Launch Copy:</b> {openaiFields.launchCopy}</div>
                   </div>
                 )}
+                {/* Loading indicator */}
                 {loading && (
                   <div className="text-yellow-400 text-xs text-center mt-2">Generating image & uploading&hellip;</div>
                 )}
+                {/* IPFS hash display */}
                 {ipfsHash && (
                   <div className="mt-3 p-2 border border-cyan-700 bg-cyan-900/20 text-cyan-300 rounded text-xs font-mono ">
                     <b>IPFS Hash:</b> <span className="break-all">{ipfsHash}</span>
@@ -391,6 +423,17 @@ export const WizardModal: React.FC<{
                         View image
                       </a>
                     </div>
+                  </div>
+                )}
+                {/* --- Zora mint output --- */}
+                {tokenAddress && (
+                  <div className="mt-3 p-2 border border-indigo-600 bg-indigo-900/20 text-indigo-300 rounded text-xs font-mono">
+                    <b>Zora Token Address:</b> <span className="break-all">{tokenAddress}</span>
+                  </div>
+                )}
+                {txHash && (
+                  <div className="mt-1 p-2 border border-indigo-600 bg-indigo-900/10 text-indigo-100 rounded text-xs font-mono">
+                    <b>Zora Tx Hash:</b> <span className="break-all">{txHash}</span>
                   </div>
                 )}
                 <AccentButton
