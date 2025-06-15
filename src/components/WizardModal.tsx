@@ -36,8 +36,6 @@ export const WizardModal: React.FC<{
     setDoAdvancedToken,
   } = useWizardState();
 
-  if (!isOpen) return null;
-
   const wantsAdvanced = !!state.doAdvancedToken;
   const totalSteps = wantsAdvanced ? 6 : 5;
   const lastStep = totalSteps;
@@ -52,6 +50,9 @@ export const WizardModal: React.FC<{
       setStep(lastStep);
     }
   }, [state.step, state.doAdvancedToken, lastStep, setStep]);
+
+  // Move the early return AFTER all hooks have been called
+  if (!isOpen) return null;
 
   const handleRestart = () => {
     setStep(1);
