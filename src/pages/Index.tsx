@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -15,7 +16,7 @@ const Index: React.FC = () => {
     <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-x-hidden">
       <FullWaveBackground />
       {/* --- HERO SECTION --- */}
-      <div className="w-full pt-24 pb-10 px-4 z-10 relative flex flex-col items-center">
+      <div className="w-full pt-16 md:pt-20 pb-10 px-4 z-10 relative flex flex-col items-center">
         {/* Wallet button right-aligned (desktop), mobile top-right */}
         <div className="w-full max-w-5xl flex justify-end">
           <button
@@ -26,7 +27,7 @@ const Index: React.FC = () => {
             <Wallet size={20} color="#FFD700" />
           </button>
         </div>
-        <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.15] hero-title py-4 mt-4 max-w-3xl">
+        <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.15] hero-title py-2 mt-2 max-w-3xl">
           TALENT &gt; MONEY
         </h1>
         <div className="hero-tagline tagline mb-4 max-w-xl text-lg md:text-xl text-success">
@@ -56,3 +57,4 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+
