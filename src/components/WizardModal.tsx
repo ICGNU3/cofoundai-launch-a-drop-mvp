@@ -331,6 +331,110 @@ export const WizardModal: React.FC<{
     }
   };
 
+  // NEW: mark complete flags, results
+  const [markingComplete, setMarkingComplete] = useState(false);
+  const [markCompleteStatus, setMarkCompleteStatus] = useState<string | null>(null);
+  const [flexBadgeResults, setFlexBadgeResults] = useState<any[]>([]);
+
+  // ----- MARK COMPLETE/FINALIZE -----
+  async function handleMarkComplete() {
+    setMarkingComplete(true);
+    setMarkCompleteStatus("Starting vendor payouts...");
+    try {
+      if (!signer) throw new Error("No signer - connect your wallet.");
+
+      // Prepare Superfluid framework
+      const sf = await Framework.create({
+        chainId: 84532,
+        provider: signer.provider,
+      });
+
+      // USDCx contract (Base Sepolia)
+      const USDCX = "0x4086eBf75233e8492bA044F4b5632F3A63fC25bA";
+      const cfaV1 = sf.cfaV1;
+      // For transfer: get USDCx contract
+      const usdcx = sf.tokens.USDCx;
+
+      // 1. Payout each expense in USDCx to vendorWallet
+      for (const expense of state.expenses) {
+        setMarkCompleteStatus(`Paying vendor: ${expense.expenseName}...`);
+        const amt = ethers.utils.parseUnits(
+          expense.amountUSDC.toString(),
+          18 // USDCx typically uses 18 decimals
+        );
+        // Use simple ERC20 transfer for USDCx payout
+        const tx = await usdcx.transfer({
+          receiver: expense.vendorWallet,
+          amount: amt.toString(),
+        }).exec(signer);
+        // Optionally, store tx hash per vendor
+        // await tx.wait();
+      }
+
+      // 2. Revenue Streams: create a Superfluid flow per role from escrow to role.wallet
+      const pledgeNum = Number(state.pledgeUSDC) || 0;
+      if (pledgeNum > 0) {
+        const secondsInMonth = 30 * 24 * 3600;
+        const pledgeTotal = ethers.utils.parseUnits(
+          pledgeNum.toString(),
+          18 // USDCx is 18 decimals
+        );
+        for (const role of state.roles) {
+          setMarkCompleteStatus(`Starting flow to: ${role.roleName}...`);
+          // Compute share (role.percent): e.g. .25 for 25% share
+          const percentShare = role.percent / 100;
+          const flowAmt = pledgeTotal.mul(Math.floor(percentShare * 1e6)).div(1e6); // Fix decimals
+
+          // Compute flowRate = share / secondsInMonth, as BigNumber
+          const flowRate = flowAmt.div(secondsInMonth);
+          const roleWallet = role.walletAddress;
+
+          // Start the flow from escrow address to role.wallet
+          // NOTE: signer must be attached to the escrow owner,
+          // or if escrow is multisig, must be handled via Safe SDK etc
+          // For simple case, assume signer owns the escrow
+          const flowOp = cfaV1.createFlow({
+            receiver: roleWallet,
+            superToken: USDCX,
+            flowRate: flowRate.toString(),
+          });
+          await flowOp.exec(signer);
+        }
+      }
+
+      setMarkCompleteStatus("Minting Flex Badges...");
+      // 3. Mint Flex Badge for each contributor via Zora API
+      // POST to https://api.zora.co/v4/editions/testnet (API: create edition)
+      // We'll create one edition ("tokenSymbol Flex Badge"), and mint to each wallet
+      const badgeName = (openaiFields.tokenSymbol || "BADGE") + " Flex Badge";
+      const badgeUri = "ipfs://" + (ipfsHash || "");
+      const addresses = state.roles.map(r => r.walletAddress);
+
+      const zoraRes = await fetch("https://api.zora.co/v4/editions/testnet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chainId: 84532,
+          name: badgeName,
+          symbol: openaiFields.tokenSymbol || "BADGE",
+          uri: badgeUri,
+          creatorAddress: state.walletAddress,
+          recipients: addresses
+        })
+      });
+      if (!zoraRes.ok) throw new Error('Zora Flex Badge mint error: ' + (await zoraRes.text()));
+      const zoraData = await zoraRes.json();
+      setFlexBadgeResults(zoraData);
+      setMarkCompleteStatus("All complete! 🎉");
+    } catch (err: any) {
+      setMarkCompleteStatus(`Error: ${err?.message || String(err)}`);
+    } finally {
+      setMarkingComplete(false);
+    }
+  }
+
   return !state.isWizardOpen ? null : (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm transition">
       <div className="wizard-card w-[95vw] max-w-card mx-auto relative animate-fade-in shadow-lg">
@@ -521,6 +625,29 @@ export const WizardModal: React.FC<{
                 >
                   ← Back
                 </AccentButton>
+                <AccentButton
+                  className="w-full bg-green-500 hover:bg-green-600 mt-4"
+                  disabled={markingComplete || !state.walletAddress}
+                  onClick={handleMarkComplete}
+                >
+                  {markingComplete ? "Processing..." : "Mark Complete"}
+                </AccentButton>
+                {markCompleteStatus && (
+                  <div className="mt-3 p-2 border border-amber-600 bg-amber-900/10 text-yellow-200 rounded text-xs font-mono whitespace-pre-line">
+                    {markCompleteStatus}
+                  </div>
+                )}
+                {flexBadgeResults && flexBadgeResults.txHash && (
+                  <div className="mt-3 p-2 border border-teal-600 bg-teal-900/20 text-teal-300 rounded text-xs font-mono whitespace-pre-line">
+                    <b>Flex Badges Minted!</b><br />
+                    <div>
+                      <b>TxHash:</b>{" "}
+                      <a className="underline" href={`https://basescan.org/tx/${flexBadgeResults.txHash}`} target="_blank" rel="noopener noreferrer">
+                        {flexBadgeResults.txHash}
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             {/* Expense Modal */}
