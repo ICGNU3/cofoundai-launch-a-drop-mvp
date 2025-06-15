@@ -21,8 +21,8 @@ export async function createSafe(owner: string): Promise<string> {
     signerOrProvider: signer,
   });
 
-  // 3. Create the Safe factory via the static method
-  const factory = await SafeFactory.create({ ethAdapter });
+  // 3. Create the Safe factory via the constructor for SafeFactory v6+
+  const factory = new SafeFactory({ ethAdapter });
 
   // 4. Deploy a new Safe with a single owner
   const safeAccountConfig: SafeAccountConfig = {
