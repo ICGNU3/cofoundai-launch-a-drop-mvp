@@ -1,17 +1,9 @@
 import React, { useState } from "react";
 import { useWizardState } from "@/hooks/useWizardState";
-import { AccentButton } from "./ui/AccentButton";
-import { RolePill } from "./ui/RolePill";
-import { AddRoleModal } from "./ui/AddRoleModal";
-import { ExpensePill } from "./ui/ExpensePill";
-import { AddExpenseModal } from "./ui/AddExpenseModal";
-import { PercentBar } from "./ui/PercentBar";
 import { WizardStep1Describe } from "./WizardStep1Describe";
-import WizardStep2Roles from "./WizardStep2Roles";
+import { WizardBudgetStep } from "./WizardBudgetStep";
 import { WizardStep3Expenses } from "./WizardStep3Expenses";
 import { WizardStep4Success } from "./WizardStep4Success";
-
-const projectTypes = ["Music", "Film", "Fashion", "Art", "Other"] as const;
 
 export const WizardModal: React.FC<{
   state: ReturnType<typeof useWizardState>["state"];
@@ -83,6 +75,7 @@ export const WizardModal: React.FC<{
         >
           ×
         </button>
+        
         {/* Stepper */}
         <div className="flex justify-center mb-6">
           {[1, 2, 3, 4].map(n => (
@@ -96,6 +89,7 @@ export const WizardModal: React.FC<{
             />
           ))}
         </div>
+        
         {/* Steps Switch */}
         {state.step === 1 && (
           <WizardStep1Describe
@@ -105,14 +99,18 @@ export const WizardModal: React.FC<{
           />
         )}
         {state.step === 2 && (
-          <WizardStep2Roles
+          <WizardBudgetStep
             roles={state.roles}
+            expenses={state.expenses}
             editingRoleIdx={state.editingRoleIdx}
+            editingExpenseIdx={state.editingExpenseIdx}
             projectType={state.projectType}
             setField={setField}
             loadDefaultRoles={loadDefaultRoles}
             saveRole={saveRole}
             removeRole={removeRole}
+            saveExpense={saveExpense}
+            removeExpense={removeExpense}
             setStep={setStep}
           />
         )}
