@@ -170,6 +170,7 @@ export const WizardModal: React.FC<{
                 pledgeUSDC={state.pledgeUSDC}
                 walletAddress={state.walletAddress}
                 setStep={setStep}
+                roles={state.roles}
               />
             </motion.div>
           )}

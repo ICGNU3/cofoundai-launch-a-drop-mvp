@@ -10,6 +10,22 @@ type PercentBarProps = {
 export const PercentBar: React.FC<PercentBarProps> = ({ used, max = 100 }) => {
   const percent = Math.min(used, max);
   const remaining = Math.max(max - used, 0);
+  
+  // Dynamic label logic
+  let labelText = "";
+  let labelColor = "";
+  
+  if (used < 100) {
+    labelText = `Need ${100 - used}% more`;
+    labelColor = "text-red-500";
+  } else if (used > 100) {
+    labelText = `Remove ${used - 100}%`;
+    labelColor = "text-red-500";
+  } else {
+    labelText = "Percentages balanced ✓";
+    labelColor = "text-green-400";
+  }
+  
   return (
     <div className="w-full mt-2 mb-3">
       <div className="flex items-center gap-2">
@@ -29,6 +45,14 @@ export const PercentBar: React.FC<PercentBarProps> = ({ used, max = 100 }) => {
           className="h-2"
         />
       </div>
+      {/* Dynamic label with animated color */}
+      <motion.div
+        className={`text-sm font-semibold mt-2 ${labelColor}`}
+        animate={{ color: labelColor === "text-red-500" ? "#ef4444" : "#4ade80" }}
+        transition={{ duration: 0.3 }}
+      >
+        {labelText}
+      </motion.div>
     </div>
   );
 };

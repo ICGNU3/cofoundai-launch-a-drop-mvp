@@ -15,6 +15,7 @@ interface WizardStep3ExpensesProps {
   pledgeUSDC: string;
   walletAddress: string | null;
   setStep: (s: 1 | 2 | 3 | 4) => void;
+  roles: any[]; // Add roles prop to check percentage sum
 }
 
 export const WizardStep3Expenses: React.FC<WizardStep3ExpensesProps> = ({
@@ -26,6 +27,7 @@ export const WizardStep3Expenses: React.FC<WizardStep3ExpensesProps> = ({
   pledgeUSDC,
   walletAddress,
   setStep,
+  roles = [], // Default to empty array
 }) => {
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
 
@@ -34,6 +36,14 @@ export const WizardStep3Expenses: React.FC<WizardStep3ExpensesProps> = ({
   const expenseSum = upfrontExpenses.reduce((sum, x) => sum + x.amountUSDC, 0);
   const outcomeSum = uponOutcomeExpenses.reduce((sum, x) => sum + x.amountUSDC, 0);
   const pledgeNum = Number(pledgeUSDC) || 0;
+
+  // Calculate percentage sum from roles
+  const percentSum = roles.reduce((sum, role) => sum + (role.percent || 0), 0);
+
+  // Determine if Mint & Fund should be disabled
+  const hasExpensesOrPledge = expenses.length > 0 || pledgeNum > 0;
+  const isPercentBalanced = percentSum === 100;
+  const canMintAndFund = isPercentBalanced || hasExpensesOrPledge;
 
   return (
     <div>
@@ -103,11 +113,16 @@ export const WizardStep3Expenses: React.FC<WizardStep3ExpensesProps> = ({
           )}
           <AccentButton
             className="w-full"
-            disabled={!walletAddress}
+            disabled={!walletAddress || !canMintAndFund}
             onClick={() => setStep(4)}
           >
             Mint &amp; Fund
           </AccentButton>
+          {!canMintAndFund && (
+            <div className="text-xs text-red-400 text-center">
+              Need balanced percentages (100%) or at least one expense/pledge
+            </div>
+          )}
           <AccentButton
             secondary
             className="w-full"
