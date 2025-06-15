@@ -1,4 +1,3 @@
-
 // Utility for Superfluid upgrades using latest SDK methods
 import { Framework } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
@@ -30,13 +29,10 @@ export async function upgradeUSDCx({
     provider,
   });
 
-  // Use the new upgradeSuperToken pattern
-  const upgradeOp = sf.upgradeSuperToken({
-    superToken: usdcxAddress,
-    amount,
-    sender: userAddress,
-  });
+  // Load the SuperToken
+  const usdcx = await sf.loadSuperToken(usdcxAddress);
 
-  // Execute the upgrade (wrap USDC to USDCx)
+  // Upgrade USDC to USDCx using SuperToken method
+  const upgradeOp = usdcx.upgrade({ amount });
   return await upgradeOp.exec(signer);
 }

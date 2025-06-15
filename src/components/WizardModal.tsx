@@ -308,14 +308,12 @@ export const WizardModal: React.FC<{
         const upgradeAmt = ethers.utils.parseUnits(fundAmount.toString(), 6); // USDC: 6 decimals
         await usdc.approve(USDCX, upgradeAmt);
 
-        // Upgrade USDC to USDCx using correct SDK method
-        await sf.superToken.upgrade({
-          superToken: USDCX,
-          amount: upgradeAmt.toString()
-        }).exec(signer);
+        // Correct: upgrade USDC to USDCx
+        const usdcx = await sf.loadSuperToken(USDCX); // USDCX contract address
+        const upgradeOp = usdcx.upgrade({ amount: upgradeAmt.toString() });
+        await upgradeOp.exec(signer);
 
         // Send USDCx to pre-deployed escrow
-        const usdcx = await sf.loadSuperToken("USDCx");
         const sendOp = usdcx.transfer({
           receiver: ESCROW_ADDRESS,
           amount: upgradeAmt.toString(),

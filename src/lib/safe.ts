@@ -17,12 +17,12 @@ export async function createSafe(owner: `0x${string}`) {
     signerOrProvider: signer
   });
 
-  // 3. Safe factory (use correct static create method)
-  const safeFactory = await SafeFactory.create({ ethAdapter });
+  // 3. Safe factory (instantiate with 'new')
+  const safeFactory = new SafeFactory({ ethAdapter });
 
   // 4. Deploy a 1-owner Safe
   const config: SafeAccountConfig = { owners: [owner], threshold: 1 };
   const safeSdk = await safeFactory.deploySafe({ safeAccountConfig: config });
 
-  return safeSdk.getAddress(); // Smart-wallet address
+  return await safeSdk.getAddress(); // Smart-wallet address
 }
