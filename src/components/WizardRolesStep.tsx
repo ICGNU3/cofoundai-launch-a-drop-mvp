@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { RolePill } from "./ui/RolePill";
 import { AddRoleModal } from "./ui/AddRoleModal";
@@ -52,6 +53,17 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
   percentColor = sumPercent === 100 ? "text-green-400" : "text-red-500";
   const disableStep2Next = sumPercent !== 100;
 
+  // Handle project type change with default role loading
+  const handleProjectTypeChange = (newType: ProjectType) => {
+    setField("projectType", newType);
+    loadDefaultRoles(newType);
+    
+    toast({
+      title: "Project Type Changed",
+      description: `Loaded default roles for ${newType} projects`,
+    });
+  };
+
   // Handle load/save for templates
   const handleSaveTemplate = () => {
     if (newTemplateName.trim()) {
@@ -96,10 +108,7 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
         <select
           className="w-full mb-2"
           value={projectType}
-          onChange={e => {
-            setField("projectType", e.target.value as ProjectType);
-            loadDefaultRoles(e.target.value as ProjectType);
-          }}
+          onChange={e => handleProjectTypeChange(e.target.value as ProjectType)}
         >
           {projectTypes.map(type => (
             <option value={type} key={type}>{type}</option>
