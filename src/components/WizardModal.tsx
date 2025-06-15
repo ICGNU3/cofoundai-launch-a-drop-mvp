@@ -1,4 +1,3 @@
-
 import React from "react";
 import { X } from "lucide-react";
 import WizardStep1Describe from "./WizardStep1Describe";
@@ -86,8 +85,13 @@ export const WizardModal: React.FC<{
     return "Create Your Drop";
   };
 
-  // Show skipping loader when auto-transitioning step 5
-  if (state.step === 5 && !state.doAdvancedToken) {
+  // Only show skipping loader if skipping ahead to a NEW lastStep (e.g., totalSteps > 5)
+  if (
+    state.step === 5 &&
+    !state.doAdvancedToken &&
+    totalSteps > 5 &&
+    lastStep > 5
+  ) {
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
