@@ -42,10 +42,16 @@ export const useMintingProcess = () => {
   const simulateMinting = async ({
     coverBase64,
     tokenSymbol,
+    tokenName = "Drop",
+    tokenSupply = 1000000,
+    userWallet,
     ...rest
   }: {
     coverBase64: string;
     tokenSymbol: string;
+    tokenName?: string;
+    tokenSupply?: number;
+    userWallet?: string;
     [key: string]: any;
   }): Promise<{ tokenAddress: string; txHash: string; coverArtUrl: string; ipfsHash: string }> => {
     setIsMinting(true);
@@ -54,48 +60,69 @@ export const useMintingProcess = () => {
 
     try {
       setMintingStatus("📤 Uploading cover to IPFS...");
-      let ipfsHash: string;
       if (!coverBase64) throw new Error("No cover image to upload!");
       const coverName = `${tokenSymbol}-cover.png`;
       const res = await pinFileToIPFS({ dataURL: coverBase64, name: coverName });
-      ipfsHash = res.IpfsHash;
+      const ipfsHash = res.IpfsHash;
       setProgress(35);
 
+      // --------- ZORA MINTING HERE -----------
       setCurrentStep("uploading-metadata");
-      setMintingStatus("📡 Uploading metadata to IPFS...");
+      setMintingStatus("⚡ Creating Zora V4 coin...");
       setProgress(55);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Compose Zora body
+      const zoraBody = {
+        chainId: 84532,
+        name: tokenName,
+        symbol: tokenSymbol,
+        totalSupply: tokenSupply,
+        uri: `ipfs://${ipfsHash}`,
+        creatorAddress: userWallet,
+      };
+
+      // Call Supabase Edge Function (never expose Zora key!)
+      const zoraRes = await fetch("/functions/v1/mint-zora-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(zoraBody),
+      });
+      if (!zoraRes.ok) {
+        const errText = await zoraRes.text();
+        throw new Error(`Zora minting failed: ${errText}`);
+      }
+      const zoraData = await zoraRes.json();
+      if (!zoraData.tokenAddress) throw new Error("No tokenAddress returned from Zora");
 
       setCurrentStep("minting-token");
-      setMintingStatus("🚀 Minting your Zora coin...");
+      setMintingStatus("🚀 Minting your Zora coin on chain...");
       setProgress(70);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1200));
 
       setCurrentStep("confirming-transaction");
       setMintingStatus("⛽ Confirming on blockchain...");
       setProgress(90);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       setCurrentStep("saving-project");
       setMintingStatus("💾 Setting up your project hub...");
       setProgress(97);
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Generate mock data
-      const mockTokenAddress = `0x${Math.random().toString(16).substr(2, 40)}`;
-      const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`;
+      // Compose returned values
+      const tokenAddress = zoraData.tokenAddress;
+      const txHash = zoraData.txHash || "";
       const coverArtUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
 
       setCurrentStep("complete");
       setProgress(100);
 
       return {
-        tokenAddress: mockTokenAddress,
-        txHash: mockTxHash,
+        tokenAddress,
+        txHash,
         coverArtUrl,
-        ipfsHash
+        ipfsHash,
       };
-
     } catch (error) {
       console.error("Minting error:", error);
       setCurrentStep("error");

@@ -80,7 +80,16 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
     setLoadingMint(true);
     try {
       const tokenSymbol = "DROP";
-      const mintData = await simulateMinting({ coverBase64, tokenSymbol });
+      const tokenName = "Drop";
+      const tokenSupply = 1000000;
+      // userWallet = walletAddress
+      const mintData = await simulateMinting({
+        coverBase64,
+        tokenSymbol,
+        tokenName,
+        tokenSupply,
+        userWallet: walletAddress,
+      });
       setCoverIpfs(mintData.ipfsHash);
       const project = await saveProjectMutation.mutateAsync({
         projectIdea,
