@@ -1,6 +1,6 @@
 
 import React from "react";
-import { WizardStep1Describe } from "./WizardStep1Describe";
+import WizardStep1Describe from "./WizardStep1Describe";
 import WizardStep2Roles from "./WizardStep2Roles";
 import { WizardBudgetStep } from "./WizardBudgetStep";
 import { WizardStepTokenConfirm } from "./WizardStepTokenConfirm";

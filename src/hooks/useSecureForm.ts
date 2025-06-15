@@ -21,7 +21,7 @@ export const useSecureForm = <T extends Record<string, any>>(
 ) => {
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
-  const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});
+  const [touched, setTouchedState] = useState<Partial<Record<keyof T, boolean>>>({});
 
   const validateField = useCallback((name: keyof T, value: any): string | undefined => {
     const fieldConfig = config[name as string];
@@ -98,8 +98,6 @@ export const useSecureForm = <T extends Record<string, any>>(
     const error = validateField(name, values[name]);
     setErrors(prev => ({ ...prev, [name]: error }));
   }, [validateField, values]);
-
-  const setTouchedState = setTouched;
 
   const validateForm = useCallback((): boolean => {
     const newErrors: Partial<Record<keyof T, string>> = {};

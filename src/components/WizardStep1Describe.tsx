@@ -4,12 +4,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SecureTextarea } from "@/components/ui/SecureTextarea";
 import { ProjectTypeSelector } from "@/components/ui/ProjectTypeSelector";
 import { useSecureForm } from "@/hooks/useSecureForm";
-import { useWizardState } from "@/hooks/useWizardState";
 import { projectContent } from "@/utils/contentSanitizer";
+import type { WizardStateData, ProjectType } from "@/hooks/useWizardState";
 
-const WizardStep1Describe = () => {
-  const { projectIdea, projectType, setProjectIdea, setProjectType } = useWizardState();
+interface WizardStep1DescribeProps {
+  projectIdea: string;
+  projectType: ProjectType;
+  onSetField: <K extends keyof WizardStateData>(k: K, v: WizardStateData[K]) => void;
+  onLoadDefaultRoles: (type: ProjectType) => void;
+  canProceed: boolean;
+  onNext: () => void;
+}
 
+const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
+  projectIdea,
+  projectType,
+  onSetField,
+  onLoadDefaultRoles,
+  canProceed,
+  onNext
+}) => {
   const { values, errors, setValue, setTouched } = useSecureForm(
     { projectIdea, projectType },
     {
@@ -30,12 +44,13 @@ const WizardStep1Describe = () => {
   const handleProjectIdeaChange = (value: string) => {
     const sanitized = projectContent.sanitizeProjectIdea(value);
     setValue('projectIdea', sanitized);
-    setProjectIdea(sanitized);
+    onSetField('projectIdea', sanitized);
   };
 
-  const handleProjectTypeChange = (type: any) => {
+  const handleProjectTypeChange = (type: ProjectType) => {
     setValue('projectType', type);
-    setProjectType(type);
+    onSetField('projectType', type);
+    onLoadDefaultRoles(type);
   };
 
   return (
@@ -65,8 +80,8 @@ const WizardStep1Describe = () => {
               Project Type <span className="text-red-500">*</span>
             </label>
             <ProjectTypeSelector 
-              value={projectType} 
-              onChange={handleProjectTypeChange}
+              selectedType={projectType} 
+              onTypeChange={handleProjectTypeChange}
             />
           </div>
         </CardContent>
