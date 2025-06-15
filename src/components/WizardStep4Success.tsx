@@ -11,6 +11,8 @@ import { Wizard4AIContentSection } from "./wizard4success/Wizard4AIContentSectio
 import { MintingWorkflowModal } from "./MintingWorkflowModal";
 import Confetti from "react-confetti";
 import { useMintingWorkflow } from "./hooks/useMintingWorkflow";
+import { Wizard4ConfettiCelebration } from "./wizard4success/Wizard4ConfettiCelebration";
+import { Wizard4DefaultTokenNotice } from "./wizard4success/Wizard4DefaultTokenNotice";
 
 // --- TokenCustomization type for prop typing ---
 type TokenCustomization = {
@@ -150,8 +152,6 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   };
 
   // Determine token name/symbol for summary display
-  const defaultTokenName = "Drop";
-  const defaultTokenSymbol = "DROP";
   const isDefaultToken = !tokenCustomization;
 
   // Loading UI
@@ -168,15 +168,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   return (
     <div className="space-y-6 relative" ref={containerRef}>
       {/* Confetti celebration */}
-      {showConfetti && (
-        <Confetti
-          width={typeof window !== "undefined" ? window.innerWidth : 600}
-          height={typeof window !== "undefined" ? window.innerHeight : 400}
-          numberOfPieces={220}
-          recycle={false}
-          gravity={0.24}
-        />
-      )}
+      <Wizard4ConfettiCelebration show={showConfetti} />
 
       <Wizard4MintingOverlaySection
         isMinting={isMinting}
@@ -202,13 +194,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
       />
 
       {/* Insert: Message for default token show */}
-      {isDefaultToken && (
-        <div className="bg-yellow-100 dark:bg-yellow-900/15 rounded px-3 py-2 text-sm text-yellow-900 dark:text-yellow-200 border border-yellow-300 dark:border-yellow-800 mb-3 mt-1 flex items-center gap-2">
-          <span className="font-semibold text-gold">Note:</span>
-          This drop will use the <b>default token name</b> <span className="font-mono px-1 bg-black/10 rounded">{defaultTokenName}</span> 
-          and <b>symbol</b> <span className="font-mono px-1 bg-black/10 rounded">{defaultTokenSymbol}</span>.
-        </div>
-      )}
+      {isDefaultToken && <Wizard4DefaultTokenNotice />}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
