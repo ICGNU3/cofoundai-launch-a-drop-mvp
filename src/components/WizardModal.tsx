@@ -1,216 +1,163 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useWizardState } from "@/hooks/useWizardState";
-import { WizardStep1Describe } from "./WizardStep1Describe";
-import { WizardBudgetStep } from "./WizardBudgetStep";
-import { WizardStep3Expenses } from "./WizardStep3Expenses";
-import { WizardStep4Success } from "./WizardStep4Success";
+
+import React from "react";
+import { X } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
+import { WizardStep1Describe } from "./WizardStep1Describe";
+import { WizardStep2Roles } from "./WizardStep2Roles";
+import { WizardBudgetStep } from "./WizardBudgetStep";
+import { WizardStep4Success } from "./WizardStep4Success";
+import { useWizardState } from "@/hooks/useWizardState";
 
-export const WizardModal: React.FC<{
-  state: ReturnType<typeof useWizardState>["state"];
-  setField: ReturnType<typeof useWizardState>["setField"];
-  setStep: (s: 1 | 2 | 3 | 4) => void;
-  close: () => void;
-  saveRole: ReturnType<typeof useWizardState>["saveRole"];
-  removeRole: ReturnType<typeof useWizardState>["removeRole"];
-  updateRolePercent?: ReturnType<typeof useWizardState>["updateRolePercent"];
-  saveExpense: ReturnType<typeof useWizardState>["saveExpense"];
-  removeExpense: ReturnType<typeof useWizardState>["removeExpense"];
-  loadDefaultRoles: ReturnType<typeof useWizardState>["loadDefaultRoles"];
-}> = ({
-  state,
-  setField,
-  setStep,
-  close,
-  saveRole,
-  removeRole,
-  updateRolePercent,
-  saveExpense,
-  removeExpense,
-  loadDefaultRoles,
+type WizardModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  walletAddress: string | null;
+};
+
+export const WizardModal: React.FC<WizardModalProps> = ({
+  isOpen,
+  onClose,
+  walletAddress,
 }) => {
-  // For MVP, modal overlay and simple transitions only
-  const [roleModalOpen, setRoleModalOpen] = useState(false);
-  const [expenseModalOpen, setExpenseModalOpen] = useState(false);
+  const {
+    state,
+    setStep,
+    setField,
+    saveRole,
+    removeRole,
+    updateRolePercent,
+    saveExpense,
+    removeExpense,
+    loadDefaultRoles,
+  } = useWizardState();
 
-  // Percent validation
-  const sumPercent = state.roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
-  let percentMsg = "";
-  let percentColor = "";
-  if (sumPercent < 100)
-    percentMsg = `Need ${100 - sumPercent} % allocated`;
-  else if (sumPercent > 100)
-    percentMsg = `Remove ${sumPercent - 100} % (over-allocated)`;
-  else percentMsg = "Cuts balanced ✓";
-  percentColor = sumPercent === 100 ? "text-green-400" : "text-red-500";
-  const disableStep2Next = sumPercent !== 100;
+  if (!isOpen) return null;
 
-  // Expense/calculation
-  const upfrontExpenses = state.expenses.filter(e => e.payoutType === "immediate");
-  const uponOutcomeExpenses = state.expenses.filter(e => e.payoutType === "uponOutcome");
-  const expenseSum = upfrontExpenses.reduce((sum, x) => sum + x.amountUSDC, 0);
-  const outcomeSum = uponOutcomeExpenses.reduce((sum, x) => sum + x.amountUSDC, 0);
-  const pledgeNum = Number(state.pledgeUSDC) || 0;
-  const totalNeeded = expenseSum + pledgeNum;
+  const handleNext = () => {
+    if (state.step < 4) {
+      setStep((state.step + 1) as typeof state.step);
+    }
+  };
 
-  // Success state logic
-  const isSuccessStep = state.step === 4;
+  const handleBack = () => {
+    if (state.step > 1) {
+      setStep((state.step - 1) as typeof state.step);
+    }
+  };
 
-  // Handler for "Start New Drop"
-  const handleStartNewDrop = () => {
+  const handleRestart = () => {
+    setStep(1);
     setField("projectIdea", "");
+    setField("projectType", "Music");
     setField("roles", []);
     setField("expenses", []);
     setField("pledgeUSDC", "");
-    setField("walletAddress", null);
-    setField("projectType", "Music");
-    setField("step", 1);
-    close();
   };
 
-  const slideVariants = {
-    enter: { x: 300, opacity: 0 },
-    center: { x: 0, opacity: 1 },
-    exit: { x: -300, opacity: 0 }
+  const getStepTitle = () => {
+    switch (state.step) {
+      case 1: return "Describe Your Project";
+      case 2: return "Define Roles & Revenue Split";
+      case 3: return "Budget Breakdown";
+      case 4: return "Launch Your Drop";
+      default: return "Create Your Drop";
+    }
   };
 
-  return !state.isWizardOpen ? null : (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm transition"
-    >
-      <div className="wizard-card w-[95vw] max-w-card mx-auto relative shadow-lg max-h-[90vh] flex flex-col">
-        <button
-          className="absolute top-3 right-4 text-body-text opacity-70 hover:opacity-100 z-50"
-          onClick={close}
-          aria-label="Close"
-        >
-          ×
-        </button>
-        
-        {/* Stepper */}
-        <div className="flex justify-center mb-6 flex-shrink-0">
-          {[1, 2, 3, 4].map(n => (
-            <motion.div
-              key={n}
-              className={`mx-1 w-6 h-2 rounded-full ${
-                state.step === n 
-                  ? "progress-bar"
-                  : "bg-[#333]"
-              }`}
-              animate={{ 
-                background: state.step === n 
-                  ? "linear-gradient(90deg, #9A4DFF 0%, #5D5FEF 100%)" 
-                  : "#333"
-              }}
-              transition={{ duration: 0.3 }}
-            />
-          ))}
+  const canProceedStep1 = state.projectIdea.trim().length > 0;
+  const canProceedStep2 = state.roles.length > 0 && 
+    Math.abs(state.roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0) - 100) < 0.1;
+  const canProceedStep3 = canProceedStep2 && Number(state.pledgeUSDC) > 0;
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-border">
+          <div>
+            <h2 className="text-2xl font-bold text-headline">{getStepTitle()}</h2>
+            <div className="text-sm text-body-text/70 mt-1">
+              Step {state.step} of 4
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-body-text/60 hover:text-body-text transition-colors"
+          >
+            <X size={24} />
+          </button>
         </div>
-        
-        {/* Scrollable content area */}
-        <ScrollArea className="flex-1 px-1">
-          <AnimatePresence mode="wait">
-            {state.step === 1 && (
-              <motion.div
-                key="step1"
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.2, ease: "easeOut" }}
-              >
-                <WizardStep1Describe
-                  projectIdea={state.projectIdea}
-                  setField={setField}
-                  onNext={() => setStep(2)}
-                />
-              </motion.div>
-            )}
-            {state.step === 2 && (
-              <motion.div
-                key="step2"
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.2, ease: "easeOut" }}
-              >
-                <WizardBudgetStep
-                  roles={state.roles}
-                  expenses={state.expenses}
-                  editingRoleIdx={state.editingRoleIdx}
-                  editingExpenseIdx={state.editingExpenseIdx}
-                  projectType={state.projectType}
-                  pledgeUSDC={state.pledgeUSDC}
-                  setField={setField}
-                  loadDefaultRoles={loadDefaultRoles}
-                  saveRole={saveRole}
-                  removeRole={removeRole}
-                  updateRolePercent={updateRolePercent}
-                  saveExpense={saveExpense}
-                  removeExpense={removeExpense}
-                  setStep={setStep}
-                />
-              </motion.div>
-            )}
-            {state.step === 3 && (
-              <motion.div
-                key="step3"
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.2, ease: "easeOut" }}
-              >
-                <WizardStep3Expenses
-                  expenses={state.expenses}
-                  editingExpenseIdx={state.editingExpenseIdx}
-                  setField={setField}
-                  saveExpense={saveExpense}
-                  removeExpense={removeExpense}
-                  pledgeUSDC={state.pledgeUSDC}
-                  walletAddress={state.walletAddress}
-                  setStep={setStep}
-                  roles={state.roles}
-                />
-              </motion.div>
-            )}
-            {state.step === 4 && (
-              <motion.div
-                key="step4"
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.2, ease: "easeOut" }}
-              >
-                <WizardStep4Success
-                  projectIdea={state.projectIdea}
-                  projectType={state.projectType}
-                  roles={state.roles}
-                  expenses={state.expenses}
-                  pledgeUSDC={state.pledgeUSDC}
-                  walletAddress={state.walletAddress}
-                  onRestart={() => {
-                    setField("projectIdea", "");
-                    setField("roles", []);
-                    setField("expenses", []);
-                    setField("pledgeUSDC", "");
-                    setField("walletAddress", null);
-                    setField("projectType", "Music");
-                    setField("step", 1);
-                    close();
-                  }}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </ScrollArea>
+
+        {/* Progress Indicator */}
+        <div className="px-6 py-3 border-b border-border">
+          <div className="flex gap-2">
+            {[1, 2, 3, 4].map((stepNum) => (
+              <div
+                key={stepNum}
+                className={`flex-1 h-2 rounded-full ${
+                  stepNum <= state.step
+                    ? "bg-accent"
+                    : stepNum === state.step + 1
+                    ? "bg-accent/30"
+                    : "bg-border"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-hidden">
+          {state.step === 1 && (
+            <WizardStep1Describe
+              projectIdea={state.projectIdea}
+              projectType={state.projectType}
+              onSetField={setField}
+              onLoadDefaultRoles={loadDefaultRoles}
+              canProceed={canProceedStep1}
+              onNext={handleNext}
+            />
+          )}
+
+          {state.step === 2 && (
+            <WizardStep2Roles
+              roles={state.roles}
+              editingRoleIdx={state.editingRoleIdx}
+              onSaveRole={saveRole}
+              onRemoveRole={removeRole}
+              onUpdateRolePercent={updateRolePercent}
+              onSetField={setField}
+              canProceed={canProceedStep2}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
+          )}
+
+          {state.step === 3 && (
+            <WizardBudgetStep
+              state={state}
+              onUpdateRolePercent={updateRolePercent}
+              onSaveExpense={saveExpense}
+              onRemoveExpense={removeExpense}
+              onSetField={setField}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
+          )}
+
+          {state.step === 4 && (
+            <WizardStep4Success
+              projectIdea={state.projectIdea}
+              projectType={state.projectType}
+              roles={state.roles}
+              expenses={state.expenses}
+              pledgeUSDC={state.pledgeUSDC}
+              walletAddress={walletAddress}
+              onRestart={handleRestart}
+            />
+          )}
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 };

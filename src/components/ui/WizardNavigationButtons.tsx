@@ -1,7 +1,6 @@
 
 import React from "react";
 import { AccentButton } from "./AccentButton";
-import type { WizardStep } from "@/hooks/useWizardState";
 
 type WizardNavigationButtonsProps = {
   canProceed: boolean;
@@ -15,7 +14,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
   onNext,
 }) => {
   return (
-    <div className="flex gap-2 mt-2">
+    <div className="flex gap-2">
       <AccentButton
         secondary
         className="w-1/2"
@@ -28,7 +27,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
         disabled={!canProceed}
         onClick={onNext}
       >
-        Next: Expenses →
+        Launch Project →
       </AccentButton>
     </div>
   );
