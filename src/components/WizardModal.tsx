@@ -10,6 +10,10 @@ import { WizardRolesStep } from "./WizardRolesStep";
 import { Framework } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
 
+import { WizardOverlay } from "./WizardOverlay";
+import { WizardExpensesStep } from "./WizardExpensesStep";
+import { useWallet } from "@/hooks/useWallet";
+
 const projectTypes = ["Music", "Film", "Fashion", "Art", "Other"] as const;
 
 const ESCROW_ADDRESS = "0xESCROW_ADDRESS_REPLACE_ME"; // replace with real escrow address
@@ -319,244 +323,166 @@ export const WizardModal: React.FC<{
     }
   }
 
-  return !state.isWizardOpen ? null : (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm transition">
-      <div className="wizard-card w-[95vw] max-w-card mx-auto relative animate-fade-in shadow-lg">
-        <button
-          className="absolute top-3 right-4 text-body-text opacity-70 hover:opacity-100"
-          onClick={close}
-          aria-label="Close"
-        >
-          ×
-        </button>
-        {/* Stepper */}
-        <div className="flex justify-center mb-6">
-          {[1, 2, 3].map(n => (
-            <div
-              key={n}
-              className={`mx-1 w-6 h-2 rounded-full ${
-                state.step === n 
-                  ? "progress-bar"
-                  : "bg-[#333]"
-              }`}
-            />
-          ))}
-        </div>
-        {/* Step 1 */}
-        {state.step === 1 && (
-          <div>
-            <h2 className="hero-title text-center">Describe Your Project Idea</h2>
-            <textarea
-              className="w-full mt-2 mb-7 min-h-[100px] resize-none"
-              value={state.projectIdea}
-              maxLength={256}
-              onChange={e => setField("projectIdea", e.target.value)}
-              placeholder="Three-track lo-fi EP…"
-            />
-            <AccentButton className="w-full mt-2" onClick={() => setStep(2)}>
-              Next: Crew &amp; Cut →
-            </AccentButton>
-          </div>
-        )}
-        {/* Step 2 */}
-        {state.step === 2 && (
-          <WizardRolesStep
-            roles={state.roles}
-            editingRoleIdx={state.editingRoleIdx}
-            projectType={state.projectType}
-            setField={setField}
-            loadDefaultRoles={loadDefaultRoles}
-            saveRole={saveRole}
-            removeRole={removeRole}
-            setStep={setStep}
+  if (!state.isWizardOpen) return null;
+
+  return (
+    <WizardOverlay onClose={close}>
+      {/* Stepper */}
+      <div className="flex justify-center mb-6">
+        {[1, 2, 3].map(n => (
+          <div
+            key={n}
+            className={`mx-1 w-6 h-2 rounded-full ${state.step === n ? "progress-bar" : "bg-[#333]"}`}
           />
-        )}
-        {/* Step 3 */}
-        {state.step === 3 && (
-          <div>
-            <h2 className="headline text-center mb-2">Expenses &amp; Funding</h2>
-            <div>
-              {/* Expense Pills */}
-              <div className="mb-2 flex flex-wrap gap-2">
-                {[...upfrontExpenses, ...uponOutcomeExpenses].map((expense, i) => (
-                  <ExpensePill
-                    key={i}
-                    expense={expense}
-                    onEdit={() => {
-                      setField("editingExpenseIdx", i);
-                      setExpenseModalOpen(true);
-                    }}
-                    onDelete={() => removeExpense(i)}
-                  />
-                ))}
-                <button
-                  className="expense-pill bg-[#292929] text-accent border-accent hover:bg-accent/10 ml-1"
-                  onClick={() => {
-                    setField("editingExpenseIdx", null);
-                    setExpenseModalOpen(true);
-                  }}
-                  aria-label="Add Expense"
-                  type="button"
-                >+ Add Expense</button>
-              </div>
-              <div className="text-body-text text-sm opacity-80 mb-2">
-                <span className="font-semibold text-accent">{upfrontExpenses.length} Up Front</span> &middot;{" "}
-                <span className="font-semibold text-yellow-500">{uponOutcomeExpenses.length} Upon Outcome</span>
-              </div>
-              <div className="text-body-text text-sm opacity-80 mb-2">
-                Up front expenses: <span className="font-semibold text-accent">${expenseSum.toFixed(2)}</span><br/>
-                Upon outcome: <span className="font-semibold text-yellow-500">${outcomeSum.toFixed(2)}</span>
-              </div>
-              <div className="text-body-text text-sm opacity-80 mb-2">
-                You need <span className="font-semibold text-accent">${expenseSum.toFixed(2)}</span> USDC +{' '}
-                {pledgeNum > 0 ? <>{pledgeNum} (pledge)</> : <>any extra for revenue splits</>}
-              </div>
-              <label className="block mt-5 mb-1 font-semibold text-body-text">
-                (Optional) Pledge in USDC
-              </label>
-              <input
-                type="number"
-                inputMode="decimal"
-                min={0}
-                step="0.01"
-                placeholder="e.g. 100"
-                value={state.pledgeUSDC}
-                onChange={e => setField("pledgeUSDC", e.target.value.replace(/^0+/, ""))}
-                className="w-full mb-1"
-              />
-              <div className="flex flex-col gap-3 mt-6">
-                {/* PINATA JWT input (for MVP/testing) */}
-                <input
-                  type="password"
-                  className="w-full text-xs border border-yellow-500 bg-neutral-900 rounded px-3 py-2 mb-3"
-                  placeholder="Pinata JWT (Paste here for IPFS upload)"
-                  value={pinataJwt}
-                  onChange={e => setPinataJwt(e.target.value)}
-                />
-                {/* Updated Connect Wallet */}
-                {!state.walletAddress ? (
-                  <AccentButton
-                    className="w-full"
-                    onClick={handleConnectWallet}
-                  >
-                    Connect Wallet (Base Sepolia)
-                  </AccentButton>
-                ) : (
-                  <div className="rounded border border-accent px-4 py-3 text-accent mb-2 text-center font-mono text-sm">
-                    {state.walletAddress}
-                  </div>
-                )}
-                <AccentButton
-                  className="w-full"
-                  disabled={!state.walletAddress || loading}
-                  onClick={handleMintAndFund}
+        ))}
+      </div>
+      {/* Step 1 */}
+      {state.step === 1 && (
+        <div>
+          <h2 className="hero-title text-center">Describe Your Project Idea</h2>
+          <textarea
+            className="w-full mt-2 mb-7 min-h-[100px] resize-none"
+            value={state.projectIdea}
+            maxLength={256}
+            onChange={e => setField("projectIdea", e.target.value)}
+            placeholder="Three-track lo-fi EP…"
+          />
+          <AccentButton className="w-full mt-2" onClick={() => setStep(2)}>
+            Next: Crew &amp; Cut →
+          </AccentButton>
+        </div>
+      )}
+      {/* Step 2 */}
+      {state.step === 2 && (
+        <WizardRolesStep
+          roles={state.roles}
+          editingRoleIdx={state.editingRoleIdx}
+          projectType={state.projectType}
+          setField={setField}
+          loadDefaultRoles={loadDefaultRoles}
+          saveRole={saveRole}
+          removeRole={removeRole}
+          setStep={setStep}
+        />
+      )}
+      {/* Step 3 */}
+      {state.step === 3 && (
+        <WizardExpensesStep
+          upfrontExpenses={state.expenses.filter(e => e.payoutType === "immediate")}
+          uponOutcomeExpenses={state.expenses.filter(e => e.payoutType === "uponOutcome")}
+          expenseSum={state.expenses.filter(e => e.payoutType === "immediate").reduce((sum, x) => sum + x.amountUSDC, 0)}
+          outcomeSum={state.expenses.filter(e => e.payoutType === "uponOutcome").reduce((sum, x) => sum + x.amountUSDC, 0)}
+          pledgeNum={Number(state.pledgeUSDC) || 0}
+          totalNeeded={state.expenses.reduce((sum, x) => sum + x.amountUSDC, 0) + (Number(state.pledgeUSDC) || 0)}
+          state={state}
+          setField={setField}
+          saveExpense={saveExpense}
+          removeExpense={removeExpense}
+          setStep={setStep}
+          pinataJwt={pinataJwt}
+          setPinataJwt={setPinataJwt}
+        >
+          {/* Wallet + Mint flow UI (children) */}
+          {!state.walletAddress ? (
+            <AccentButton className="w-full" onClick={handleConnectWallet}>
+              Connect Wallet (Base Sepolia)
+            </AccentButton>
+          ) : (
+            <div className="rounded border border-accent px-4 py-3 text-accent mb-2 text-center font-mono text-sm">
+              {state.walletAddress}
+            </div>
+          )}
+          <AccentButton
+            className="w-full"
+            disabled={!state.walletAddress || loading}
+            onClick={handleMintAndFund}
+          >
+            {loading ? "Calling OpenAI..." : "Mint & Fund"}
+          </AccentButton>
+          {error && (
+            <div className="mt-2 text-red-500 text-center text-xs">{error}</div>
+          )}
+          {/* AI fields (after OpenAI) */}
+          {Object.keys(openaiFields).length > 0 && (
+            <div className="mt-3 p-2 border border-green-600 bg-green-900/30 text-green-300 rounded text-xs font-mono space-y-1">
+              <div><b>Token Name:</b> {openaiFields.tokenName}</div>
+              <div><b>Symbol:</b> {openaiFields.tokenSymbol}</div>
+              <div><b>Supply:</b> {openaiFields.tokenSupply}</div>
+              <div><b>Image Prompt:</b> {openaiFields.imagePrompt}</div>
+              <div><b>Launch Copy:</b> {openaiFields.launchCopy}</div>
+            </div>
+          )}
+          {/* Loading indicator */}
+          {loading && (
+            <div className="text-yellow-400 text-xs text-center mt-2">Generating image & uploading&hellip;</div>
+          )}
+          {/* IPFS hash display */}
+          {ipfsHash && (
+            <div className="mt-3 p-2 border border-cyan-700 bg-cyan-900/20 text-cyan-300 rounded text-xs font-mono ">
+              <b>IPFS Hash:</b> <span className="break-all">{ipfsHash}</span>
+              <div>
+                <a
+                  href={`https://gateway.pinata.cloud/ipfs/${ipfsHash}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="underline text-cyan-200 ml-2"
                 >
-                  {loading ? "Calling OpenAI..." : "Mint & Fund"}
-                </AccentButton>
-                {error && (
-                  <div className="mt-2 text-red-500 text-center text-xs">{error}</div>
-                )}
-                {/* AI fields (after OpenAI) */}
-                {Object.keys(openaiFields).length > 0 && (
-                  <div className="mt-3 p-2 border border-green-600 bg-green-900/30 text-green-300 rounded text-xs font-mono space-y-1">
-                    <div><b>Token Name:</b> {openaiFields.tokenName}</div>
-                    <div><b>Symbol:</b> {openaiFields.tokenSymbol}</div>
-                    <div><b>Supply:</b> {openaiFields.tokenSupply}</div>
-                    <div><b>Image Prompt:</b> {openaiFields.imagePrompt}</div>
-                    <div><b>Launch Copy:</b> {openaiFields.launchCopy}</div>
-                  </div>
-                )}
-                {/* Loading indicator */}
-                {loading && (
-                  <div className="text-yellow-400 text-xs text-center mt-2">Generating image & uploading&hellip;</div>
-                )}
-                {/* IPFS hash display */}
-                {ipfsHash && (
-                  <div className="mt-3 p-2 border border-cyan-700 bg-cyan-900/20 text-cyan-300 rounded text-xs font-mono ">
-                    <b>IPFS Hash:</b> <span className="break-all">{ipfsHash}</span>
-                    <div>
-                      <a
-                        href={`https://gateway.pinata.cloud/ipfs/${ipfsHash}`}
-                        target="_blank" rel="noopener noreferrer"
-                        className="underline text-cyan-200 ml-2"
-                      >
-                        View image
-                      </a>
-                    </div>
-                  </div>
-                )}
-                {/* --- Zora mint output --- */}
-                {tokenAddress && (
-                  <div className="mt-3 p-2 border border-indigo-600 bg-indigo-900/20 text-indigo-300 rounded text-xs font-mono">
-                    <b>Zora Token Address:</b> <span className="break-all">{tokenAddress}</span>
-                  </div>
-                )}
-                {txHash && (
-                  <div className="mt-1 p-2 border border-indigo-600 bg-indigo-900/10 text-indigo-100 rounded text-xs font-mono">
-                    <b>Zora Tx Hash:</b> <span className="break-all">{txHash}</span>
-                  </div>
-                )}
-                {/* Escrow funding tx hash */}
-                {escrowTxHash && (
-                  <div className="mt-3 p-2 border border-amber-600 bg-amber-900/20 text-yellow-300 rounded text-xs font-mono">
-                    <b>Escrow Funding Tx:</b> <span className="break-all">{escrowTxHash}</span>
-                  </div>
-                )}
-                <AccentButton
-                  secondary
-                  className="w-full"
-                  onClick={() => setStep(2)}
-                >
-                  ← Back
-                </AccentButton>
-                <AccentButton
-                  className="w-full bg-green-500 hover:bg-green-600 mt-4"
-                  disabled={markingComplete || !state.walletAddress}
-                  onClick={handleMarkComplete}
-                >
-                  {markingComplete ? "Processing..." : "Mark Complete"}
-                </AccentButton>
-                {markCompleteStatus && (
-                  <div className="mt-3 p-2 border border-amber-600 bg-amber-900/10 text-yellow-200 rounded text-xs font-mono whitespace-pre-line">
-                    {markCompleteStatus}
-                  </div>
-                )}
-                {flexBadgeResults && flexBadgeResults.txHash && (
-                  <div className="mt-3 p-2 border border-teal-600 bg-teal-900/20 text-teal-300 rounded text-xs font-mono whitespace-pre-line">
-                    <b>Flex Badges Minted!</b><br />
-                    <div>
-                      <b>TxHash:</b>{" "}
-                      <a className="underline" href={`https://basescan.org/tx/${flexBadgeResults.txHash}`} target="_blank" rel="noopener noreferrer">
-                        {flexBadgeResults.txHash}
-                      </a>
-                    </div>
-                  </div>
-                )}
-                {tokenSupplyConfirmed && tokenAddress &&
-                  <a href={`https://zora.co/collect/${tokenAddress}`} target="_blank" rel="noopener noreferrer"
-                     className="...">Collect Token</a>
-                }
-                {flowsChecked && streamsLive && (
-                  <div className="badge badge-success text-xs mt-2">Streams live! ✅</div>
-                )}
+                  View image
+                </a>
               </div>
             </div>
-            {/* Expense Modal */}
-            <AddExpenseModal
-              open={expenseModalOpen}
-              defaultExpense={
-                state.editingExpenseIdx !== null ? state.expenses[state.editingExpenseIdx] : undefined
-              }
-              onClose={() => setExpenseModalOpen(false)}
-              onSave={exp => {
-                // Use exp.payoutType from modal. Always set isFixed: true.
-                saveExpense({ ...exp, isFixed: true }, state.editingExpenseIdx);
-                setExpenseModalOpen(false);
-              }}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+          )}
+          {/* --- Zora mint output --- */}
+          {tokenAddress && (
+            <div className="mt-3 p-2 border border-indigo-600 bg-indigo-900/20 text-indigo-300 rounded text-xs font-mono">
+              <b>Zora Token Address:</b> <span className="break-all">{tokenAddress}</span>
+            </div>
+          )}
+          {txHash && (
+            <div className="mt-1 p-2 border border-indigo-600 bg-indigo-900/10 text-indigo-100 rounded text-xs font-mono">
+              <b>Zora Tx Hash:</b> <span className="break-all">{txHash}</span>
+            </div>
+          )}
+          {/* Escrow funding tx hash */}
+          {escrowTxHash && (
+            <div className="mt-3 p-2 border border-amber-600 bg-amber-900/20 text-yellow-300 rounded text-xs font-mono">
+              <b>Escrow Funding Tx:</b> <span className="break-all">{escrowTxHash}</span>
+            </div>
+          )}
+          <AccentButton secondary className="w-full" onClick={() => setStep(2)}>
+            ← Back
+          </AccentButton>
+          <AccentButton
+            className="w-full bg-green-500 hover:bg-green-600 mt-4"
+            disabled={markingComplete || !state.walletAddress}
+            onClick={handleMarkComplete}
+          >
+            {markingComplete ? "Processing..." : "Mark Complete"}
+          </AccentButton>
+          {markCompleteStatus && (
+            <div className="mt-3 p-2 border border-amber-600 bg-amber-900/10 text-yellow-200 rounded text-xs font-mono whitespace-pre-line">
+              {markCompleteStatus}
+            </div>
+          )}
+          {flexBadgeResults && flexBadgeResults.txHash && (
+            <div className="mt-3 p-2 border border-teal-600 bg-teal-900/20 text-teal-300 rounded text-xs font-mono whitespace-pre-line">
+              <b>Flex Badges Minted!</b><br />
+              <div>
+                <b>TxHash:</b>{" "}
+                <a className="underline" href={`https://basescan.org/tx/${flexBadgeResults.txHash}`} target="_blank" rel="noopener noreferrer">
+                  {flexBadgeResults.txHash}
+                </a>
+              </div>
+            </div>
+          )}
+          {tokenSupplyConfirmed && tokenAddress &&
+            <a href={`https://zora.co/collect/${tokenAddress}`} target="_blank" rel="noopener noreferrer"
+               className="...">Collect Token</a>
+          }
+          {flowsChecked && streamsLive && (
+            <div className="badge badge-success text-xs mt-2">Streams live! ✅</div>
+          )}
+        </WizardExpensesStep>
+      )}
+    </WizardOverlay>
   );
 };

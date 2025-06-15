@@ -1,7 +1,6 @@
 
-// Fix for incompatible ethers version: use require() instead of direct import in EthersAdapter (Safe expects v5)
 import { ethers } from 'ethers';
-import SafeFactory, { SafeAccountConfig } from '@safe-global/protocol-kit'; // <-- Ensure this is default import
+import Safe, { SafeAccountConfig } from '@safe-global/protocol-kit';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
 const RPC = 'https://sepolia.base.org'; // Base Sepolia
@@ -14,10 +13,13 @@ export async function createSafe(owner: `0x${string}`) {
   // 2. Ethers adapter
   const ethAdapter = new EthersAdapter({
     ethers: require('ethers'), // HACK: make "ethers" look like v5 for Safe
-    signerOrProvider: signer
+    signerOrProvider: signer,
   });
 
   // 3. Safe factory (must use static create method; default import)
+  // The workaround: SafeFactory is the default export AND has the static create method
+  const SafeFactoryModule = await import('@safe-global/protocol-kit');
+  const SafeFactory = SafeFactoryModule.default;
   const safeFactory = await SafeFactory.create({ ethAdapter });
 
   // 4. Deploy a 1-owner Safe
