@@ -13,7 +13,7 @@ const projectTypes = ["Music", "Film", "Fashion", "Art", "Other"] as const;
 export const WizardModal: React.FC<{
   state: ReturnType<typeof useWizardState>["state"];
   setField: ReturnType<typeof useWizardState>["setField"];
-  setStep: (s: 1 | 2 | 3) => void;
+  setStep: (s: 1 | 2 | 3 | 4) => void;
   close: () => void;
   saveRole: ReturnType<typeof useWizardState>["saveRole"];
   removeRole: ReturnType<typeof useWizardState>["removeRole"];
@@ -55,6 +55,21 @@ export const WizardModal: React.FC<{
   const pledgeNum = Number(state.pledgeUSDC) || 0;
   const totalNeeded = expenseSum + pledgeNum;
 
+  // Success state logic
+  const isSuccessStep = state.step === 4;
+
+  // Handler for "Start New Drop"
+  const handleStartNewDrop = () => {
+    setField("projectIdea", "");
+    setField("roles", []);
+    setField("expenses", []);
+    setField("pledgeUSDC", "");
+    setField("walletAddress", null);
+    setField("projectType", "Music");
+    setField("step", 1);
+    close();
+  };
+
   return !state.isWizardOpen ? null : (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm transition">
       <div className="wizard-card w-[95vw] max-w-card mx-auto relative animate-fade-in shadow-lg">
@@ -67,7 +82,7 @@ export const WizardModal: React.FC<{
         </button>
         {/* Stepper */}
         <div className="flex justify-center mb-6">
-          {[1, 2, 3].map(n => (
+          {[1, 2, 3, 4].map(n => (
             <div
               key={n}
               className={`mx-1 w-6 h-2 rounded-full ${
@@ -177,7 +192,7 @@ export const WizardModal: React.FC<{
                 <AccentButton
                   className="w-full"
                   disabled={!state.walletAddress}
-                  onClick={() => {/* Automations next step coming soon */}}
+                  onClick={() => setStep(4)}
                 >
                   Mint &amp; Fund
                 </AccentButton>
@@ -203,6 +218,72 @@ export const WizardModal: React.FC<{
                 setExpenseModalOpen(false);
               }}
             />
+          </div>
+        )}
+        {/* Step 4: SUCCESS */}
+        {isSuccessStep && (
+          <div className="flex flex-col items-center text-center p-8">
+            <div className="text-green-400 text-4xl mb-3">✓</div>
+            <h2 className="headline mb-2">Project Launched!</h2>
+            <div className="text-body-text font-medium mb-6">
+              Your drop is created. Here’s a quick summary:
+            </div>
+            <div className="w-full max-w-md mx-auto rounded-xl border border-border p-4 bg-[#191919] flex flex-col gap-2 mb-6">
+              <div>
+                <div className="font-semibold text-accent">Project Idea:</div>
+                <div className="mb-2">{state.projectIdea || <span className="opacity-70">No idea entered</span>}</div>
+              </div>
+              <div>
+                <div className="font-semibold text-accent">Project Type:</div>
+                <div className="mb-2">{state.projectType}</div>
+              </div>
+              <div>
+                <div className="font-semibold text-accent">Crew:</div>
+                <div className="flex flex-wrap gap-1 mt-1 mb-2">
+                  {state.roles.length === 0 ? (
+                    <span className="opacity-60">No roles</span>
+                  ) : (
+                    state.roles.map((role, i) => (
+                      <span key={i} className="inline-flex items-center rounded px-2 py-1 text-xs bg-accent/10 border border-accent text-accent mr-1">
+                        {role.roleName} ({role.percent}%)
+                      </span>
+                    ))
+                  )}
+                </div>
+              </div>
+              <div>
+                <div className="font-semibold text-accent">Expenses:</div>
+                <div className="flex flex-wrap gap-1 mt-1 mb-2">
+                  {state.expenses.length === 0 ? (
+                    <span className="opacity-60">None</span>
+                  ) : (
+                    state.expenses.map((exp, i) => (
+                      <span key={i} className="inline-flex items-center rounded px-2 py-1 text-xs bg-yellow-800/20 border border-yellow-600 text-yellow-400 mr-1">
+                        {exp.expenseName} (${exp.amountUSDC})
+                      </span>
+                    ))
+                  )}
+                </div>
+              </div>
+              <div>
+                <div className="font-semibold text-accent">Pledge:</div>
+                <div className="mb-2">
+                  {pledgeNum > 0 ? `$${pledgeNum}` : <span className="opacity-60">No pledge</span>}
+                </div>
+              </div>
+              <div>
+                <div className="font-semibold text-accent">Wallet:</div>
+                <div className="mb-2">
+                  {state.walletAddress || <span className="opacity-60">Not connected</span>}
+                </div>
+              </div>
+            </div>
+            <AccentButton 
+              className="w-full max-w-xs"
+              onClick={handleStartNewDrop}
+            >
+              Start New Drop
+            </AccentButton>
           </div>
         )}
       </div>
