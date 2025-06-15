@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { AccentButton } from "@/components/ui/AccentButton";
 import { FileText, RefreshCw, Copy, Edit, Sparkles, Target, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AICopyGeneratorProps {
   projectIdea: string;
@@ -63,40 +63,62 @@ export const AICopyGenerator: React.FC<AICopyGeneratorProps> = ({
     );
   };
 
+  // Helper: Call Edge Function for AI
+  const fetchAIContent = async (prompt: string, model = "gpt-4o-mini") => {
+    try {
+      const res = await fetch("/functions/v1/generate-content-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, model }),
+      });
+      const data = await res.json();
+      if (data.generated) return data.generated;
+      throw new Error(data.error || "AI generation failed");
+    } catch (err: any) {
+      toast({
+        title: "AI Error",
+        description: err?.message || "Failed to generate content.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
   const generateCopy = async () => {
     setIsGenerating(true);
     try {
-      // Simulate AI generation
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      
-      const mockCopy = selectedPlatforms.map(platform => {
-        const platformData = platforms.find(p => p.value === platform);
+      // For each platform, get AI-generated copy via Edge Function
+      const mockFn = async (platform: string) => {
+        const prompt = `Write a ${tone} marketing announcement for a ${projectType} project called "${projectIdea}". Platform: ${platform}. Target audience: ${targetAudience || "general"}. Key messages: ${keyMessages || "Default campaign."}`;
         return {
           id: `${platform}-${Date.now()}`,
           platform,
-          platformLabel: platformData?.label || platform,
-          icon: platformData?.icon || "📝",
+          platformLabel: platforms.find(p => p.value === platform)?.label || platform,
+          icon: platforms.find(p => p.value === platform)?.icon || "📝",
           tone,
           targetAudience,
-          content: generateMockContent(platform, projectIdea, tone),
-          variations: [
-            generateMockContent(platform, projectIdea, tone, "variation1"),
-            generateMockContent(platform, projectIdea, tone, "variation2"),
-          ],
+          // REAL AI content:
+          content: await fetchAIContent(prompt),
+          variations: [],
           metrics: {
             readability: Math.floor(Math.random() * 20) + 80,
             engagement: Math.floor(Math.random() * 30) + 70,
             clarity: Math.floor(Math.random() * 25) + 75,
           },
         };
-      });
-      
+      };
+
+      const mockCopy = [];
+      for (const platform of selectedPlatforms) {
+        mockCopy.push(await mockFn(platform));
+      }
+
       setGeneratedCopy(mockCopy);
       onCopyGenerated(mockCopy);
-      
+
       toast({
         title: "Marketing Copy Generated! 📝",
-        description: `Created ${mockCopy.length} platform-specific versions.`,
+        description: `Created ${mockCopy.length} platform-specific versions via AI.`,
       });
     } catch (error) {
       toast({
@@ -109,54 +131,26 @@ export const AICopyGenerator: React.FC<AICopyGeneratorProps> = ({
     }
   };
 
-  const generateMockContent = (platform: string, idea: string, tone: string, variation?: string) => {
-    const toneModifiers = {
-      professional: "professionally crafted",
-      playful: "with exciting energy",
-      urgent: "with immediate action needed",
-      inspiring: "that motivates and uplifts",
-      casual: "in a friendly, approachable way",
-    };
-
-    const modifier = toneModifiers[tone as keyof typeof toneModifiers] || "expertly designed";
-    const varSuffix = variation ? ` (${variation})` : "";
-
-    switch (platform) {
-      case "twitter":
-        return `🚀 Just launched "${idea}" - ${modifier}! This ${projectType.toLowerCase()} project is going to change everything. #NewDrop #Creative${varSuffix}`;
-      case "instagram":
-        return `✨ Excited to share our latest ${projectType.toLowerCase()} project: "${idea}"!\n\nThis has been months in the making, ${modifier} to bring you something truly special. Can't wait for you to experience it!\n\n#NewRelease #Creative #${projectType}${varSuffix}`;
-      case "linkedin":
-        return `We're thrilled to announce the launch of our latest ${projectType.toLowerCase()} project: "${idea}". This initiative represents our commitment to innovation and creative excellence, ${modifier} to deliver exceptional value to our community.${varSuffix}`;
-      case "blog":
-        return `# Introducing "${idea}"\n\nWe're incredibly excited to share our latest ${projectType.toLowerCase()} project with you. This endeavor has been ${modifier}, combining cutting-edge creativity with thoughtful execution...\n\n[Full blog post content would continue here]${varSuffix}`;
-      default:
-        return `Check out our new ${projectType.toLowerCase()} project: "${idea}" - ${modifier} for maximum impact!${varSuffix}`;
-    }
-  };
-
   const refineCopy = async (copyItem: any) => {
     if (!refinementRequest.trim()) return;
-    
     setIsGenerating(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate refinement
-      const refinedContent = `${copyItem.content} [Refined: ${refinementRequest}]`;
-      
+      // Use Edge Function for refinement prompt
+      const prompt = `Refine the following marketing copy for ${copyItem.platformLabel}: "${copyItem.content}"\nInstruction: ${refinementRequest}`;
+      const refinedContent = await fetchAIContent(prompt);
+
       const updatedCopy = generatedCopy.map(item =>
         item.id === copyItem.id
           ? { ...item, content: refinedContent, refined: true }
           : item
       );
-      
+
       setGeneratedCopy(updatedCopy);
       setRefinementRequest("");
-      
+
       toast({
         title: "Copy Refined! ✨",
-        description: "Your refinement has been applied successfully.",
+        description: "Your refinement has been applied successfully via AI.",
       });
     } catch (error) {
       toast({

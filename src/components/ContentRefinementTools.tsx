@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -114,26 +113,65 @@ export const ContentRefinementTools: React.FC<ContentRefinementToolsProps> = ({
     { label: "More Urgent", value: "urgent" },
   ];
 
+  // Add Edge Function call for AI refinement
+  const fetchAIContent = async (prompt: string, model = "gpt-4o-mini") => {
+    try {
+      const res = await fetch("/functions/v1/generate-content-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, model }),
+      });
+      const data = await res.json();
+      if (data.generated) return data.generated;
+      throw new Error(data.error || "AI generation failed");
+    } catch (err: any) {
+      toast({
+        title: "AI Error",
+        description: err?.message || "Failed to generate content.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  // Update applyRefinement for AI-backed output
   const applyRefinement = async (type: string, value?: string) => {
     setIsRefining(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      let aiPrompt = "";
+      switch (type) {
+        case "suggestions":
+          aiPrompt = `Suggest improvements for this content: "${content.copy?.[0]?.content || ""}". Focus: ${value || "general improvement."}`;
+          break;
+        case "platform":
+          aiPrompt = `Optimize this content for ${value}. Here is the content: "${content.copy?.[0]?.content || ""}"`;
+          break;
+        case "tone":
+          aiPrompt = `Rewrite this marketing copy to have a more ${value} tone. Content: "${content.copy?.[0]?.content || ""}"`;
+          break;
+        case "custom":
+          aiPrompt = `Apply this custom refinement: "${value}" to the content: "${content.copy?.[0]?.content || ""}"`;
+          break;
+        default:
+          aiPrompt = `Improve this content: "${content.copy?.[0]?.content || ""}"`;
+      }
+      const aiResult = await fetchAIContent(aiPrompt);
+
       const refinement = {
         id: Date.now(),
         type,
         value,
         timestamp: new Date().toISOString(),
-        content: content,
+        content: aiResult,
         description: `Applied ${type} refinement`,
       };
-      
+
       setRefinementHistory(prev => [refinement, ...prev]);
       onContentRefined(refinement);
-      
+
       toast({
         title: "Content Refined! ✨",
-        description: `${type} refinement has been applied successfully.`,
+        description: `${type} refinement has been applied successfully via AI.`,
       });
     } catch (error) {
       toast({
