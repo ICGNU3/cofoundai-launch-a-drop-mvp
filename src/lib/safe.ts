@@ -1,6 +1,6 @@
 
+// Fix for incompatible ethers version: use require() instead of direct import in EthersAdapter (Safe expects v5)
 import { ethers } from 'ethers';
-// SafeFactory is default import as per type error
 import SafeFactory, { SafeAccountConfig } from '@safe-global/protocol-kit';
 import Safe from '@safe-global/protocol-kit';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
@@ -14,11 +14,11 @@ export async function createSafe(owner: `0x${string}`) {
 
   // 2. Ethers adapter
   const ethAdapter = new EthersAdapter({
-    ethers,
+    ethers: require('ethers'), // HACK: make "ethers" look like v5 for Safe
     signerOrProvider: signer
   });
 
-  // 3. Safe factory (default import)
+  // 3. Safe factory
   const safeFactory = await SafeFactory.create({ ethAdapter });
 
   // 4. Deploy a 1-owner Safe

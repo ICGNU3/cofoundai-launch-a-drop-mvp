@@ -334,7 +334,7 @@ export const WizardModal: React.FC<{
   // NEW: mark complete flags, results
   const [markingComplete, setMarkingComplete] = useState(false);
   const [markCompleteStatus, setMarkCompleteStatus] = useState<string | null>(null);
-  const [flexBadgeResults, setFlexBadgeResults] = useState<any[]>([]);
+  const [flexBadgeResults, setFlexBadgeResults] = useState<any>([]);
 
   // ----- MARK COMPLETE/FINALIZE -----
   async function handleMarkComplete() {
@@ -432,6 +432,59 @@ export const WizardModal: React.FC<{
       setMarkCompleteStatus(`Error: ${err?.message || String(err)}`);
     } finally {
       setMarkingComplete(false);
+    }
+  }
+
+  // NEW: mark complete flags, results
+  const [streamsLive, setStreamsLive] = useState(false);
+  const [flowsChecked, setFlowsChecked] = useState(false);
+  const [tokenSupplyConfirmed, setTokenSupplyConfirmed] = useState(false);
+
+  // --- COLLECT LINK/STREAMS CHECK HELPERS ---
+
+  // Query Zora Coins API for token supply
+  async function checkZoraTotalSupply(tokenAddress: string) {
+    try {
+      const res = await fetch(`https://api.zora.co/v4/coins/testnet/${tokenAddress}`);
+      if (!res.ok) return false;
+      const data = await res.json();
+      return Number(data?.totalSupply || 0) > 0;
+    } catch { return false; }
+  }
+
+  // Query Superfluid CFA getFlow for each role
+  async function checkAllFlowsLive(roles: any[], pledgeNum: number, escrowAddress: string, usdcxAddress: string, signer: any) {
+    try {
+      const sf = await Framework.create({
+        chainId: 84532,
+        provider: signer.provider,
+      });
+      const cfa = sf.cfaV1;
+      let allLive = true;
+      const secondsInMonth = 30 * 24 * 3600;
+      const pledgeTotal = ethers.utils.parseUnits(
+        pledgeNum.toString(),
+        18 // USDCx is 18 decimals
+      );
+
+      for (const role of roles) {
+        const percentShare = role.percent / 100;
+        const flowAmt = pledgeTotal.mul(Math.floor(percentShare * 1e6)).div(1e6);
+        const expectedRate = flowAmt.div(secondsInMonth);
+
+        const flow = await cfa.getFlow({
+          superToken: usdcxAddress,
+          sender: ESCROW_ADDRESS,
+          receiver: role.walletAddress,
+          providerOrSigner: signer.provider,
+        });
+        if (!flow?.flowRate || !flow?.receiver || ethers.BigNumber.from(flow.flowRate).lt(expectedRate)) {
+          allLive = false;
+        }
+      }
+      return allLive;
+    } catch {
+      return false;
     }
   }
 
@@ -647,6 +700,13 @@ export const WizardModal: React.FC<{
                       </a>
                     </div>
                   </div>
+                )}
+                {tokenSupplyConfirmed && tokenAddress &&
+                  <a href={`https://zora.co/collect/${tokenAddress}`} target="_blank" rel="noopener noreferrer"
+                     className="...">Collect Token</a>
+                }
+                {flowsChecked && streamsLive && (
+                  <div className="badge badge-success text-xs mt-2">Streams live! ✅</div>
                 )}
               </div>
             </div>
