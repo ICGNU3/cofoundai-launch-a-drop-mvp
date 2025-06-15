@@ -1,6 +1,6 @@
+
 import React, { useState } from "react";
 import { AccentButton } from "./ui/AccentButton";
-import { AddBudgetItemForm } from "./ui/AddBudgetItemForm";
 import { AddRoleModal } from "./ui/AddRoleModal";
 import { AddExpenseModal } from "./ui/AddExpenseModal";
 import { ProjectTypeSelector } from "./ui/ProjectTypeSelector";
@@ -79,6 +79,11 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
     setRoleModalOpen(true);
   };
 
+  const handleAddExpenseClick = () => {
+    setField("editingExpenseIdx", null);
+    setExpenseModalOpen(true);
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="headline text-center mb-4">Budget Breakdown</h2>
@@ -117,6 +122,17 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
           className="w-full max-w-xs"
         >
           + Add Role
+        </AccentButton>
+      </div>
+
+      {/* Add Expense Button */}
+      <div className="flex justify-center">
+        <AccentButton
+          secondary
+          onClick={handleAddExpenseClick}
+          className="w-full max-w-xs"
+        >
+          + Add Expense
         </AccentButton>
       </div>
 
