@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -70,14 +71,16 @@ const Index: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-x-hidden">
       <FullWaveBackground />
-      <section className="relative w-full pt-16 md:pt-20 pb-10 px-4 z-10 flex flex-col items-center pb-24">
+      <section className="relative w-full max-w-7xl mx-auto pt-16 md:pt-20 pb-10 px-4 z-10 flex flex-col items-center pb-24">
         <div className="hero-gradient pointer-events-none" aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 80%,rgba(154,77,255,.18) 0%,transparent 72%)', zIndex: 0 }} />
-        <HeroSection
-          counter={counter}
-          onCtaClick={wizard.openWizard}
-          countUpDollarRef={countUpDollarRef}
-          countUpDropRef={countUpDropRef}
-        />
+        <div className="w-full max-w-4xl mx-auto">
+          <HeroSection
+            counter={counter}
+            onCtaClick={wizard.openWizard}
+            countUpDollarRef={countUpDollarRef}
+            countUpDropRef={countUpDropRef}
+          />
+        </div>
         <div className="w-full flex items-center justify-center mt-6 mb-2">
           <LogoRow />
         </div>
@@ -86,7 +89,10 @@ const Index: React.FC = () => {
         </div>
       </section>
 
-      <LandingFeaturesSection />
+      <div className="w-full max-w-7xl mx-auto px-4">
+        <LandingFeaturesSection />
+      </div>
+      
       <AdvancedTokenCustomizationModal isOpen={tokenModalOpen} onClose={() => setTokenModalOpen(false)} />
       <WizardModal
         isOpen={wizard.state.isWizardOpen}

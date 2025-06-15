@@ -79,7 +79,7 @@ export const WizardModal: React.FC<{
   if (state.step === 5 && !state.doAdvancedToken) {
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
+        <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
           <WizardHeader 
             title="Skipping Advanced Customization" 
             currentStep={progressStep} 
@@ -100,7 +100,7 @@ export const WizardModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
+      <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
         <WizardHeader 
           title={getStepTitle()} 
           currentStep={progressStep} 
