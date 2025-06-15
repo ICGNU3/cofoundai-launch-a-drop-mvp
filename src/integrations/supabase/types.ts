@@ -9,7 +9,185 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      funding_events: {
+        Row: {
+          amount: number
+          id: string
+          pledged_at: string | null
+          pledged_by: string | null
+          project_id: string | null
+        }
+        Insert: {
+          amount: number
+          id?: string
+          pledged_at?: string | null
+          pledged_by?: string | null
+          project_id?: string | null
+        }
+        Update: {
+          amount?: number
+          id?: string
+          pledged_at?: string | null
+          pledged_by?: string | null
+          project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funding_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_analytics: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_engagement_at: string | null
+          project_id: string | null
+          shares: number | null
+          views: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_engagement_at?: string | null
+          project_id?: string | null
+          shares?: number | null
+          views?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_engagement_at?: string | null
+          project_id?: string | null
+          shares?: number | null
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_analytics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_expenses: {
+        Row: {
+          amount_usdc: number
+          id: string
+          name: string
+          payout_type: string | null
+          project_id: string | null
+          vendor_wallet: string | null
+        }
+        Insert: {
+          amount_usdc: number
+          id?: string
+          name: string
+          payout_type?: string | null
+          project_id?: string | null
+          vendor_wallet?: string | null
+        }
+        Update: {
+          amount_usdc?: number
+          id?: string
+          name?: string
+          payout_type?: string | null
+          project_id?: string | null
+          vendor_wallet?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_expenses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_roles: {
+        Row: {
+          id: string
+          name: string
+          percent: number
+          project_id: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          percent: number
+          project_id?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          percent?: number
+          project_id?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_roles_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          cover_art_url: string | null
+          created_at: string | null
+          funding_target: number | null
+          funding_total: number | null
+          id: string
+          minted_at: string | null
+          owner_id: string
+          pledge_usdc: number | null
+          project_idea: string
+          project_type: string
+          wallet_address: string | null
+          zora_coin_url: string | null
+        }
+        Insert: {
+          cover_art_url?: string | null
+          created_at?: string | null
+          funding_target?: number | null
+          funding_total?: number | null
+          id?: string
+          minted_at?: string | null
+          owner_id: string
+          pledge_usdc?: number | null
+          project_idea: string
+          project_type: string
+          wallet_address?: string | null
+          zora_coin_url?: string | null
+        }
+        Update: {
+          cover_art_url?: string | null
+          created_at?: string | null
+          funding_target?: number | null
+          funding_total?: number | null
+          id?: string
+          minted_at?: string | null
+          owner_id?: string
+          pledge_usdc?: number | null
+          project_idea?: string
+          project_type?: string
+          wallet_address?: string | null
+          zora_coin_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,16 +9,16 @@ import NotFound from "./pages/NotFound";
 import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
 import React from "react";
 
-// Define the Base Sepolia chain object in the correct format for Privy and wagmi
+import Dashboard from "./pages/Dashboard";
+import ProjectOverview from "./pages/ProjectOverview";
+
 const baseSepoliaChain = {
   id: 84532,
   name: "Base Sepolia",
   rpcUrls: {
     default: {
       http: ["https://sepolia.base.org"],
-      // webSocket: [], // You can add websocket endpoints here if needed.
     },
-    // privyWalletOverride could be added if Privy suggests a special endpoint, but it's optional.
   },
   blockExplorers: {
     default: {
@@ -85,7 +86,8 @@ const AppRoutes = () => (
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<Index />} />
-      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/project/:id" element={<ProjectOverview />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>
