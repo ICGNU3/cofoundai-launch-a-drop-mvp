@@ -39,18 +39,20 @@ const PROJECT_TYPES = Object.keys(TYPICAL_SPLITS);
 export const AIProjectKickoffModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  onContinueToWizard?: (aiData: { projectIdea: string; projectType: string; roleSplits?: Array<{ role: string; percent: number }> }) => void; // NEW
+  onContinueToWizard?: (aiData: { projectIdea: string; projectType: string; roleSplits?: Array<{ role: string; percent: number }> }) => void;
 }> = ({ isOpen, onClose, onContinueToWizard }) => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [idea, setIdea] = useState("");
   const [projectType, setProjectType] = useState("Music");
   const [aiPlan, setAiPlan] = useState("");
   const [loading, setLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const { fetchAIContent } = useAICopyGeneration();
 
   const handleSubmitIdea = async () => {
     setLoading(true);
+    setAiError(null);
     // Call AI to generate action plan for user's idea and type
     const prompt = `
 A user submitted a new ${projectType} project idea: "${idea}".
@@ -66,7 +68,14 @@ Output:
 [Tip 1], [Tip 2]
     `;
     const aiText = await fetchAIContent(prompt, "gpt-4o-mini");
-    setAiPlan(aiText || "Could not generate plan from AI.");
+    if (!aiText) {
+      setAiPlan("Could not generate plan from AI.");
+      setAiError("AI did not return any result (see toast for details).");
+      setLoading(false);
+      setStep(2);
+      return;
+    }
+    setAiPlan(aiText);
     setLoading(false);
     setStep(2);
   };
@@ -149,6 +158,9 @@ Output:
                   AI Launch Plan
                 </div>
                 <pre className="bg-background/70 border border-accent/15 rounded-lg px-4 py-3 font-mono whitespace-pre-wrap text-sm scrollbar-thin max-h-64 animate-fade-in">{aiPlan}</pre>
+                {aiError &&
+                  <div className="text-red-500 text-xs mt-2">Error: {aiError}</div>
+                }
               </div>
               <div className="h-4"></div>
               <div className="flex w-full justify-between mt-6">

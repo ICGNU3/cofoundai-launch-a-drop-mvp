@@ -12,18 +12,27 @@ export function useAICopyGeneration() {
         body: JSON.stringify({ prompt, model }),
       });
       const data = await res.json();
+      console.log("[AICopyGeneration] Edge function response:", data);
       if (data.generated) return data.generated;
-      throw new Error(data.error || "AI generation failed");
+      if (data.error) {
+        console.error("[AICopyGeneration] AI error:", data.error, data.details || "");
+        toast({
+          title: "AI Generation Failed",
+          description: data.error + (data.details ? ` (${data.details})` : ""),
+          variant: "destructive",
+        });
+      }
+      return null;
     } catch (err: any) {
       toast({
         title: "AI Error",
         description: err?.message || "Failed to generate content.",
         variant: "destructive",
       });
+      console.error("[AICopyGeneration] Exception:", err);
       return null;
     }
   };
 
   return { fetchAIContent };
 }
-
