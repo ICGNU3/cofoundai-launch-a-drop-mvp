@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import { WizardStep1Describe } from "./WizardStep1Describe";
@@ -31,39 +32,43 @@ export const WizardModal: React.FC<{
     setDoAdvancedToken,
   } = useWizardState();
 
-  // Local state for advanced token customization (kept for completeness)
-  const [tokenState, setTokenState] = useState<any>(null);
-
+  // If closed, render nothing.
   if (!isOpen) return null;
 
-  // Corrected step mapping & navigation
-  // 1 = describe, 2 = roles, 3 = budget, 4 = token confirm, 5 = advanced config, 6 = launch/success
+  // Step logic: 1 = describe, 2 = roles, 3 = budget, 4 = token confirm, 5 = advanced config, 6 = launch/success
   const wantsAdvanced = !!state.doAdvancedToken;
-  const lastStep = wantsAdvanced ? 6 : 5;
-  const isFinalStep = () => state.step === lastStep;
+  const totalSteps = wantsAdvanced ? 6 : 5;
+  const lastStep = totalSteps;
+  const progressStep = Math.max(1, Math.min(state.step, totalSteps));
+
+  // NEW LOGIC TO PREVENT BLANK STEP 5:
+  // - If NOT advanced, step 5 instantly skips ahead to step 6. Blank page is avoided by never rendering content in such case.
+  React.useEffect(() => {
+    // Defensive: auto-advance if user is on step 5 but did not choose advanced
+    if (!state.doAdvancedToken && state.step === 5) {
+      setStep(6);
+    }
+  }, [state.doAdvancedToken, state.step, setStep]);
 
   const handleNext = () => {
-    // Token customization decision step logic
+    // At Token Customization decision (step 4):
     if (state.step === 4) {
-      if (state.doAdvancedToken) {
-        setStep(5); // Choose advanced
-      } else {
-        setStep(6); // Skip to launch
-      }
+      if (state.doAdvancedToken) setStep(5);
+      else setStep(6);
     } else if (state.step === 5 && !state.doAdvancedToken) {
-      // Shouldn't happen, but for safety: skip extra advanced step if not requested
-      setStep(6);
-    } else if (isFinalStep()) {
-      // stay at final
-    } else {
+      setStep(6); // Defensive: shouldn't hit, but for safety
+    } else if (state.step < lastStep) {
       setStep((state.step + 1) as any);
     }
+    // else, already at or past last step.
   };
+
   const handleBack = () => {
     if (state.step === 4) setStep(3);
     else if (state.step === 5 && state.doAdvancedToken) setStep(4);
     else if (state.step > 1) setStep((state.step - 1) as any);
   };
+
   const handleRestart = () => {
     setStep(1);
     setField("projectIdea", "");
@@ -84,10 +89,6 @@ export const WizardModal: React.FC<{
     if (state.step === lastStep) return "Launch Your Drop";
     return "Create Your Drop";
   };
-
-  // Step counter (fix "6 of 5" issue)
-  const totalSteps = wantsAdvanced ? 6 : 5;
-  const progressStep = Math.max(1, Math.min(state.step, totalSteps));
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -136,6 +137,7 @@ export const WizardModal: React.FC<{
               onNext={handleNext}
             />
           )}
+
           {state.step === 2 && (
             <div className="h-full max-h-[calc(90vh-152px)] flex flex-col">
               <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4" style={{ scrollbarGutter: "stable" }}>
@@ -152,6 +154,7 @@ export const WizardModal: React.FC<{
               </div>
             </div>
           )}
+
           {state.step === 3 && (
             <WizardBudgetStep
               state={state}
@@ -163,6 +166,7 @@ export const WizardModal: React.FC<{
               onBack={handleBack}
             />
           )}
+
           {/* Token customization branching */}
           {state.step === 4 && (
             <WizardStepTokenConfirm
@@ -172,6 +176,7 @@ export const WizardModal: React.FC<{
               onBack={handleBack}
             />
           )}
+
           {/* Advanced config - only if chosen */}
           {state.doAdvancedToken && state.step === 5 && (
             <div className="overflow-y-auto px-6 py-4 h-full">
@@ -180,10 +185,11 @@ export const WizardModal: React.FC<{
                 setTokenCustomization={setTokenCustomization}
                 setStep={setStep}
                 onBack={handleBack}
-                onNext={handleNext}
+                onNext={() => setStep(6)}
               />
             </div>
           )}
+
           {/* Final launch step */}
           {state.step === lastStep && (
             <WizardStep4Success
@@ -202,3 +208,5 @@ export const WizardModal: React.FC<{
     </div>
   );
 };
+
+// ... End of file. This WizardModal.tsx file is long. Consider breaking out additional steps or logic into their own files for even better maintainability!
