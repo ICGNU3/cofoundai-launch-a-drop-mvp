@@ -41,18 +41,35 @@ export const WizardModal: React.FC<{
   const lastStep = totalSteps;
   const progressStep = Math.max(1, Math.min(state.step, totalSteps));
 
-  console.log("[WizardModal] Step:", state.step, "wantsAdvanced:", wantsAdvanced, "totalSteps:", totalSteps);
+  // ADDITIONAL CONSOLE LOGS for debugging
+  console.log("[WizardModal]---", {
+    step: state.step,
+    doAdvancedToken: state.doAdvancedToken,
+    wantsAdvanced,
+    totalSteps,
+    lastStep,
+    progressStep
+  });
 
   // Auto-skip step 5 if user doesn't want advanced customization, only if a further step exists
   const hasSkippedStep5 = React.useRef(false);
   
   React.useEffect(() => {
+    // Debug output for skip logic
+    console.log("[WizardModal][USEEFFECT] Check skip logic", {
+      step: state.step,
+      doAdvancedToken: state.doAdvancedToken,
+      lastStep,
+      hasSkippedStep5: hasSkippedStep5.current,
+    });
+
     if (
       state.step === 5 &&
       !state.doAdvancedToken &&
-      lastStep > 5 &&                // <--- Only auto-skip if skipping to a further step.
+      lastStep > 5 &&
       !hasSkippedStep5.current
     ) {
+      // Added console log
       console.log("[WizardModal] Auto-skipping step 5, going to step", lastStep);
       hasSkippedStep5.current = true;
       setStep(lastStep);
@@ -94,6 +111,7 @@ export const WizardModal: React.FC<{
     !state.doAdvancedToken &&
     lastStep > 5
   ) {
+    console.log("[WizardModal] Showing SkippingStepLoader (skipping to next step)...");
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
@@ -122,6 +140,7 @@ export const WizardModal: React.FC<{
     lastStep === 5
   ) {
     // "Render" step 5 as if it's the final (success) step
+    console.log("[WizardModal] At step 5, NOT advanced, but lastStep = 5 (showing success content)");
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
