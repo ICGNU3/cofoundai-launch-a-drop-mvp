@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,11 +8,17 @@ import NotFound from "./pages/NotFound";
 import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
 import React from "react";
 
-// Define the Base Sepolia chain object
+// Define the Base Sepolia chain object in the correct format for Privy and wagmi
 const baseSepoliaChain = {
   id: 84532,
   name: "Base Sepolia",
-  rpcUrls: ["https://sepolia.base.org"],
+  rpcUrls: {
+    default: {
+      http: ["https://sepolia.base.org"],
+      // webSocket: [], // You can add websocket endpoints here if needed.
+    },
+    // privyWalletOverride could be added if Privy suggests a special endpoint, but it's optional.
+  },
   blockExplorers: {
     default: {
       name: "Base Sepolia Explorer",
