@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useMintingProcess } from "@/hooks/useMintingProcess";
 import { useUSDCxBalance } from "@/hooks/useUSDCxBalance";
@@ -83,6 +84,14 @@ export function useMintingWorkflow({
       onSaveComplete(project);
       completeMinting();
       pollUSDCxBalance();
+
+      // SUCCESS TOAST
+      toast({
+        title: "Drop Minted Successfully!",
+        description: "Your drop is live and ready to share.",
+        variant: "default",
+      });
+
       setLoadingMint(false);
       return { txHash: mintData.txHash, step: "txn-pending" as const };
     } catch (error: any) {
@@ -131,6 +140,13 @@ export function useMintingWorkflow({
           }
         );
       }
+      // FAILURE TOAST
+      toast({
+        title: "Minting Failed",
+        description: "Minting Failed. Please try again.",
+        variant: "destructive",
+      });
+
       return { error: errMsg, code, txHash, step: "error" as const, isUserRejection };
     }
   };
@@ -154,3 +170,4 @@ export function useMintingWorkflow({
     lastError, // for external monitoring if needed
   };
 }
+
