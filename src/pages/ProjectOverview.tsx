@@ -1,8 +1,7 @@
-
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../integrations/supabase/client";
 // Minimal UI components:
 import { ProjectFundingProgress, ProjectAnalytics, ProjectShares } from "@/components/ProjectOverviewParts";
 

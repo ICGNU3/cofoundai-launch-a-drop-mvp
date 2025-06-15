@@ -1,7 +1,6 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../integrations/supabase/client";
 import { usePrivy } from "@privy-io/react-auth";
 import { Link } from "react-router-dom";
 
