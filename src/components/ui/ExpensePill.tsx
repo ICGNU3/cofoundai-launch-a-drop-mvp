@@ -9,7 +9,7 @@ export type ExpensePillProps = {
 };
 export const ExpensePill: React.FC<ExpensePillProps> = ({ expense, onEdit, onDelete }) => (
   <span
-    className="inline-flex expense-pill items-center cursor-pointer select-none"
+    className="inline-flex expense-pill items-center cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
     tabIndex={0}
     aria-label={`Edit expense ${expense.expenseName}`}
     onClick={onEdit}
@@ -24,7 +24,7 @@ export const ExpensePill: React.FC<ExpensePillProps> = ({ expense, onEdit, onDel
     </span>
     {onDelete && (
       <button
-        className="ml-2 px-1 text-[15px] font-bold text-accent hover:text-white bg-transparent border-0 cursor-pointer"
+        className="ml-2 px-1 text-[15px] font-bold text-red-400 hover:text-white bg-transparent border-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-red-400 focus-visible:outline-offset-2 rounded"
         aria-label={`Remove ${expense.expenseName}`}
         onClick={e => { e.stopPropagation(); onDelete && onDelete(); }}
         tabIndex={-1}

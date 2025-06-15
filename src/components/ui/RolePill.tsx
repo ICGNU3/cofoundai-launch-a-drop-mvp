@@ -18,7 +18,7 @@ export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete }) =>
     <span className="ml-1 font-mono tracking-tight">{role.percent}%</span>
     {onEdit && (
       <button
-        className="ml-2 text-accent hover:bg-accent/10 p-1 rounded"
+        className="ml-2 text-accent hover:bg-accent/10 p-1 rounded focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
         aria-label={`Edit ${role.roleName}`}
         tabIndex={0}
         type="button"
@@ -29,7 +29,7 @@ export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete }) =>
     )}
     {onDelete && (
       <button
-        className="ml-1 text-destructive hover:bg-destructive/10 p-1 rounded"
+        className="ml-1 text-red-400 hover:bg-red-400/10 p-1 rounded focus-visible:outline-2 focus-visible:outline-red-400 focus-visible:outline-offset-2"
         aria-label={`Remove ${role.roleName}`}
         tabIndex={0}
         type="button"

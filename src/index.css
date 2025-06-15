@@ -8,7 +8,8 @@
 /* GLOBAL STYLES: Typography, Surface, Card, Button, Pills */
 
 body {
-  @apply bg-background text-base font-sans font-normal text-body-text m-0 p-0 min-h-screen leading-[1.5];
+  @apply bg-background text-base font-sans font-normal m-0 p-0 min-h-screen leading-[1.5];
+  color: #E0E0E0;
 }
 
 /* Hero Section */
@@ -94,7 +95,7 @@ input, textarea, select {
   @apply font-sans text-base font-normal;
   border-radius: 8px;
   background: #19191b;
-  color: #D4D4D8;
+  color: #E0E0E0;
   border: 1px solid #2A2A2A;
   padding: 12px 14px;
   outline: none;
@@ -120,6 +121,48 @@ input, textarea, select {
   background: #262626;
 }
 
+/* Mobile-responsive pills for viewport ≤ 480px */
+@media (max-width: 480px) {
+  .role-pill, .expense-pill {
+    display: flex;
+    width: 100%;
+    margin: 0 0 16px 0;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+  
+  .mobile-budget-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .mobile-budget-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .mobile-budget-pill {
+    width: 100%;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+  
+  .mobile-payout-type {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  
+  .mobile-budget-actions {
+    align-self: flex-end;
+    margin-top: 8px;
+  }
+}
+
 /* Misc tweaks */
 .slider-track {
   background: #3A3A3A;
@@ -137,6 +180,17 @@ input, textarea, select {
 .toast {
   background: #1E1E1E;
   color: #F9F9F9;
+}
+
+/* Focus outlines for accessibility */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible,
+a:focus-visible {
+  outline: 2px solid #5D5FEF;
+  outline-offset: 2px;
 }
 
 /* Animation classes */

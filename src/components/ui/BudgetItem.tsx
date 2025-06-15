@@ -24,10 +24,10 @@ export const BudgetItem: React.FC<BudgetItemProps> = ({ item, onEdit, onDelete }
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="flex items-center justify-between p-3 bg-[#18181a] border border-[#333] rounded-lg transition-all duration-200 hover:border-accent/50"
+      className="flex items-center justify-between p-3 bg-[#18181a] border border-[#333] rounded-lg transition-all duration-200 hover:border-accent/50 mobile-budget-item"
     >
-      <div className="flex items-center gap-3">
-        <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium ${
+      <div className="flex items-center gap-3 mobile-budget-content">
+        <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium mobile-budget-pill ${
           isShare 
             ? "bg-accent/20 text-accent border border-accent/30" 
             : "bg-[#ffe7b1]/20 text-yellow-500 border border-yellow-500/30"
@@ -39,7 +39,7 @@ export const BudgetItem: React.FC<BudgetItemProps> = ({ item, onEdit, onDelete }
           )}
         </div>
         {!isShare && (
-          <span className={`text-xs px-2 py-1 rounded ${
+          <span className={`text-xs px-2 py-1 rounded mobile-payout-type ${
             (item as Expense).payoutType === "immediate"
               ? "bg-accent/10 text-accent"
               : "bg-yellow-500/10 text-yellow-500"
@@ -48,12 +48,12 @@ export const BudgetItem: React.FC<BudgetItemProps> = ({ item, onEdit, onDelete }
           </span>
         )}
       </div>
-      <div className="flex gap-1">
+      <div className="flex gap-1 mobile-budget-actions">
         {onEdit && (
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="p-1 text-accent hover:bg-accent/10 rounded"
+            className="p-1 text-accent hover:bg-accent/10 rounded focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
             onClick={onEdit}
             type="button"
             aria-label={`Edit ${isShare ? (item as Role).roleName : (item as Expense).expenseName}`}
@@ -65,7 +65,7 @@ export const BudgetItem: React.FC<BudgetItemProps> = ({ item, onEdit, onDelete }
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="p-1 text-destructive hover:bg-destructive/10 rounded"
+            className="p-1 text-red-400 hover:bg-red-400/10 rounded focus-visible:outline-2 focus-visible:outline-red-400 focus-visible:outline-offset-2"
             onClick={onDelete}
             type="button"
             aria-label={`Delete ${isShare ? (item as Role).roleName : (item as Expense).expenseName}`}
