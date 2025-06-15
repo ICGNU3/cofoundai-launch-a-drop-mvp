@@ -103,7 +103,7 @@ const Index: React.FC = () => {
           TALENT = MONEY
         </h1>
         {/* Sub-headline without em dash and emojis */}
-        <div className="text-lg text-[#E0E0E0] mt-4 max-w-xl mx-auto font-medium">
+        <div className="text-lg text-[#E0E0E0] mt-4 max-w-xl mx-auto font-medium text-center">
           Build and fund creative projects with your team. Experience instant streaming of funds as soon as you deliver.
         </div>
         {/* --- LIVE COUNTER BAR --- */}
