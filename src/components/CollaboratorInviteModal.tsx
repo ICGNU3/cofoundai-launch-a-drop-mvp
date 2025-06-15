@@ -1,6 +1,8 @@
 
 import React, { useState } from "react";
 import { Button } from "./ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { usePrivy } from "@privy-io/react-auth";
 
 interface CollaboratorInviteModalProps {
   open: boolean;
@@ -16,26 +18,36 @@ export const CollaboratorInviteModal: React.FC<CollaboratorInviteModalProps> = (
   const [wallet, setWallet] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const { user } = usePrivy();
 
   async function handleInvite() {
     setErr(null);
     setIsLoading(true);
     try {
-      const res = await fetch("/api/collaborators/invite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          projectId, email: email || null, wallet: wallet || null,
-        }),
+      if (!user?.id) {
+        setErr("Not authenticated.");
+        setIsLoading(false);
+        return;
+      }
+      if (!email && !wallet) {
+        setErr("Email or wallet required.");
+        setIsLoading(false);
+        return;
+      }
+      const { error } = await supabase.from("project_collaborators").insert({
+        project_id: projectId,
+        invited_by: user.id,
+        invited_email: email || null,
+        invited_wallet: wallet || null,
+        status: "pending",
       });
-      if (res.ok) {
+      if (!error) {
         onInvited();
         setEmail("");
         setWallet("");
         onClose();
       } else {
-        const e = await res.json();
-        setErr(e.error || "Failed to send invite.");
+        setErr(error.message || "Failed to send invite.");
       }
     } catch (e: any) {
       setErr(e.message);
