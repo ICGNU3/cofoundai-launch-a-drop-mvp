@@ -48,34 +48,6 @@ function genId() {
   return Math.random().toString(36).slice(2, 10);
 }
 
-function proportionalRebalance(roles: Role[], changing: number, newValue: number): Role[] {
-  // Returns a new roles array where `roles[changing]` gets `newValue`,
-  // others are proportionally resized to keep sum at 100.
-  // Negative percents become 0.
-  if (roles.length === 1) return [{ ...roles[0], percent: 100 }];
-  const total = roles.reduce((s, r) => s + r.percent, 0);
-  const delta = newValue - roles[changing].percent;
-  let remainSum = 0;
-  roles.forEach((r, i) => { if (i !== changing) remainSum += r.percent; });
-
-  let next = roles.map((r, i) => {
-    if (i === changing) return { ...r, percent: newValue };
-    if (remainSum === 0) return { ...r, percent: (100 - newValue) / (roles.length - 1) };
-    let prop = r.percent / remainSum;
-    let p = Math.max(0, r.percent - prop * delta);
-    return { ...r, percent: p };
-  });
-
-  // Final normalization
-  let sum = next.reduce((s, r) => s + r.percent, 0);
-  if (Math.abs(sum - 100) > 0.01) {
-    // Nudge first role to correct for rounding
-    next[0].percent += 100 - sum;
-  }
-  // Avoid any negative percents
-  return next.map(r => ({ ...r, percent: Math.max(0, Math.round(r.percent * 10) / 10) }));
-}
-
 const colorByPercent = (sum: number) => {
   if (sum < 100) return "bg-amber-400";
   if (sum > 100) return "bg-red-500";
