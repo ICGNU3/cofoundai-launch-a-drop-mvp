@@ -29,7 +29,7 @@ const CreatorCarousel: React.FC<CreatorCarouselProps> = ({ carousel }) => {
   return (
     <div className="carousel flex gap-6 overflow-x-auto py-8 hide-scrollbar w-full max-w-5xl" ref={carouselRef} role="list">
       {carousel.length === 0 && (
-        <div className="opacity-70 text-sm italic text-neutral-400 p-8">
+        <div className="flex justify-center items-center w-full opacity-70 text-sm italic text-neutral-400 p-8 min-h-[80px] text-center">
           Recent creator drops will appear here soon!
         </div>
       )}
