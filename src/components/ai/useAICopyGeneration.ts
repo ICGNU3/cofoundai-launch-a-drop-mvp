@@ -26,25 +26,42 @@ export function useAICopyGeneration() {
         body: JSON.stringify({ prompt, model }),
       });
 
-      // If response is HTML, treat as error
       const text = await res.text();
+      console.log("[AICopyGeneration] Raw edge fn text response:", text);
+
       let data;
       try {
         data = JSON.parse(text);
       } catch (e) {
+        toast({
+          title: "AI Error",
+          description: "Supabase Edge Function did not return valid JSON. Check deployment and function logs.",
+          variant: "destructive",
+        });
         throw new Error("Edge function did not return valid JSON. Check deployment and function logs.");
       }
 
-      console.log("[AICopyGeneration] Edge function response:", data);
-      if (data.generated) return data.generated;
-      if (data.error) {
-        console.error("[AICopyGeneration] AI error:", data.error, data.details || "");
+      if (data.generated) {
+        return data.generated;
+      }
+      if (data.generatedText) {
+        return data.generatedText;
+      }
+      if (data.error || data.message || data.details) {
+        // Surface all info
         toast({
           title: "AI Generation Failed",
-          description: data.error + (data.details ? ` (${data.details})` : ""),
+          description: (data.error || data.message || "An unknown AI error occurred.") + 
+                       (data.details ? ` (${data.details})` : ""),
           variant: "destructive",
         });
       }
+      // Fallback: error but nothing useable sent back
+      toast({
+        title: "AI Generation Error",
+        description: "AI did not return any result. Please try again or check function logs.",
+        variant: "destructive",
+      });
       return null;
     } catch (err: any) {
       toast({
@@ -59,3 +76,4 @@ export function useAICopyGeneration() {
 
   return { fetchAIContent };
 }
+
