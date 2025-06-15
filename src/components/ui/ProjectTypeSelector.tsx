@@ -23,9 +23,8 @@ export const ProjectTypeSelector: React.FC<ProjectTypeSelectorProps> = ({
 
   return (
     <div>
-      <label className="block mb-2 text-body-text font-semibold">Project Type</label>
       <select
-        className="w-full mb-2"
+        className="w-full p-2 border border-border rounded-md bg-background text-foreground"
         value={projectType}
         onChange={handleChange}
       >

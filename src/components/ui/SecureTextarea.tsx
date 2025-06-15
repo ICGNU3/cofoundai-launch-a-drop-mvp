@@ -30,7 +30,7 @@ export const SecureTextarea: React.FC<SecureTextareaProps> = ({
   required = false,
   disabled = false,
   maxLength,
-  rows = 4,
+  rows = 3,
   className
 }) => {
   return (
@@ -53,11 +53,6 @@ export const SecureTextarea: React.FC<SecureTextareaProps> = ({
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : undefined}
       />
-      {maxLength && (
-        <div className="text-xs text-gray-500 text-right">
-          {value.length}/{maxLength}
-        </div>
-      )}
       {error && (
         <p id={`${id}-error`} className="text-sm text-red-600" role="alert">
           {error}
