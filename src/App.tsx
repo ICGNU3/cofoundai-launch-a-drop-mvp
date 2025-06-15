@@ -44,6 +44,27 @@ const PRIVY_APP_ID = "cmbwrcdqp00sijy0mx4wx4aew";
 // Simple UI at the top for login/logout with Privy
 const PrivyAuthBar = () => {
   const { ready, authenticated, user, login, logout } = usePrivy();
+  const [safeAddress, setSafeAddress] = useState<string | null>(null);
+
+  // Log addresses after login
+  useEffect(() => {
+    if (authenticated && user?.wallet?.address && !safeAddress) {
+      const privyWalletAddress = user.wallet.address;
+      // Only create Safe if we haven't already
+      createSafe(privyWalletAddress as `0x${string}`)
+        .then((safeAddr) => {
+          setSafeAddress(safeAddr);
+          console.log("privyWalletAddress:", privyWalletAddress);
+          console.log("safeAddress:", safeAddr);
+        })
+        .catch((e) => {
+          // Optionally, log any error
+          console.error("Safe creation error", e);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated, user?.wallet?.address, safeAddress]);
+
   if (!ready) return null;
 
   let userDisplay = "";
