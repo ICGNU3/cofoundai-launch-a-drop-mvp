@@ -1,16 +1,14 @@
 
 import React, { useState } from "react";
 import { AccentButton } from "./ui/AccentButton";
-import { BudgetItem, type BudgetItemType } from "./ui/BudgetItem";
 import { AddBudgetItemForm } from "./ui/AddBudgetItemForm";
 import { AddRoleModal } from "./ui/AddRoleModal";
 import { AddExpenseModal } from "./ui/AddExpenseModal";
-import { PercentBar } from "./ui/PercentBar";
+import { ProjectTypeSelector } from "./ui/ProjectTypeSelector";
+import { RoleTemplateManager } from "./ui/RoleTemplateManager";
+import { BudgetItemsList } from "./ui/BudgetItemsList";
+import { BudgetValidationStatus } from "./ui/BudgetValidationStatus";
 import type { Role, Expense, ProjectType } from "@/hooks/useWizardState";
-import { useRoleTemplates } from "@/hooks/useRoleTemplates";
-import { useToast } from "@/hooks/use-toast";
-
-const projectTypes: ProjectType[] = ["Music", "Film", "Fashion", "Art", "Other"];
 
 type WizardBudgetStepProps = {
   roles: Role[];
@@ -45,223 +43,72 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
 }) => {
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
-  const [editingType, setEditingType] = useState<"role" | "expense" | null>(null);
-
-  const templatesCtx = useRoleTemplates();
-  const [showTemplateMenu, setShowTemplateMenu] = useState(false);
-  const [newTemplateName, setNewTemplateName] = useState("");
-  const { toast } = useToast();
-
-  // Create unified budget items list
-  const budgetItems: BudgetItemType[] = [
-    ...roles.map(role => ({ ...role, type: "share" as const })),
-    ...expenses.map(expense => ({ ...expense, type: "fixed" as const }))
-  ];
 
   // Percent validation
   const sumPercent = roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
-  const percentColor = sumPercent === 100 ? "text-green-400" : "text-red-500";
-  const percentMsg = sumPercent < 100 && expenses.length === 0
-    ? `Need ${100 - sumPercent}% more` 
-    : sumPercent > 100 
-    ? `Remove ${sumPercent - 100}%` 
-    : sumPercent === 100
-    ? "Percentages balanced ✓"
-    : `${100 - sumPercent}% remaining`;
 
   // Auto-rebalance percentages when adding new role
   const handleAddRole = (newRole: Role) => {
-    const roleWithPercent = {
+    const roleWithPercent: Role = {
       ...newRole,
       percentNum: newRole.percent || 10,
-      percentStr: (newRole.percent || 10).toString()
+      percentStr: (newRole.percent || 10).toString(),
+      isFixed: false
     };
     
     saveRole(roleWithPercent, null);
   };
 
-  const handleEditItem = (index: number, type: "role" | "expense") => {
-    if (type === "role") {
-      setField("editingRoleIdx", index);
-      setEditingType("role");
-      setRoleModalOpen(true);
-    } else {
-      setField("editingExpenseIdx", index);
-      setEditingType("expense");
-      setExpenseModalOpen(true);
-    }
+  const handleEditRole = (index: number) => {
+    setField("editingRoleIdx", index);
+    setRoleModalOpen(true);
   };
 
-  const handleDeleteItem = (index: number, type: "role" | "expense") => {
-    if (type === "role") {
-      removeRole(index);
-    } else {
-      removeExpense(index);
-    }
+  const handleEditExpense = (index: number) => {
+    setField("editingExpenseIdx", index);
+    setExpenseModalOpen(true);
   };
 
-  // Template functions
-  const handleSaveTemplate = () => {
-    if (newTemplateName.trim()) {
-      templatesCtx.saveTemplate(newTemplateName.trim(), roles);
-      setNewTemplateName("");
-      setShowTemplateMenu(false);
-      toast({
-        title: "Template Saved",
-        description: `Saved template '${newTemplateName.trim()}'`,
-      });
-    }
-  };
-
-  const handleLoadTemplate = (templateName: string) => {
-    const tplRoles = templatesCtx.loadTemplate(templateName);
-    if (tplRoles) {
-      setField("roles", tplRoles.map(r => ({ ...r })));
-      setShowTemplateMenu(false);
-      toast({
-        title: "Template Loaded",
-        description: `Loaded template '${templateName}'`,
-      });
-    }
-  };
-
-  const handleDeleteTemplate = (templateName: string) => {
-    templatesCtx.deleteTemplate(templateName);
-    toast({
-      title: "Template Deleted",
-      description: `Deleted template '${templateName}'`,
-    });
+  const handleLoadTemplate = (templateRoles: Role[]) => {
+    setField("roles", templateRoles);
   };
 
   return (
     <div className="space-y-4">
       <h2 className="headline text-center mb-4">Budget Breakdown</h2>
       
-      {/* Project Type Selection */}
-      <div>
-        <label className="block mb-2 text-body-text font-semibold">Project Type</label>
-        <select
-          className="w-full mb-2"
-          value={projectType}
-          onChange={e => {
-            setField("projectType", e.target.value as ProjectType);
-            loadDefaultRoles(e.target.value as ProjectType);
-          }}
-        >
-          {projectTypes.map(type => (
-            <option value={type} key={type}>{type}</option>
-          ))}
-        </select>
-      </div>
+      <ProjectTypeSelector
+        projectType={projectType}
+        onProjectTypeChange={(type) => setField("projectType", type)}
+        onLoadDefaultRoles={loadDefaultRoles}
+      />
 
-      {/* Role Templates */}
-      <div className="mb-4">
-        <button
-          type="button"
-          className="text-xs border px-2 py-1 rounded bg-[#181818] border-[#343439] text-accent hover:bg-[#232323] transition"
-          onClick={() => setShowTemplateMenu(v => !v)}
-        >
-          {showTemplateMenu ? "Hide Templates" : "Role Templates"}
-        </button>
-        {showTemplateMenu && (
-          <div className="rounded border border-border bg-card p-3 text-xs mt-2 space-y-3">
-            <div>
-              <div className="font-semibold mb-2">Save Current as Template</div>
-              <div className="flex gap-2">
-                <input
-                  placeholder="Template Name"
-                  className="p-2 border border-border rounded bg-[#232323] text-xs flex-1"
-                  value={newTemplateName}
-                  onChange={e => setNewTemplateName(e.target.value)}
-                  maxLength={32}
-                />
-                <button
-                  className="text-xs px-3 py-2 bg-accent/80 text-background rounded hover:bg-accent"
-                  onClick={handleSaveTemplate}
-                  disabled={!newTemplateName.trim()}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-            {templatesCtx.templates.length > 0 && (
-              <div>
-                <div className="font-semibold mb-2">Load Template</div>
-                <ul className="space-y-1">
-                  {templatesCtx.templates.map(tpl => (
-                    <li key={tpl.name} className="flex items-center gap-2">
-                      <button
-                        className="text-accent hover:underline text-sm px-1"
-                        onClick={() => handleLoadTemplate(tpl.name)}
-                        type="button"
-                      >
-                        {tpl.name}
-                      </button>
-                      <button
-                        className="text-xs text-red-400 border rounded px-1 py-0.5 border-border hover:bg-red-400/20"
-                        onClick={() => handleDeleteTemplate(tpl.name)}
-                        type="button"
-                      >
-                        Delete
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <RoleTemplateManager
+        roles={roles}
+        onLoadTemplate={handleLoadTemplate}
+      />
 
-      {/* Progress Bar */}
-      <PercentBar used={sumPercent} />
-      <div className={`text-sm font-semibold ${percentColor} mb-4`}>
-        {percentMsg}
-      </div>
+      <BudgetValidationStatus
+        sumPercent={sumPercent}
+        hasExpenses={expenses.length > 0}
+      />
 
-      {/* Budget Items List */}
-      <div className="space-y-2 min-h-[200px]">
-        {budgetItems.map((item, index) => {
-          const isRole = item.type === "share";
-          const roleIndex = isRole ? roles.findIndex(r => r.roleName === item.roleName && r.walletAddress === item.walletAddress) : -1;
-          const expenseIndex = !isRole ? expenses.findIndex(e => e.expenseName === item.expenseName) : -1;
-          
-          return (
-            <div
-              key={`${item.type}-${index}`}
-              className="animate-fade-in"
-            >
-              <BudgetItem
-                item={item}
-                onEdit={() => handleEditItem(
-                  isRole ? roleIndex : expenseIndex,
-                  isRole ? "role" : "expense"
-                )}
-                onDelete={() => handleDeleteItem(
-                  isRole ? roleIndex : expenseIndex,
-                  isRole ? "role" : "expense"
-                )}
-                onPercentChange={isRole && updateRolePercent ? (newPercent) => updateRolePercent(roleIndex, newPercent) : undefined}
-              />
-            </div>
-          );
-        })}
-        
-        {budgetItems.length === 0 && (
-          <div className="text-center py-8 text-body-text/60">
-            No budget items yet. Add your first line item below.
-          </div>
-        )}
-      </div>
+      <BudgetItemsList
+        roles={roles}
+        expenses={expenses}
+        onEditRole={handleEditRole}
+        onEditExpense={handleEditExpense}
+        onDeleteRole={removeRole}
+        onDeleteExpense={removeExpense}
+        onUpdateRolePercent={updateRolePercent}
+      />
 
-      {/* Add Line Item Form */}
       <AddBudgetItemForm
         onAddRole={handleAddRole}
         onAddExpense={(expense) => saveExpense(expense, null)}
         existingRoles={roles}
       />
 
-      {/* Navigation */}
       <div className="flex gap-3 mt-6">
         <AccentButton
           secondary
@@ -279,7 +126,6 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
         </AccentButton>
       </div>
 
-      {/* Modals */}
       <AddRoleModal
         open={roleModalOpen}
         defaultRole={editingRoleIdx !== null ? roles[editingRoleIdx] : undefined}

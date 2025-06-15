@@ -6,12 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 
 type RoleTemplateManagerProps = {
   roles: Role[];
-  setField: (field: keyof any, value: any) => void;
+  onLoadTemplate: (roles: Role[]) => void;
 };
 
 export const RoleTemplateManager: React.FC<RoleTemplateManagerProps> = ({
   roles,
-  setField,
+  onLoadTemplate,
 }) => {
   const templatesCtx = useRoleTemplates();
   const [showTemplateMenu, setShowTemplateMenu] = useState(false);
@@ -33,7 +33,7 @@ export const RoleTemplateManager: React.FC<RoleTemplateManagerProps> = ({
   const handleLoadTemplate = (templateName: string) => {
     const tplRoles = templatesCtx.loadTemplate(templateName);
     if (tplRoles) {
-      setField("roles", tplRoles.map(r => ({ ...r }))); // Deep copy to prevent reference bugs
+      onLoadTemplate(tplRoles.map(r => ({ ...r })));
       setShowTemplateMenu(false);
       toast({
         title: "Template Loaded",
@@ -51,28 +51,28 @@ export const RoleTemplateManager: React.FC<RoleTemplateManagerProps> = ({
   };
 
   return (
-    <div className="mb-2 flex flex-col gap-1">
+    <div className="mb-4">
       <button
         type="button"
-        className="self-end text-xs border px-2 py-0.5 rounded bg-[#181818] border-[#343439] text-accent hover:bg-[#232323] transition mb-1"
+        className="text-xs border px-2 py-1 rounded bg-[#181818] border-[#343439] text-accent hover:bg-[#232323] transition"
         onClick={() => setShowTemplateMenu(v => !v)}
       >
         {showTemplateMenu ? "Hide Templates" : "Role Templates"}
       </button>
       {showTemplateMenu && (
-        <div className="rounded border border-border bg-card p-3 text-xs mt-0.5 flex flex-col gap-2">
-          <div className="flex flex-col gap-1">
-            <div className="font-semibold mb-1">Save Current as Template</div>
-            <div className="flex gap-1">
+        <div className="rounded border border-border bg-card p-3 text-xs mt-2 space-y-3">
+          <div>
+            <div className="font-semibold mb-2">Save Current as Template</div>
+            <div className="flex gap-2">
               <input
                 placeholder="Template Name"
-                className="p-1 border border-border rounded bg-[#232323] text-xs w-full"
+                className="p-2 border border-border rounded bg-[#232323] text-xs flex-1"
                 value={newTemplateName}
                 onChange={e => setNewTemplateName(e.target.value)}
                 maxLength={32}
               />
               <button
-                className="text-xs px-2 py-1 bg-accent/80 text-background rounded hover:bg-accent"
+                className="text-xs px-3 py-2 bg-accent/80 text-background rounded hover:bg-accent"
                 onClick={handleSaveTemplate}
                 disabled={!newTemplateName.trim()}
               >
@@ -80,33 +80,31 @@ export const RoleTemplateManager: React.FC<RoleTemplateManagerProps> = ({
               </button>
             </div>
           </div>
-          <div>
-            <div className="font-semibold mb-1">Load a Template</div>
-            {templatesCtx.templates.length === 0 && (
-              <div className="text-neutral-500 italic">No templates saved</div>
-            )}
-            <ul className="flex flex-col gap-1">
-              {templatesCtx.templates.map(tpl => (
-                <li key={tpl.name} className="flex items-center gap-2">
-                  <button
-                    className="text-accent hover:underline underline-offset-2 text-sm px-1"
-                    onClick={() => handleLoadTemplate(tpl.name)}
-                    type="button"
-                  >
-                    {tpl.name}
-                  </button>
-                  <button
-                    className="ml-1 text-[11px] text-red-400 border rounded px-1 py-0.5 border-border hover:bg-red-400/20"
-                    onClick={() => handleDeleteTemplate(tpl.name)}
-                    type="button"
-                    aria-label={`Delete template ${tpl.name}`}
-                  >
-                    Delete
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {templatesCtx.templates.length > 0 && (
+            <div>
+              <div className="font-semibold mb-2">Load Template</div>
+              <ul className="space-y-1">
+                {templatesCtx.templates.map(tpl => (
+                  <li key={tpl.name} className="flex items-center gap-2">
+                    <button
+                      className="text-accent hover:underline text-sm px-1"
+                      onClick={() => handleLoadTemplate(tpl.name)}
+                      type="button"
+                    >
+                      {tpl.name}
+                    </button>
+                    <button
+                      className="text-xs text-red-400 border rounded px-1 py-0.5 border-border hover:bg-red-400/20"
+                      onClick={() => handleDeleteTemplate(tpl.name)}
+                      type="button"
+                    >
+                      Delete
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>
