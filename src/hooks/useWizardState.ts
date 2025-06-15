@@ -1,9 +1,9 @@
-
 import React from "react";
 
 // --- UPDATED: Add payoutType ---
 export type PayoutType = "immediate" | "uponOutcome";
-export type WizardStep = 1 | 2 | 3;
+// Update WizardStep to allow 1, 2, 3, **4** (so step 4 'success' works)
+export type WizardStep = 1 | 2 | 3 | 4;
 
 export interface Role {
   roleName: string;
