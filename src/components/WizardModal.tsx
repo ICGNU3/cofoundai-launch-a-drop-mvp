@@ -1,4 +1,3 @@
-
 import React from "react";
 import { X } from "lucide-react";
 import { WizardStep1Describe } from "./WizardStep1Describe";
@@ -119,16 +118,20 @@ export const WizardModal: React.FC<WizardModalProps> = ({
           )}
 
           {state.step === 2 && (
-            <WizardStep2Roles
-              roles={state.roles}
-              editingRoleIdx={state.editingRoleIdx}
-              projectType={state.projectType}
-              setField={setField}
-              loadDefaultRoles={loadDefaultRoles}
-              saveRole={saveRole}
-              removeRole={removeRole}
-              setStep={setStep}
-            />
+            <div className="h-full max-h-[calc(90vh-152px)] flex flex-col">
+              <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4" style={{ scrollbarGutter: "stable" }}>
+                <WizardStep2Roles
+                  roles={state.roles}
+                  editingRoleIdx={state.editingRoleIdx}
+                  projectType={state.projectType}
+                  setField={setField}
+                  loadDefaultRoles={loadDefaultRoles}
+                  saveRole={saveRole}
+                  removeRole={removeRole}
+                  setStep={setStep}
+                />
+              </div>
+            </div>
           )}
 
           {state.step === 3 && (
