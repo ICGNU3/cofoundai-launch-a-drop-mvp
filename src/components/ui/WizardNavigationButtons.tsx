@@ -6,12 +6,14 @@ type WizardNavigationButtonsProps = {
   canProceed: boolean;
   onBack: () => void;
   onNext: () => void;
+  nextLabel?: string;
 };
 
 export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = ({
   canProceed,
   onBack,
   onNext,
+  nextLabel = "Next",
 }) => {
   return (
     <div className="flex gap-2">
@@ -19,6 +21,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
         secondary
         className="w-1/2"
         onClick={onBack}
+        type="button"
       >
         ← Back
       </AccentButton>
@@ -26,8 +29,9 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
         className="w-1/2"
         disabled={!canProceed}
         onClick={onNext}
+        type="button"
       >
-        Launch Project →
+        {nextLabel}
       </AccentButton>
     </div>
   );

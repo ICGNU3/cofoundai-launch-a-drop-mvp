@@ -32,7 +32,10 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   const epsilon = 0.1;
   const isRoleBalanceValid = Math.abs(sumPercent - 100) < epsilon;
   const pledgeAmount = Number(state.pledgeUSDC) || 0;
-  const canProceed = isRoleBalanceValid && pledgeAmount > 0;
+
+  // Update: allow proceeding if there are valid expenses (amount > 0, at least 1) OR a positive pledge
+  const hasValidExpense = state.expenses.some(e => e.amountUSDC > 0);
+  const canProceed = isRoleBalanceValid && (hasValidExpense || pledgeAmount > 0);
 
   const handleLoadScenario = (scenario: any) => {
     onSetField("roles", scenario.roles);
@@ -95,7 +98,6 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
             pledgeAmount={pledgeAmount}
           />
 
-          {/* Add some bottom padding to ensure navigation buttons are accessible */}
           <div className="h-20" />
         </div>
       </ScrollArea>
@@ -106,6 +108,7 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
           canProceed={canProceed}
           onBack={onBack}
           onNext={onNext}
+          nextLabel="Continue"
         />
       </div>
     </div>
