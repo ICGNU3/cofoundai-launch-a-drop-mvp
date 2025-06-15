@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Rocket, Users, DollarSign } from "lucide-react";
 
@@ -9,8 +8,8 @@ const features = [
         <Rocket className="text-white w-7 h-7 drop-shadow-lg" />
       </div>
     ),
-    title: "Instant Creation",
-    desc: "Describe your drop and launch in under 2 minutes. No bureaucracy, no code.",
+    title: "Instant Onchain Launch",
+    desc: "Start a drop, invite your team, and fund in minutes. No gatekeeping.",
   },
   {
     icon: (
@@ -18,8 +17,8 @@ const features = [
         <Users className="text-white w-7 h-7 drop-shadow-lg" />
       </div>
     ),
-    title: "Collaborative Roles",
-    desc: "Assign clear roles and budget so every contributor is rewarded transparently.",
+    title: "Crystal Clear Roles",
+    desc: "Define each collaborator’s share up front for total transparency.",
   },
   {
     icon: (
@@ -27,15 +26,15 @@ const features = [
         <DollarSign className="text-white w-7 h-7 drop-shadow-lg" />
       </div>
     ),
-    title: "Fund & Mint in One Tap",
-    desc: "Collect funds, mint, and distribute - all from a single powerful tool.",
+    title: "Wallet & Mint Built In",
+    desc: "Pledge, mint, and payout in a single flow. Works on desktop & mobile.",
   },
 ];
 
 const LandingFeaturesSection: React.FC = () => (
-  <section className="w-full max-w-4xl mx-auto py-12 px-2 grid gap-8">
-    <h2 className="text-2xl font-headline font-bold text-center text-success mb-8 drop-shadow">
-      How it Works
+  <section className="w-full max-w-4xl mx-auto py-10 px-2 grid gap-8">
+    <h2 className="text-2xl font-headline font-bold text-center text-success mb-7 drop-shadow">
+      Why creators choose us
     </h2>
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
       {features.map(({ icon, title, desc }) => (
@@ -45,7 +44,7 @@ const LandingFeaturesSection: React.FC = () => (
         >
           {icon}
           <h3 className="font-bold text-lg text-accent mb-1">{title}</h3>
-          <p className="text-body-text text-sm font-sans">{desc}</p>
+          <p className="text-body-text text-[15px] font-sans">{desc}</p>
         </div>
       ))}
     </div>
@@ -53,4 +52,3 @@ const LandingFeaturesSection: React.FC = () => (
 );
 
 export default LandingFeaturesSection;
-

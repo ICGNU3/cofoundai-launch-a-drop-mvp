@@ -8,7 +8,8 @@ import { Wallet } from "lucide-react";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
 import CreatorCarousel from "@/components/CreatorCarousel";
 import LiveCounterBar from "@/components/LiveCounterBar";
-import CrewSplitSliderDemo from "@/components/CrewSplitSliderDemo";
+// Import LogoRow!
+import LogoRow from "@/components/LogoRow";
 // Import Avatar for carousel
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 // Add missing import for AdvancedTokenCustomization
@@ -81,15 +82,49 @@ const Index: React.FC = () => {
     }
   }
 
+  // For live metrics in hero
+  const liveMetrics = (
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-3 text-success font-mono text-lg font-bold mb-1 select-none">
+      <span className="sm:border-r sm:border-[#45e36e88] pr-4">
+        ${counter.total.toLocaleString()} streamed
+      </span>
+      <span className="pl-0 sm:pl-4">
+        {counter.drops} drops funded
+      </span>
+    </div>
+  );
+
+  // Steps
+  const steps = [
+    {
+      label: "Describe & Launch",
+      desc: "Enter your project idea, choose roles — one click to go live.",
+      emoji: "✍️",
+    },
+    {
+      label: "Fund & Collaborate",
+      desc: "Share your drop link; everyone pledges, no wallet guessing.",
+      emoji: "💸",
+    },
+    {
+      label: "Mint & Stream",
+      desc: "Funds are streamed as you deliver. Your team always gets paid.",
+      emoji: "🚀",
+    },
+  ];
+
   // Optionally: carousel auto-scroll
   // (Removed - this logic is now handled inside CreatorCarousel, so no need for carouselRef here)
+
+  const countUpDollarRef = useRef<HTMLSpanElement>(null);
+  const countUpDropRef = useRef<HTMLSpanElement>(null);
 
   return (
     <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-x-hidden">
       <FullWaveBackground />
       <section className="relative w-full pt-16 md:pt-20 pb-10 px-4 z-10 flex flex-col items-center pb-24">
         {/* HERO GRADIENT */}
-        <div className="hero-gradient pointer-events-none" aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 80%,rgba(154,77,255,.35) 0%,transparent 70%)', zIndex: 0 }} />
+        <div className="hero-gradient pointer-events-none" aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 80%,rgba(154,77,255,.28) 0%,transparent 70%)', zIndex: 0 }} />
         <div className="w-full max-w-5xl flex justify-end">
           <button
             onClick={() => setWalletOpen(true)}
@@ -99,28 +134,50 @@ const Index: React.FC = () => {
             <Wallet size={20} color="#FFD700" />
           </button>
         </div>
-        <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.15] hero-title py-2 mt-2 max-w-3xl relative z-10">
-          TALENT = MONEY
+        {/* HEADLINE */}
+        <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.13] hero-title py-2 mt-2 max-w-3xl relative z-10">
+          Unlock Onchain Teamwork for Creators
         </h1>
-        {/* Sub-headline without em dash and emojis */}
-        <div className="text-lg text-[#E0E0E0] mt-4 max-w-xl mx-auto font-medium text-center">
-          Build and fund creative projects with your team. Experience instant streaming of funds as soon as you deliver.
+        {/* SUBHEADLINE */}
+        <div className="text-lg text-[#e4f9ea] mt-4 max-w-xl mx-auto font-medium text-center mb-1">
+          Launch projects, invite your crew, and stream funds as you create. No code, no gatekeepers.
         </div>
-        {/* --- LIVE COUNTER BAR --- */}
-        <LiveCounterBar counter={counter} />
-        {/* HERO CTA BUTTON */}
+        {/* LIVE METRICS */}
+        {liveMetrics}
+
+        {/* CTA */}
         <AccentButton
-          className="hero-cta mt-6 sm:mt-7 px-8 py-4 text-lg rounded-xl shadow-lg hover:scale-105 transition-all font-bold z-20"
+          className="hero-cta mt-7 px-8 py-4 text-lg rounded-xl shadow-lg hover:scale-105 transition-all font-bold z-20"
           style={{ background: 'linear-gradient(90deg,#5D5FEF 0%,#9A4DFF 100%)', boxShadow: '0 0 16px rgba(93,95,239,.6)' }}
           onClick={wizard.openWizard}
           aria-label="Launch a Drop"
         >
-          <span className="inline-flex items-center gap-2">
-            Launch a Drop
-          </span>
+          Launch My Drop
         </AccentButton>
+
+        {/* HOW IT WORKS */}
+        <div className="w-full flex flex-col items-center gap-3 mt-12 mb-2">
+          <h2 className="text-xl md:text-2xl font-bold text-accent mb-3">How it works</h2>
+          <div className="flex flex-col md:flex-row gap-5 md:gap-7 justify-center">
+            {steps.map(({label, desc, emoji}, i) => (
+              <div key={label} className="bg-card border border-accent/20 rounded-xl px-5 py-6 md:py-7 flex flex-col items-center max-w-xs shadow-md">
+                <div className="text-3xl mb-2">{emoji}</div>
+                <div className="font-headline text-accent font-bold mb-1">{label}</div>
+                <div className="text-tagline text-sm text-center">{desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* LOGO ROW */}
+        <div className="w-full flex items-center justify-center mt-6 mb-2">
+          <LogoRow />
+        </div>
+
         {/* CREATOR CAROUSEL */}
-        <CreatorCarousel carousel={carousel} />
+        <div className="w-full max-w-5xl mx-auto">
+          <CreatorCarousel carousel={carousel} />
+        </div>
       </section>
 
       {/* FEATURES SECTION */}
@@ -149,6 +206,17 @@ const Index: React.FC = () => {
         walletAddress={null}
       />
       <Web3WalletModule open={walletOpen} onClose={() => setWalletOpen(false)} />
+
+      {/* FOOTER */}
+      <footer className="py-8 border-t border-border bg-[#101910] w-full text-center mt-auto z-[5]">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-3 mb-2 text-sm text-tagline font-mono">
+          <span>Audited, non-custodial, open source.</span>
+          <a href="https://discord.com/invite/lovable" target="_blank" rel="noopener noreferrer" className="mx-2 hover:text-accent underline">Join Discord</a>
+          <a href="https://x.com/lovableai" target="_blank" rel="noopener noreferrer" className="mx-2 hover:text-accent underline">X (Twitter)</a>
+          <a href="https://docs.lovable.dev" target="_blank" rel="noopener noreferrer" className="mx-2 hover:text-accent underline">Docs</a>
+        </div>
+        <div className="text-xs text-body-text/70">Made with ❤️ — Powered by Lovable + Zora, {new Date().getFullYear()}</div>
+      </footer>
     </div>
   );
 };
