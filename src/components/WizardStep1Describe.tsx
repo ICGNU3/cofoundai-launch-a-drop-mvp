@@ -1,57 +1,78 @@
 
 import React from "react";
-import { AccentButton } from "./ui/AccentButton";
-import type { ProjectType, WizardStateData } from "@/hooks/useWizardState";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SecureTextarea } from "@/components/ui/SecureTextarea";
+import { ProjectTypeSelector } from "@/components/ui/ProjectTypeSelector";
+import { useSecureForm } from "@/hooks/useSecureForm";
+import { useWizardState } from "@/hooks/useWizardState";
+import { projectContent } from "@/utils/contentSanitizer";
 
-interface WizardStep1DescribeProps {
-  projectIdea: string;
-  projectType: ProjectType;
-  onSetField: <K extends keyof WizardStateData>(k: K, v: WizardStateData[K]) => void;
-  onLoadDefaultRoles: (type: ProjectType) => void;
-  canProceed: boolean;
-  onNext: () => void;
-}
+const WizardStep1Describe = () => {
+  const { projectIdea, projectType, setProjectIdea, setProjectType } = useWizardState();
 
-export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
-  projectIdea,
-  projectType,
-  onSetField,
-  onLoadDefaultRoles,
-  canProceed,
-  onNext,
-}) => {
+  const { values, errors, setValue, setTouched } = useSecureForm(
+    { projectIdea, projectType },
+    {
+      projectIdea: {
+        required: true,
+        type: 'text',
+        maxLength: 2000,
+        custom: (value: string) => {
+          if (value && value.trim().length < 10) {
+            return { isValid: false, error: 'Project idea must be at least 10 characters long' };
+          }
+          return { isValid: true };
+        }
+      }
+    }
+  );
+
+  const handleProjectIdeaChange = (value: string) => {
+    const sanitized = projectContent.sanitizeProjectIdea(value);
+    setValue('projectIdea', sanitized);
+    setProjectIdea(sanitized);
+  };
+
+  const handleProjectTypeChange = (type: any) => {
+    setValue('projectType', type);
+    setProjectType(type);
+  };
+
   return (
-    <div className="p-4 md:p-6 space-y-4 h-full overflow-y-auto flex flex-col">
-      <div className="text-center">
-        <h2 className="text-xl md:text-2xl font-bold text-headline mb-2">Describe Your Project</h2>
-        <p className="text-body-text/70 text-sm md:text-base">
-          Tell us about your creative project idea.
-        </p>
-      </div>
-      
-      <div className="flex-1 flex flex-col">
-        <textarea
-          className="w-full p-3 border border-border rounded-lg bg-card text-body-text resize-none min-h-[120px] md:min-h-[150px] text-sm md:text-base"
-          value={projectIdea}
-          maxLength={256}
-          onChange={e => onSetField("projectIdea", e.target.value)}
-          placeholder="Three-track lo-fi EP with dreamy soundscapes..."
-        />
-        
-        <div className="text-xs md:text-sm text-body-text/60 text-right mt-2">
-          {projectIdea.length}/256 characters
-        </div>
-      </div>
-      
-      <div className="pt-4">
-        <AccentButton 
-          className="w-full max-w-sm mx-auto block" 
-          onClick={onNext}
-          disabled={!canProceed}
-        >
-          Next: Define Roles →
-        </AccentButton>
-      </div>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            ✨ Describe Your Creative Project
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <SecureTextarea
+            id="project-idea"
+            label="What's your creative vision?"
+            value={values.projectIdea}
+            onChange={handleProjectIdeaChange}
+            onBlur={() => setTouched('projectIdea')}
+            error={errors.projectIdea}
+            placeholder="Describe your project idea, goals, and what makes it unique..."
+            required
+            maxLength={2000}
+            rows={6}
+          />
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Project Type <span className="text-red-500">*</span>
+            </label>
+            <ProjectTypeSelector 
+              value={projectType} 
+              onChange={handleProjectTypeChange}
+            />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
+
+export default WizardStep1Describe;
