@@ -1,13 +1,14 @@
 
 import { getDefaultProvider, ethers } from "ethers";
 import EthersAdapter from "@safe-global/protocol-kit";
-import Safe, { SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
+import Safe, { SafeAccountConfig } from "@safe-global/protocol-kit";
+import SafeFactory from "@safe-global/protocol-kit";
 
 // Creates a Safe wallet and returns its address
 export async function createSafe(owner: `0x${string}`): Promise<string> {
   const provider = getDefaultProvider("https://sepolia.base.org");
   const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: provider });
-  const safeFactory = await SafeFactory.create({ ethAdapter });
+  const safeFactory = new SafeFactory(ethAdapter);
   const safeAccountConfig: SafeAccountConfig = {
     owners: [owner],
     threshold: 1,
