@@ -1,17 +1,30 @@
 
 import { useToast } from "@/hooks/use-toast";
 
+const SUPABASE_EDGE_FN_URL = "https://mwopsiduetlwehpcrkzg.functions.supabase.co/generate-content-ai";
+
 export function useAICopyGeneration() {
   const { toast } = useToast();
 
   const fetchAIContent = async (prompt: string, model = "gpt-4o-mini") => {
     try {
-      const res = await fetch("/functions/v1/generate-content-ai", {
+      // Always use the full Supabase edge function URL
+      const res = await fetch(SUPABASE_EDGE_FN_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, model }),
       });
-      const data = await res.json();
+
+      // If response is HTML, treat as error
+      const text = await res.text();
+      // Try to parse as JSON
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error("Edge function did not return valid JSON. Check deployment and function logs.");
+      }
+
       console.log("[AICopyGeneration] Edge function response:", data);
       if (data.generated) return data.generated;
       if (data.error) {
@@ -36,3 +49,4 @@ export function useAICopyGeneration() {
 
   return { fetchAIContent };
 }
+
