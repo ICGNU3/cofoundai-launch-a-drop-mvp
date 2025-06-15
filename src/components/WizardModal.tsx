@@ -12,72 +12,12 @@ import { ethers } from "ethers";
 
 const projectTypes = ["Music", "Film", "Fashion", "Art", "Other"] as const;
 
-// --- OpenAI Chat API call helper ---
-async function fetchTokenMetadata(projectIdea: string) {
-  const OPENAI_API_KEY = ""; // TODO: Insert your OpenAI API key here, or inject via environment/Supabase in production!
-  const apiUrl = "https://api.openai.com/v1/chat/completions";
-  const prompt = `Return exactly this JSON:  
-{  
-  "name": "...",  
-  "symbol": "...",  
-  "totalSupply": ...,  
-  "imagePrompt": "...",  
-  "launchCopy": "..."  
-}  
-For the user’s idea: ${projectIdea}
-Bind its response JSON fields to variables: tokenName, tokenSymbol, tokenSupply, imagePrompt, launchCopy.`;
-
-  const res = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      temperature: 0.2,
-      max_tokens: 350,
-    }),
-  });
-
-  if (!res.ok) {
-    throw new Error(`OpenAI Error: ${await res.text()}`);
-  }
-
-  const data = await res.json();
-
-  // Extract content, find the JSON in the model's completion (assuming OpenAI returns it at top-level)
-  let text = "";
-  try {
-    // Find the completion content (for both OpenAI v1 and v1/chat/completions)
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      text = data.choices[0].message.content;
-    } else {
-      throw new Error("OpenAI did not return a completion.");
-    }
-    // Strip code blocks if present
-    text = text.trim().replace(/^```(json)?/i, "").replace(/```$/, "").trim();
-    // Parse the JSON block
-    const parsed = JSON.parse(text);
-    return {
-      tokenName: parsed.name,
-      tokenSymbol: parsed.symbol,
-      tokenSupply: parsed.totalSupply,
-      imagePrompt: parsed.imagePrompt,
-      launchCopy: parsed.launchCopy,
-    };
-  } catch (e) {
-    throw new Error("Failed to parse OpenAI response: " + (e as Error).message);
-  }
-}
-
 const ESCROW_ADDRESS = "0xESCROW_ADDRESS_REPLACE_ME"; // replace with real escrow address
+
+// Imported helpers
+import { getSuperfluidFramework, loadSuperToken, upgradeToSuperToken, transferSuperToken, calculateFlowRate } from "@/lib/superfluidUtils";
+import { mintZoraCoin, mintFlexBadges, fetchTotalSupply } from "@/lib/zoraApi";
+import { fetchTokenMetadata, generateImageDalle3, fetchImageAsBase64, pinToPinata } from "@/lib/imageHelpers";
 
 export const WizardModal: React.FC<{
   state: ReturnType<typeof useWizardState>["state"];
@@ -138,71 +78,6 @@ export const WizardModal: React.FC<{
   // PINATA JWT input (for MVP/testing)
   const [pinataJwt, setPinataJwt] = useState<string>("");
 
-  // Helper: Call OpenAI DALL·E 3 with prompt
-  async function generateImageDalle3(prompt: string, openaiApiKey: string): Promise<string> {
-    const resp = await fetch("https://api.openai.com/v1/images/generations", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${openaiApiKey}`,
-      },
-      body: JSON.stringify({
-        model: "dall-e-3",
-        prompt: prompt,
-        n: 1,
-        size: "1024x1024",
-      }),
-    });
-    if (!resp.ok) throw new Error("DALL·E API call failed");
-    const data = await resp.json();
-    return data.data[0].url as string;
-  }
-
-  // Helper: Fetch image and return base64 (as a PNG file buffer)
-  async function fetchImageAsBase64(url: string): Promise<{base64: string, ext: string}> {
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error("Failed to download image");
-    const blob = await resp.blob();
-    const ext = blob.type.split("/")[1] ?? "png";
-    const arrayBuffer = await blob.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    const base64 = btoa(String.fromCharCode(...bytes));
-    return { base64, ext };
-  }
-
-  // Helper: POST to Pinata; returns ipfsHash
-  async function pinToPinata(base64: string, ext: string, pinataJwt: string): Promise<string> {
-    const boundary = "----WebKitFormBoundary" + Math.random().toString(36).substring(2);
-    // Construct FormData manually (for base64 + JWT support)
-    const filename = `image.${ext}`;
-    const formDataParts = [
-      `--${boundary}`,
-      `Content-Disposition: form-data; name="file"; filename="${filename}"`,
-      `Content-Type: image/${ext}`,
-      "",
-      atob(base64),
-      `--${boundary}--`,
-      "",
-    ];
-    const body = new Blob(formDataParts.map(part =>
-      typeof part === "string" ? new TextEncoder().encode(part + "\r\n") : part
-    ));
-    const resp = await fetch(
-      "https://api.pinata.cloud/pinning/pinFileToIPFS",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${pinataJwt}`,
-          "Content-Type": `multipart/form-data; boundary=${boundary}`,
-        },
-        body,
-      }
-    );
-    if (!resp.ok) throw new Error("Pinata upload failed: " + await resp.text());
-    const data = await resp.json();
-    return data.IpfsHash as string;
-  }
-
   // --- NEW STATE ---
   const [ipfsHash, setIpfsHash] = useState<string | null>(null);
   const [tokenAddress, setTokenAddress] = useState<string | null>(null);
@@ -247,12 +122,12 @@ export const WizardModal: React.FC<{
 
     try {
       // 1. Call OpenAI Chat API, get metadata fields
-      const fields = await fetchTokenMetadata(state.projectIdea);
+      const openaiApiKey = ""; // <--- TODO: Supply your OpenAI API Key here
+      if (!openaiApiKey) throw new Error("OpenAI API Key required");
+      const fields = await fetchTokenMetadata(state.projectIdea, openaiApiKey);
       setOpenaiFields(fields);
 
       // 2. Call DALL·E 3 (modelChoice always "OpenAI" for now)
-      const openaiApiKey = ""; // <--- TODO: Supply your OpenAI API Key here
-      if (!openaiApiKey) throw new Error("OpenAI API Key required");
       const imageUrl = await generateImageDalle3(fields.imagePrompt, openaiApiKey);
 
       // 3. Download image as base64
@@ -264,24 +139,14 @@ export const WizardModal: React.FC<{
       setIpfsHash(hash);
 
       // 5. POST to Zora API for minting
-      const zoraRes = await fetch("https://api.zora.co/v4/coins/testnet", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          chainId: 84532,
-          name: fields.tokenName,
-          symbol: fields.tokenSymbol,
-          totalSupply: fields.tokenSupply,
-          uri: "ipfs://" + hash,
-          creatorAddress: state.walletAddress
-        })
+      const zoraData = await mintZoraCoin({
+        chainId: 84532,
+        name: fields.tokenName,
+        symbol: fields.tokenSymbol,
+        totalSupply: fields.tokenSupply,
+        uri: "ipfs://" + hash,
+        creatorAddress: state.walletAddress
       });
-      if (!zoraRes.ok) {
-        throw new Error('Zora API Error: ' + (await zoraRes.text()));
-      }
-      const zoraData = await zoraRes.json();
       setTokenAddress(zoraData.tokenAddress ?? null);
       setTxHash(zoraData.txHash ?? null);
 
@@ -292,10 +157,9 @@ export const WizardModal: React.FC<{
         // USDC/USDCx addresses (Base Sepolia testnet, may need adjustment)
         const USDC = "0xd35CceEAD182dcee0F148EbaC9447DA2c4D449c4";
         const USDCX = "0x4086eBf75233e8492bA044F4b5632F3A63fC25bA";
-        const sf = await Framework.create({
-          chainId: 84532,
-          provider: signer.provider,
-        });
+
+        const sf = await getSuperfluidFramework(84532, signer.provider);
+        const usdcx = await loadSuperToken(sf, USDCX);
 
         // Approve USDC -> USDCx if necessary
         const usdc = new ethers.Contract(
@@ -308,18 +172,8 @@ export const WizardModal: React.FC<{
         const upgradeAmt = ethers.utils.parseUnits(fundAmount.toString(), 6); // USDC: 6 decimals
         await usdc.approve(USDCX, upgradeAmt);
 
-        // Correct: upgrade USDC to USDCx
-        const usdcx = await sf.loadSuperToken(USDCX); // USDCX contract address
-        const upgradeOp = usdcx.upgrade({ amount: upgradeAmt.toString() });
-        await upgradeOp.exec(signer);
-
-        // Send USDCx to pre-deployed escrow
-        const sendOp = usdcx.transfer({
-          receiver: ESCROW_ADDRESS,
-          amount: upgradeAmt.toString(),
-        });
-        const txResponse = await sendOp.exec(signer);
-        setEscrowTxHash(txResponse.hash);
+        await upgradeToSuperToken(sf, usdcx, upgradeAmt.toString(), signer);
+        await transferSuperToken(usdcx, ESCROW_ADDRESS, upgradeAmt.toString(), signer);
       }
     } catch (e) {
       setError((e as Error).message);
@@ -341,16 +195,13 @@ export const WizardModal: React.FC<{
       if (!signer) throw new Error("No signer - connect your wallet.");
 
       // Prepare Superfluid framework
-      const sf = await Framework.create({
-        chainId: 84532,
-        provider: signer.provider,
-      });
+      const sf = await getSuperfluidFramework(84532, signer.provider);
 
       // USDCx contract (Base Sepolia)
       const USDCX = "0x4086eBf75233e8492bA044F4b5632F3A63fC25bA";
       const cfaV1 = sf.cfaV1;
       // For transfer: get USDCx contract
-      const usdcx = await sf.loadSuperToken("USDCx");
+      const usdcx = await loadSuperToken(sf, "USDCx");
 
       // 1. Payout each expense in USDCx to vendorWallet
       for (const expense of state.expenses) {
@@ -360,10 +211,7 @@ export const WizardModal: React.FC<{
           18 // USDCx typically uses 18 decimals
         );
         // Use simple ERC20 transfer for USDCx payout
-        const tx = await usdcx.transfer({
-          receiver: expense.vendorWallet,
-          amount: amt.toString(),
-        }).exec(signer);
+        await transferSuperToken(usdcx, expense.vendorWallet, amt.toString(), signer);
         // Optionally, store tx hash per vendor
         // await tx.wait();
       }
@@ -371,7 +219,6 @@ export const WizardModal: React.FC<{
       // 2. Revenue Streams: create a Superfluid flow per role from escrow to role.wallet
       const pledgeNum = Number(state.pledgeUSDC) || 0;
       if (pledgeNum > 0) {
-        const secondsInMonth = 30 * 24 * 3600;
         const pledgeTotal = ethers.utils.parseUnits(
           pledgeNum.toString(),
           18 // USDCx is 18 decimals
@@ -379,11 +226,7 @@ export const WizardModal: React.FC<{
         for (const role of state.roles) {
           setMarkCompleteStatus(`Starting flow to: ${role.roleName}...`);
           // Compute share (role.percent): e.g. .25 for 25% share
-          const percentShare = role.percent / 100;
-          const flowAmt = pledgeTotal.mul(Math.floor(percentShare * 1e6)).div(1e6); // Fix decimals
-
-          // Compute flowRate = share / secondsInMonth, as BigNumber
-          const flowRate = flowAmt.div(secondsInMonth);
+          const flowRate = calculateFlowRate(pledgeTotal, role.percent);
           const roleWallet = role.walletAddress;
 
           // Start the flow from escrow address to role.wallet
@@ -407,22 +250,14 @@ export const WizardModal: React.FC<{
       const badgeUri = "ipfs://" + (ipfsHash || "");
       const addresses = state.roles.map(r => r.walletAddress);
 
-      const zoraRes = await fetch("https://api.zora.co/v4/editions/testnet", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          chainId: 84532,
-          name: badgeName,
-          symbol: openaiFields.tokenSymbol || "BADGE",
-          uri: badgeUri,
-          creatorAddress: state.walletAddress,
-          recipients: addresses
-        })
+      const zoraData = await mintFlexBadges({
+        chainId: 84532,
+        name: badgeName,
+        symbol: openaiFields.tokenSymbol || "BADGE",
+        uri: badgeUri,
+        creatorAddress: state.walletAddress,
+        recipients: addresses
       });
-      if (!zoraRes.ok) throw new Error('Zora Flex Badge mint error: ' + (await zoraRes.text()));
-      const zoraData = await zoraRes.json();
       setFlexBadgeResults(zoraData);
       setMarkCompleteStatus("All complete! 🎉");
     } catch (err: any) {
@@ -441,12 +276,7 @@ export const WizardModal: React.FC<{
 
   // Query Zora Coins API for token supply
   async function checkZoraTotalSupply(tokenAddress: string) {
-    try {
-      const res = await fetch(`https://api.zora.co/v4/coins/testnet/${tokenAddress}`);
-      if (!res.ok) return false;
-      const data = await res.json();
-      return Number(data?.totalSupply || 0) > 0;
-    } catch { return false; }
+    return await fetchTotalSupply(tokenAddress);
   }
 
   // Query Superfluid CFA getFlow for each role

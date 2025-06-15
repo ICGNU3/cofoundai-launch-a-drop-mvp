@@ -1,4 +1,3 @@
-
 // Fix for incompatible ethers version: use require() instead of direct import in EthersAdapter (Safe expects v5)
 import { ethers } from 'ethers';
 import SafeFactory, { SafeAccountConfig } from '@safe-global/protocol-kit';
@@ -17,7 +16,7 @@ export async function createSafe(owner: `0x${string}`) {
     signerOrProvider: signer
   });
 
-  // 3. Safe factory (use static create method)
+  // 3. Safe factory (must use static create method; default import)
   const safeFactory = await SafeFactory.create({ ethAdapter });
 
   // 4. Deploy a 1-owner Safe
