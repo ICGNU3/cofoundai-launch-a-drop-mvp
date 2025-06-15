@@ -76,6 +76,47 @@ export type Database = {
           },
         ]
       }
+      project_collaborators: {
+        Row: {
+          accepted_at: string | null
+          id: string
+          invited_at: string | null
+          invited_by: string | null
+          invited_email: string | null
+          invited_wallet: string | null
+          project_id: string | null
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          invited_email?: string | null
+          invited_wallet?: string | null
+          project_id?: string | null
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          invited_email?: string | null
+          invited_wallet?: string | null
+          project_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_collaborators_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_expenses: {
         Row: {
           amount_usdc: number
