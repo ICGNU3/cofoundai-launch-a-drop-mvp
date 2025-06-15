@@ -11,6 +11,23 @@ import ProjectOverview from "./pages/ProjectOverview";
 import ProjectDashboard from "./pages/ProjectDashboard";
 import NotFound from "./pages/NotFound";
 
+// --- Wagmi imports for v2+ ---
+import { WagmiProvider, createConfig, http } from "wagmi";
+import { mainnet } from "wagmi/chains";
+import { injected, walletConnect } from 'wagmi/connectors';
+
+const wagmiConfig = createConfig({
+  chains: [mainnet],
+  transports: {
+    [mainnet.id]: http(), // Use public node, or your own RPC URL.
+  },
+  connectors: [
+    injected({}),
+    walletConnect({ projectId: "wagmi-example" }),
+  ],
+  ssr: false,
+});
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -26,22 +43,25 @@ const App = () => (
       },
     }}
   >
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/project/:projectId" element={<ProjectOverview />} />
-            <Route path="/project/:projectId/dashboard" element={<ProjectDashboard />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/project/:projectId" element={<ProjectOverview />} />
+              <Route path="/project/:projectId/dashboard" element={<ProjectDashboard />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   </PrivyProvider>
 );
 
 export default App;
+
