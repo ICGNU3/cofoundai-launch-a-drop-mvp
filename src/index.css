@@ -1,3 +1,4 @@
+
 @import "./styles/fonts.css";
 
 @tailwind base;
@@ -5,13 +6,12 @@
 @tailwind utilities;
 
 /* GLOBAL STYLES: Typography, Surface, Card, Button, Pills */
-
 body {
   @apply bg-background text-base font-sans font-normal m-0 p-0 min-h-screen leading-[1.5];
   color: #E0E0E0;
 }
 
-/* Hero Section */
+/* Success palette Hero Section */
 .hero-title, h1.headline, h1 {
   font-family: "Satoshi", sans-serif;
   font-size: 36px;
@@ -20,6 +20,11 @@ body {
   color: #F9F9F9;
   padding-top: 24px;
   padding-bottom: 24px;
+  background: linear-gradient(90deg, #22C55E 5%, #A3E635 60%, #FFD700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+          background-clip: text;
+          text-fill-color: transparent;
 }
 
 /* Section headings */
@@ -27,7 +32,7 @@ h2, .section-heading {
   font-family: "Satoshi", sans-serif;
   font-size: 20px;
   font-weight: 600;
-  color: #F9F9F9;
+  color: #4ADE80;
   margin-bottom: 16px;
 }
 
@@ -42,13 +47,13 @@ h2, .section-heading {
   margin-top: 8px;
 }
 
-/* Card/Surface with new background and shadow */
+/* Card/Surface with green glow */
 .card, .wizard-card {
-  background: #1E1E1E;
-  border: 2px solid #222;
+  background: #161C18;
+  border: 2px solid #22C55E33;
   border-radius: 12px;
   max-width: 620px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 18px rgba(34, 197, 94, 0.16);
   padding: 2.5rem;
 }
 @media (max-width: 640px) {
@@ -57,33 +62,35 @@ h2, .section-heading {
   }
 }
 
-/* Gradient Accent Button with animation */
+/* Gradient Accent Button: success theme, subtle gold glow */
 button.accent-btn, .accent-btn {
   @apply rounded-lg text-white font-semibold h-12 px-6;
-  background: linear-gradient(90deg, #9A4DFF 0%, #5D5FEF 100%);
+  background: linear-gradient(90deg, #22C55E 10%, #A3E635 80%, #FFD700 100%);
   border: none;
+  box-shadow: 0 0 16px #FFD70022;
   transition: transform 0.15s cubic-bezier(0.23, 1.03, 0.65, 1.19);
   font-size: 16px;
   cursor: pointer;
 }
 button.accent-btn:hover, .accent-btn:hover {
   transform: scale(1.05);
-  filter: brightness(106%);
+  filter: brightness(108%);
+  box-shadow: 0 0 24px #FFD70055, 0 0 2px #A3E63577;
 }
 button.accent-btn:active, .accent-btn:active {
   transform: scale(0.95);
-  filter: brightness(98%);
+  filter: brightness(100%);
 }
 button.accent-btn.secondary, .accent-btn.secondary {
   background: transparent !important;
-  border: 2px solid #5D5FEF !important;
-  color: #5D5FEF !important;
+  border: 2px solid #22C55E !important;
+  color: #22C55E !important;
   box-shadow: none;
 }
 
-/* Gradient Progress Bar with smooth transitions */
+/* Gradient Progress Bar with greens + gold */
 .progress-bar {
-  background: linear-gradient(90deg, #9A4DFF 0%, #5D5FEF 100%);
+  background: linear-gradient(90deg, #22C55E 0%, #A3E635 78%, #FFD700 100%);
   height: 6px;
   border-radius: 9999px;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -93,9 +100,9 @@ button.accent-btn.secondary, .accent-btn.secondary {
 input, textarea, select {
   @apply font-sans text-base font-normal;
   border-radius: 8px;
-  background: #19191b;
+  background: #181E15;
   color: #E0E0E0;
-  border: 1px solid #2A2A2A;
+  border: 1px solid #22C55E44;
   padding: 12px 14px;
   outline: none;
 }
@@ -107,17 +114,17 @@ input, textarea, select {
   padding: 6px 10px;
   margin: 4px 4px 4px 0;
   border-radius: 20px;
-  border: 1.5px solid #555;
+  border: 1.5px solid #22C55E77;
   display: inline-flex;
   align-items: center;
-  background: #262626;
-  color: #E4E4E4;
+  background: #181E15;
+  color: #A3E635;
 }
 .role-pill {
-  background: #18181a;
+  background: #131D14;
 }
 .expense-pill {
-  background: #262626;
+  background: #181E15;
 }
 
 /* Mobile-responsive pills for viewport ≤ 480px */
@@ -169,16 +176,16 @@ input, textarea, select {
   border-radius: 9999px;
 }
 .slider-thumb {
-  background: #5D5FEF;
-  box-shadow: 0 2px 12px 0 #5D5FEF66;
+  background: #22C55E;
+  box-shadow: 0 2px 12px 0 #22C55E66;
   border-radius: 9999px;
   width: 28px;
   height: 28px;
   border: none;
 }
 .toast {
-  background: #1E1E1E;
-  color: #F9F9F9;
+  background: #161C18;
+  color: #A3E635;
 }
 
 /* Focus outlines for accessibility */
@@ -188,7 +195,7 @@ textarea:focus-visible,
 select:focus-visible,
 [tabindex]:focus-visible,
 a:focus-visible {
-  outline: 2px solid #5D5FEF;
+  outline: 2px solid #A3E635;
   outline-offset: 2px;
 }
 
@@ -233,7 +240,7 @@ a:focus-visible {
   .card.wizard-card {
     padding: 1rem;
     max-width: 97vw;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    box-shadow: 0 2px 6px rgba(34,197,94,0.12);
     margin-top: 18vw;
     margin-bottom: 8vw;
   }
@@ -290,3 +297,4 @@ a:focus-visible {
 .hover-scale:hover {
   transform: scale(1.04);
 }
+

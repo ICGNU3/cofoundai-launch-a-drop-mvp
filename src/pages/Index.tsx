@@ -21,23 +21,25 @@ const Index: React.FC = () => {
         <div className="w-full max-w-5xl flex justify-end">
           <button
             onClick={() => setWalletOpen(true)}
-            className="rounded-lg p-2 bg-black/10 hover:bg-accent/20 text-accent transition-all"
+            className="rounded-lg p-2 bg-gold/15 hover:bg-accent/30 text-accent transition-all"
             aria-label="Open Wallet"
           >
-            <Wallet size={20} />
+            <Wallet size={20} color="#FFD700" />
           </button>
         </div>
-        <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.15] text-headline py-4 mt-4 max-w-3xl bg-gradient-to-r from-[#5D5FEF] to-[#9A4DFF] bg-clip-text text-transparent">
+        <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.15] hero-title py-4 mt-4 max-w-3xl">
           Launch Music, Art, or Ideas — with a single tap.
         </h1>
-        <div className="hero-tagline tagline mb-4 max-w-xl text-lg md:text-xl">
+        <div className="hero-tagline tagline mb-4 max-w-xl text-lg md:text-xl text-success">
           Type your idea, assign roles and expenses, tap Launch. Mint, fund, and collaborate instantly with anyone.
         </div>
         <AccentButton
           className="mt-4 sm:mt-6 px-8 py-4 text-lg rounded-xl shadow-lg hover:scale-105 transition-all"
           onClick={wizard.openWizard}
         >
-          Launch a Drop
+          <span className="inline-flex items-center gap-2">
+            <span className="text-gold">🌟</span> Launch a Drop <span className="text-gold">→</span>
+          </span>
         </AccentButton>
       </div>
 
@@ -55,3 +57,4 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+
