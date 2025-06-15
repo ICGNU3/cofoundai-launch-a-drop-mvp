@@ -17,6 +17,7 @@ import { NavigationSection } from "@/components/NavigationSection";
 import { TeamDirectory } from "@/components/TeamManagement/TeamDirectory";
 import { RolePermissionsPanel } from "@/components/TeamManagement/RolePermissionsPanel";
 import { ProjectChat } from "@/components/TeamManagement/ProjectChat";
+import UnifiedPeopleSection from "@/components/UnifiedPeopleSection";
 
 type ProjectWithDetails = {
   id: string;
@@ -45,24 +46,6 @@ type ProjectWithDetails = {
 const ProjectDashboard: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const { user } = usePrivy();
-
-  const [inviteOpen, setInviteOpen] = useState(false);
-  const [forceReload, setForceReload] = useState(0);
-
-  // Load collaborators
-  const { data: collaborators, refetch: refetchCollaborators } = useQuery({
-    queryKey: ["collaborators", projectId, forceReload],
-    queryFn: async () => {
-      if (!projectId) return [];
-      const { data, error } = await supabase
-        .from("project_collaborators")
-        .select("*")
-        .eq("project_id", projectId);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!projectId,
-  });
 
   const { data: project, isLoading, refetch } = useQuery({
     queryKey: ["project-dashboard", projectId],
@@ -113,22 +96,16 @@ const ProjectDashboard: React.FC = () => {
   const activeStreams = project.roles.filter(role => role.stream_active);
   const totalFlowRate = activeStreams.reduce((sum, role) => sum + (role.stream_flow_rate || 0), 0);
 
-  // Check if this is a newly launched project (minted in last 10 minutes)
   const isNewlyLaunched = project.minted_at && 
     Date.now() - new Date(project.minted_at).getTime() < 10 * 60 * 1000;
 
   return (
     <div className="min-h-screen bg-background px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        {/* Team Management Module */}
-        <TeamDirectory projectId={projectId!} projectOwnerId={project.owner_id} currentUserId={user?.id || null} />
-        <RolePermissionsPanel projectId={projectId!} currentUserId={user?.id || null} userIsOwner={user?.id === project.owner_id} />
-        <ProjectChat projectId={projectId!} teamMemberId={null} />
+        {/* Team & Collaborators: unified */}
+        <UnifiedPeopleSection projectId={projectId!} projectOwnerId={project.owner_id} />
 
-        {/* Collaborators Section */}
-        <CollaboratorsSection projectId={projectId!} />
-
-        {/* Show Launch Hub for newly launched projects */}
+        {/* The rest of the dashboard remains as before */}
         {isNewlyLaunched && (
           <div className="mb-8">
             <ProjectLaunchHub 
@@ -138,7 +115,6 @@ const ProjectDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Header */}
         <ProjectHeaderSection
           projectName={project.project_idea}
           projectType={project.project_type}
@@ -148,7 +124,6 @@ const ProjectDashboard: React.FC = () => {
           projectIdea={project.project_idea}
         />
 
-        {/* Status Cards */}
         <StatusCardsSection
           tokenAddress={project.token_address}
           txHash={project.tx_hash}
@@ -160,16 +135,12 @@ const ProjectDashboard: React.FC = () => {
           totalFlowRate={totalFlowRate}
         />
 
-        {/* Funding Progress */}
         <FundingProgressSection project={project} />
 
-        {/* Active Streams Detail */}
         <ActiveStreamsSection activeStreams={activeStreams} />
 
-        {/* All Roles */}
         <AllRolesSection roles={project.roles} />
 
-        {/* Navigation */}
         <NavigationSection />
       </div>
     </div>
