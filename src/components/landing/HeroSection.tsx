@@ -1,7 +1,6 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { AccentButton } from "@/components/ui/AccentButton";
-import { AIProjectKickoffModal } from "../AIProjectKickoffModal";
 
 type HeroSectionProps = {
   counter: { total: number; drops: number };
@@ -35,15 +34,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   onCtaClick,
   countUpDollarRef,
   countUpDropRef,
-  onAIFinish, // NEW PROP
+  onAIFinish, // NEW PROP (now unused)
 }) => {
-  const [showAIModal, setShowAIModal] = useState(false);
-
-  // Handler called from inside modal when AI kicks off wizard
-  const handleAIContinueWizard = (aiData: { projectIdea: string; projectType: string; roleSplits?: Array<{ role: string; percent: number }> }) => {
-    setShowAIModal(false);
-    if (onAIFinish) onAIFinish(aiData);
-  };
+  // Remove all AI modal logic
 
   return (
     <div className="w-full text-center">
@@ -61,18 +54,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         <AccentButton
           className="hero-cta px-6 md:px-8 py-3 md:py-4 text-base md:text-lg rounded-xl shadow-lg hover:scale-105 transition-all font-bold z-20 w-full max-w-xs"
           style={{ background: 'linear-gradient(90deg,#5D5FEF 0%,#9A4DFF 100%)', boxShadow: '0 0 16px rgba(93,95,239,.6)' }}
-          onClick={() => setShowAIModal(true)}
-          aria-label="Let AI Start Project"
+          onClick={onCtaClick}
+          aria-label="Launch Project Wizard"
         >
-          <span role="img" aria-label="Sparkles" className="animate-bounce mr-1">✨</span>
-          Let AI Start My Project
+          Start My Project
         </AccentButton>
-        {/* AI Modal */}
-        <AIProjectKickoffModal
-          isOpen={showAIModal}
-          onClose={() => setShowAIModal(false)}
-          onContinueToWizard={handleAIContinueWizard} // Pass handler for AI wizard
-        />
       </div>
       {/* HOW IT WORKS */}
       <div className="w-full flex flex-col items-center gap-3 mt-12 mb-2 px-4">
@@ -92,4 +78,3 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 };
 
 export default HeroSection;
-
