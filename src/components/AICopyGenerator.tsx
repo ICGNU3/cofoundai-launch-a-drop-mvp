@@ -9,6 +9,9 @@ import { AccentButton } from "@/components/ui/AccentButton";
 import { FileText, RefreshCw, Copy, Edit, Sparkles, Target, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { AICopyGeneratorControls } from "./ai/AICopyGeneratorControls";
+import { AIGeneratedCopyList } from "./ai/AIGeneratedCopyList";
+import { useAICopyGeneration } from "./ai/useAICopyGeneration";
 
 interface AICopyGeneratorProps {
   projectIdea: string;
@@ -63,31 +66,11 @@ export const AICopyGenerator: React.FC<AICopyGeneratorProps> = ({
     );
   };
 
-  // Helper: Call Edge Function for AI
-  const fetchAIContent = async (prompt: string, model = "gpt-4o-mini") => {
-    try {
-      const res = await fetch("/functions/v1/generate-content-ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, model }),
-      });
-      const data = await res.json();
-      if (data.generated) return data.generated;
-      throw new Error(data.error || "AI generation failed");
-    } catch (err: any) {
-      toast({
-        title: "AI Error",
-        description: err?.message || "Failed to generate content.",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
+  const { fetchAIContent } = useAICopyGeneration();
 
   const generateCopy = async () => {
     setIsGenerating(true);
     try {
-      // For each platform, get AI-generated copy via Edge Function
       const mockFn = async (platform: string) => {
         const prompt = `Write a ${tone} marketing announcement for a ${projectType} project called "${projectIdea}". Platform: ${platform}. Target audience: ${targetAudience || "general"}. Key messages: ${keyMessages || "Default campaign."}`;
         return {
@@ -97,7 +80,6 @@ export const AICopyGenerator: React.FC<AICopyGeneratorProps> = ({
           icon: platforms.find(p => p.value === platform)?.icon || "📝",
           tone,
           targetAudience,
-          // REAL AI content:
           content: await fetchAIContent(prompt),
           variations: [],
           metrics: {
@@ -135,7 +117,6 @@ export const AICopyGenerator: React.FC<AICopyGeneratorProps> = ({
     if (!refinementRequest.trim()) return;
     setIsGenerating(true);
     try {
-      // Use Edge Function for refinement prompt
       const prompt = `Refine the following marketing copy for ${copyItem.platformLabel}: "${copyItem.content}"\nInstruction: ${refinementRequest}`;
       const refinedContent = await fetchAIContent(prompt);
 
@@ -185,79 +166,18 @@ export const AICopyGenerator: React.FC<AICopyGeneratorProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium mb-2 block">Target Audience</label>
-            <Input
-              value={targetAudience}
-              onChange={(e) => setTargetAudience(e.target.value)}
-              placeholder="Music lovers, young professionals, creative artists..."
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">Tone</label>
-            <Select value={tone} onValueChange={setTone}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {tones.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>
-                    {t.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">Key Messages</label>
-            <Textarea
-              value={keyMessages}
-              onChange={(e) => setKeyMessages(e.target.value)}
-              placeholder="Highlight unique features, benefits, call-to-action..."
-              className="min-h-[80px]"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">Target Platforms</label>
-            <div className="grid grid-cols-2 gap-2">
-              {platforms.map((platform) => (
-                <Button
-                  key={platform.value}
-                  variant={selectedPlatforms.includes(platform.value) ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => togglePlatform(platform.value)}
-                  className="justify-start"
-                >
-                  <span className="mr-2">{platform.icon}</span>
-                  {platform.label}
-                </Button>
-              ))}
-            </div>
-            <p className="text-xs text-body-text/60 mt-2">
-              Select platforms to generate optimized copy for each
-            </p>
-          </div>
-
-          <AccentButton
-            onClick={generateCopy}
-            disabled={isGenerating || selectedPlatforms.length === 0}
-            className="w-full"
-          >
-            {isGenerating ? (
-              <>
-                <RefreshCw size={16} className="mr-2 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Sparkles size={16} className="mr-2" />
-                Generate Marketing Copy
-              </>
-            )}
-          </AccentButton>
+          <AICopyGeneratorControls
+            targetAudience={targetAudience}
+            setTargetAudience={setTargetAudience}
+            tone={tone}
+            setTone={setTone}
+            keyMessages={keyMessages}
+            setKeyMessages={setKeyMessages}
+            selectedPlatforms={selectedPlatforms}
+            togglePlatform={togglePlatform}
+            isGenerating={isGenerating}
+            onGenerate={generateCopy}
+          />
         </CardContent>
       </Card>
 
@@ -273,68 +193,13 @@ export const AICopyGenerator: React.FC<AICopyGeneratorProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {generatedCopy.length > 0 ? (
-            <div className="space-y-4">
-              {generatedCopy.map((copyItem) => (
-                <div key={copyItem.id} className="border border-border rounded-lg p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span>{copyItem.icon}</span>
-                      <span className="font-medium">{copyItem.platformLabel}</span>
-                      {copyItem.refined && (
-                        <Badge variant="secondary" className="text-xs">
-                          Refined
-                        </Badge>
-                      )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => copyCopyToClipboard(copyItem.content)}
-                    >
-                      <Copy size={14} />
-                    </Button>
-                  </div>
-                  
-                  <div className="bg-background/50 p-3 rounded text-sm">
-                    {copyItem.content}
-                  </div>
-                  
-                  <div className="flex gap-4 text-xs">
-                    <span className="flex items-center gap-1">
-                      <Target size={12} />
-                      Readability: {copyItem.metrics.readability}%
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Sparkles size={12} />
-                      Engagement: {copyItem.metrics.engagement}%
-                    </span>
-                  </div>
-                  
-                  <div className="flex gap-2 pt-2 border-t border-border">
-                    <Input
-                      placeholder="Make it more concise, add call to action..."
-                      value={refinementRequest}
-                      onChange={(e) => setRefinementRequest(e.target.value)}
-                      className="flex-1 text-sm"
-                    />
-                    <Button
-                      size="sm"
-                      onClick={() => refineCopy(copyItem)}
-                      disabled={!refinementRequest.trim()}
-                    >
-                      <Edit size={14} />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-body-text/50">
-              <FileText size={48} className="mx-auto mb-4 opacity-20" />
-              <p>Generate marketing copy to see results here</p>
-            </div>
-          )}
+          <AIGeneratedCopyList
+            generatedCopy={generatedCopy}
+            refinementRequest={refinementRequest}
+            setRefinementRequest={setRefinementRequest}
+            refineCopy={refineCopy}
+            copyCopyToClipboard={copyCopyToClipboard}
+          />
         </CardContent>
       </Card>
     </div>

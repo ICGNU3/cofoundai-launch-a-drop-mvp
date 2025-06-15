@@ -8,6 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { AccentButton } from "@/components/ui/AccentButton";
 import { Wand2, RefreshCw, TrendingUp, Eye, Target, Zap, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { RefinementCategorySelector } from "./ai/RefinementCategorySelector";
+import { RefinementPanel } from "./ai/RefinementPanel";
+import { RefinementHistoryList } from "./ai/RefinementHistoryList";
+import { useContentRefinement } from "./ai/useContentRefinement";
 
 interface ContentRefinementToolsProps {
   content: any;
@@ -19,6 +23,8 @@ export const ContentRefinementTools: React.FC<ContentRefinementToolsProps> = ({
   onContentRefined,
 }) => {
   const { toast } = useToast();
+  
+  const { fetchAIContent } = useContentRefinement();
   
   const [activeRefiner, setActiveRefiner] = useState("suggestions");
   const [customRefinement, setCustomRefinement] = useState("");
@@ -113,28 +119,6 @@ export const ContentRefinementTools: React.FC<ContentRefinementToolsProps> = ({
     { label: "More Urgent", value: "urgent" },
   ];
 
-  // Add Edge Function call for AI refinement
-  const fetchAIContent = async (prompt: string, model = "gpt-4o-mini") => {
-    try {
-      const res = await fetch("/functions/v1/generate-content-ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, model }),
-      });
-      const data = await res.json();
-      if (data.generated) return data.generated;
-      throw new Error(data.error || "AI generation failed");
-    } catch (err: any) {
-      toast({
-        title: "AI Error",
-        description: err?.message || "Failed to generate content.",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
-
-  // Update applyRefinement for AI-backed output
   const applyRefinement = async (type: string, value?: string) => {
     setIsRefining(true);
     try {
@@ -192,34 +176,11 @@ export const ContentRefinementTools: React.FC<ContentRefinementToolsProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Refinement Categories */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {refinementCategories.map((category) => (
-          <Card
-            key={category.id}
-            className={`cursor-pointer transition ${
-              activeRefiner === category.id
-                ? "border-accent bg-accent/5"
-                : "hover:border-accent/50"
-            }`}
-            onClick={() => setActiveRefiner(category.id)}
-          >
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <category.icon size={16} />
-                <CardTitle className="text-sm">{category.label}</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <CardDescription className="text-xs">
-                {category.description}
-              </CardDescription>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Refinement Content */}
+      <RefinementCategorySelector
+        categories={refinementCategories}
+        activeRefiner={activeRefiner}
+        setActiveRefiner={setActiveRefiner}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -228,101 +189,19 @@ export const ContentRefinementTools: React.FC<ContentRefinementToolsProps> = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {activeRefiner === "suggestions" && (
-              <div className="space-y-3">
-                {aiSuggestions.map((suggestion) => (
-                  <div
-                    key={suggestion.type}
-                    className="flex items-center justify-between p-3 border border-border rounded-lg"
-                  >
-                    <div>
-                      <h4 className="font-medium text-sm">{suggestion.title}</h4>
-                      <p className="text-xs text-body-text/70">{suggestion.description}</p>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => applyRefinement(suggestion.type)}
-                      disabled={isRefining}
-                    >
-                      {suggestion.action}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {activeRefiner === "optimization" && (
-              <div className="space-y-4">
-                {platformOptimizations.map((platform) => (
-                  <div key={platform.platform} className="space-y-2">
-                    <h4 className="font-medium text-sm">{platform.platform}</h4>
-                    <div className="space-y-1">
-                      {platform.suggestions.map((suggestion, idx) => (
-                        <Button
-                          key={idx}
-                          variant="outline"
-                          size="sm"
-                          className="w-full justify-start text-xs"
-                          onClick={() => applyRefinement("platform", suggestion)}
-                          disabled={isRefining}
-                        >
-                          {suggestion}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {activeRefiner === "tone" && (
-              <div className="space-y-3">
-                {toneAdjustments.map((tone) => (
-                  <Button
-                    key={tone.value}
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={() => applyRefinement("tone", tone.value)}
-                    disabled={isRefining}
-                  >
-                    {tone.label}
-                  </Button>
-                ))}
-              </div>
-            )}
-
-            {activeRefiner === "custom" && (
-              <div className="space-y-4">
-                <Textarea
-                  value={customRefinement}
-                  onChange={(e) => setCustomRefinement(e.target.value)}
-                  placeholder="Describe the specific changes you want to make..."
-                  className="min-h-[100px]"
-                />
-                <AccentButton
-                  onClick={applyCustomRefinement}
-                  disabled={isRefining || !customRefinement.trim()}
-                  className="w-full"
-                >
-                  {isRefining ? (
-                    <>
-                      <RefreshCw size={16} className="mr-2 animate-spin" />
-                      Applying...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 size={16} className="mr-2" />
-                      Apply Custom Refinement
-                    </>
-                  )}
-                </AccentButton>
-              </div>
-            )}
+            <RefinementPanel
+              activeRefiner={activeRefiner}
+              isRefining={isRefining}
+              aiSuggestions={aiSuggestions}
+              platformOptimizations={platformOptimizations}
+              toneAdjustments={toneAdjustments}
+              applyRefinement={applyRefinement}
+              customRefinement={customRefinement}
+              setCustomRefinement={setCustomRefinement}
+              applyCustomRefinement={applyCustomRefinement}
+            />
           </CardContent>
         </Card>
-
-        {/* Refinement History */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -334,36 +213,7 @@ export const ContentRefinementTools: React.FC<ContentRefinementToolsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {refinementHistory.length > 0 ? (
-              <div className="space-y-3">
-                {refinementHistory.slice(0, 5).map((refinement) => (
-                  <div
-                    key={refinement.id}
-                    className="p-3 border border-border rounded-lg space-y-2"
-                  >
-                    <div className="flex items-center justify-between">
-                      <Badge variant="secondary" className="text-xs">
-                        {refinement.type}
-                      </Badge>
-                      <span className="text-xs text-body-text/60">
-                        {new Date(refinement.timestamp).toLocaleTimeString()}
-                      </span>
-                    </div>
-                    <p className="text-sm">{refinement.description}</p>
-                    {refinement.value && (
-                      <p className="text-xs text-body-text/70 italic">
-                        "{refinement.value}"
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-body-text/50">
-                <RefreshCw size={48} className="mx-auto mb-4 opacity-20" />
-                <p>Apply refinements to see history here</p>
-              </div>
-            )}
+            <RefinementHistoryList refinementHistory={refinementHistory} />
           </CardContent>
         </Card>
       </div>
