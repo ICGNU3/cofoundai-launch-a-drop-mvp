@@ -80,8 +80,8 @@ const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
               Project Type <span className="text-red-500">*</span>
             </label>
             <ProjectTypeSelector 
-              value={values.projectType}
-              onChange={handleProjectTypeChange}
+              projectType={values.projectType}
+              onProjectTypeChange={handleProjectTypeChange}
               onLoadDefaultRoles={onLoadDefaultRoles}
             />
           </div>
