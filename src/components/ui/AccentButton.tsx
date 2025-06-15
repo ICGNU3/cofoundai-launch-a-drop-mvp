@@ -19,6 +19,13 @@ const AccentButton = React.forwardRef<HTMLButtonElement, AccentButtonProps>(
       onDragLeave,
       onDragOver,
       onDrop,
+      onAnimationStart,
+      onAnimationEnd,
+      onAnimationIteration,
+      onTransitionStart,
+      onTransitionEnd,
+      onTransitionRun,
+      onTransitionCancel,
       ...buttonProps
     } = rest;
 
