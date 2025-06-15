@@ -308,8 +308,8 @@ export const WizardModal: React.FC<{
         const upgradeAmt = ethers.utils.parseUnits(fundAmount.toString(), 6); // USDC: 6 decimals
         await usdc.approve(USDCX, upgradeAmt);
 
-        // Upgrade USDC to USDCx
-        const usdcx = sf.tokens.USDCx;
+        // Upgrade USDC to USDCx (get SuperToken instance)
+        const usdcx = await sf.loadSuperToken("USDCx");
         // Perform upgrade (wrap) from USDC to USDCx
         const upgradeOp = usdcx.upgrade({
           amount: upgradeAmt.toString()
@@ -353,7 +353,7 @@ export const WizardModal: React.FC<{
       const USDCX = "0x4086eBf75233e8492bA044F4b5632F3A63fC25bA";
       const cfaV1 = sf.cfaV1;
       // For transfer: get USDCx contract
-      const usdcx = sf.tokens.USDCx;
+      const usdcx = await sf.loadSuperToken("USDCx");
 
       // 1. Payout each expense in USDCx to vendorWallet
       for (const expense of state.expenses) {
@@ -478,7 +478,8 @@ export const WizardModal: React.FC<{
           receiver: role.walletAddress,
           providerOrSigner: signer.provider,
         });
-        if (!flow?.flowRate || !flow?.receiver || ethers.BigNumber.from(flow.flowRate).lt(expectedRate)) {
+        // Remove .receiver property check (not guaranteed in type)
+        if (!flow?.flowRate || ethers.BigNumber.from(flow.flowRate).lt(expectedRate)) {
           allLive = false;
         }
       }
