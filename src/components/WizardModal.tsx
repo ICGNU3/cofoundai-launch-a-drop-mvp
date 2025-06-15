@@ -1,7 +1,6 @@
-
 import React from "react";
 import { X } from "lucide-react";
-import { WizardStep1Describe } from "./WizardStep1Describe";
+import WizardStep1Describe from "./WizardStep1Describe";
 import WizardStep2Roles from "./WizardStep2Roles";
 import { WizardBudgetStep } from "./WizardBudgetStep";
 import { WizardStep4Success } from "./WizardStep4Success";

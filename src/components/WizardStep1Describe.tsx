@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SecureTextarea } from "@/components/ui/SecureTextarea";
@@ -80,8 +79,9 @@ const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
               Project Type <span className="text-red-500">*</span>
             </label>
             <ProjectTypeSelector 
-              selectedType={projectType} 
-              onTypeChange={handleProjectTypeChange}
+              projectType={projectType} 
+              onProjectTypeChange={handleProjectTypeChange}
+              onLoadDefaultRoles={onLoadDefaultRoles}
             />
           </div>
         </CardContent>
