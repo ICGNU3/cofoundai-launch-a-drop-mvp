@@ -69,7 +69,7 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-x-hidden">
+    <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-x-hidden overflow-y-auto">
       <FullWaveBackground />
       <section className="relative w-full max-w-7xl mx-auto pt-16 md:pt-20 pb-10 px-4 z-10 flex flex-col items-center pb-24">
         <div className="hero-gradient pointer-events-none" aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 80%,rgba(154,77,255,.18) 0%,transparent 72%)', zIndex: 0 }} />

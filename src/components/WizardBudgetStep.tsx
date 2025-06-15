@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ScrollArea } from "./ui/scroll-area";
 import { WizardNavigationButtons } from "./ui/WizardNavigationButtons";
@@ -52,15 +53,15 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="mb-4">
+    <div className="h-full flex flex-col px-6 py-4">
+      <div className="mb-4 flex-shrink-0">
         <h2 className="text-2xl font-bold text-headline mb-2">Budget Breakdown</h2>
         <p className="text-body-text/70">
           Allocate your revenue share and manage project expenses. Use the interactive charts to visualize and adjust your budget.
         </p>
       </div>
 
-      <ScrollArea className="flex-1">
+      <div className="flex-1 overflow-y-auto">
         <div className="space-y-6 pr-4">
           {/* Budget Validation Status: Pass total sum including both shares and expenses */}
           <BudgetValidationStatus 
@@ -104,9 +105,9 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
 
           <div className="h-20" />
         </div>
-      </ScrollArea>
+      </div>
 
-      <div className="border-t border-border pt-4 mt-4">
+      <div className="border-t border-border pt-4 mt-4 flex-shrink-0">
         <WizardNavigationButtons
           canProceed={canProceed}
           onBack={onBack}
