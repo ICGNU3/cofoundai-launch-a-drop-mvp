@@ -44,8 +44,10 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
 
-  // Percent validation
+  // Enhanced percent validation with epsilon tolerance
   const sumPercent = roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
+  const epsilon = 0.1;
+  const canProceed = Math.abs(sumPercent - 100) < epsilon;
 
   // Auto-rebalance percentages when adding new role
   const handleAddRole = (newRole: Role) => {
@@ -119,10 +121,10 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
         </AccentButton>
         <AccentButton
           className="flex-1"
-          disabled={sumPercent !== 100}
+          disabled={!canProceed}
           onClick={() => setStep(3)}
         >
-          Next: Funding →
+          Mint & Fund →
         </AccentButton>
       </div>
 

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 
 export type BudgetItemType = {
@@ -28,11 +28,50 @@ export const BudgetItem: React.FC<BudgetItemProps> = ({
   onDelete,
   onPercentChange,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempPercentStr, setTempPercentStr] = useState(
+    item.percentStr || (item.percentNum || item.percent || 0).toString()
+  );
+
   const isRole = item.type === "share";
+
+  const handlePercentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+    if (v === '' || /^\d{0,3}$/.test(v)) {
+      setTempPercentStr(v);
+    }
+  };
+
+  const handlePercentBlur = () => {
+    setIsEditing(false);
+    const parsed = parseInt(tempPercentStr, 10);
+    const final = isNaN(parsed) || tempPercentStr === '' ? 0 : Math.max(0, Math.min(parsed, 100));
+    
+    if (onPercentChange) {
+      onPercentChange(final);
+    }
+    
+    setTempPercentStr(final.toString());
+  };
+
+  const handlePercentKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handlePercentBlur();
+    }
+    if (e.key === 'Escape') {
+      setTempPercentStr(item.percentStr || (item.percentNum || item.percent || 0).toString());
+      setIsEditing(false);
+    }
+  };
+
+  const handlePercentFocus = () => {
+    setIsEditing(true);
+    setTempPercentStr(item.percentStr || (item.percentNum || item.percent || 0).toString());
+  };
 
   if (isRole) {
     return (
-      <div className="role-pill flex items-center justify-between w-full">
+      <div className="role-pill flex items-center justify-between w-full bg-[#18181a] border border-accent px-3 py-2 rounded">
         <div className="flex items-center gap-2 flex-1">
           <span className="font-medium">{item.roleName}</span>
           <span className="text-xs opacity-60">
@@ -40,25 +79,25 @@ export const BudgetItem: React.FC<BudgetItemProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={item.percentStr || (item.percentNum || item.percent || 0).toString()}
-            onChange={(e) => {
-              const v = e.target.value;
-              if (v === '' || /^\d{0,3}$/.test(v)) {
-                // This would need to be handled by parent component
-                console.log('Percent change:', v);
-              }
-            }}
-            onBlur={(e) => {
-              const parsed = parseInt(e.target.value, 10);
-              const final = isNaN(parsed) ? 0 : Math.min(parsed, 100);
-              if (onPercentChange) {
-                onPercentChange(final);
-              }
-            }}
-            className="w-12 text-right text-sm bg-transparent border-0 outline-0"
-          />
+          {isEditing ? (
+            <input
+              type="text"
+              value={tempPercentStr}
+              onChange={handlePercentChange}
+              onBlur={handlePercentBlur}
+              onKeyDown={handlePercentKeyDown}
+              className="w-12 text-right text-sm bg-transparent border-0 outline-0 font-mono"
+              autoFocus
+              placeholder="0"
+            />
+          ) : (
+            <span
+              className="w-12 text-right text-sm cursor-pointer hover:bg-white/10 px-1 rounded font-mono"
+              onClick={handlePercentFocus}
+            >
+              {item.percentNum || item.percent || 0}
+            </span>
+          )}
           <span className="text-sm">%</span>
           <button
             onClick={onEdit}
@@ -81,7 +120,7 @@ export const BudgetItem: React.FC<BudgetItemProps> = ({
 
   // Expense item
   return (
-    <div className="expense-pill flex items-center justify-between w-full">
+    <div className="expense-pill flex items-center justify-between w-full bg-[#18181a] border border-border px-3 py-2 rounded">
       <div className="flex items-center gap-2 flex-1">
         <span className="font-medium">{item.expenseName}</span>
         <span className="text-xs opacity-60">
@@ -89,7 +128,7 @@ export const BudgetItem: React.FC<BudgetItemProps> = ({
         </span>
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-sm">${item.amountUSDC?.toFixed(2)}</span>
+        <span className="text-sm font-mono">${item.amountUSDC?.toFixed(2)}</span>
         <button
           onClick={onEdit}
           className="p-1 hover:bg-white/10 rounded"

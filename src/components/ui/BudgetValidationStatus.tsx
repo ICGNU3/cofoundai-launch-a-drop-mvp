@@ -11,14 +11,22 @@ export const BudgetValidationStatus: React.FC<BudgetValidationStatusProps> = ({
   sumPercent,
   hasExpenses,
 }) => {
-  const percentColor = sumPercent === 100 ? "text-green-400" : "text-red-500";
-  const percentMsg = sumPercent < 100 && !hasExpenses
-    ? `Need ${100 - sumPercent}% more` 
-    : sumPercent > 100 
-    ? `Remove ${sumPercent - 100}%` 
-    : sumPercent === 100
-    ? "Percentages balanced ✓"
-    : `${100 - sumPercent}% remaining`;
+  const epsilon = 0.1;
+  const isValid = Math.abs(sumPercent - 100) < epsilon;
+  
+  let percentColor = "";
+  let percentMsg = "";
+  
+  if (sumPercent < 100 - epsilon) {
+    percentMsg = `Need ${Math.round((100 - sumPercent) * 10) / 10}% more`;
+    percentColor = "text-red-500";
+  } else if (sumPercent > 100 + epsilon) {
+    percentMsg = `Remove ${Math.round((sumPercent - 100) * 10) / 10}%`;
+    percentColor = "text-red-500";
+  } else {
+    percentMsg = "Cuts balanced ✓";
+    percentColor = "text-green-400";
+  }
 
   return (
     <>

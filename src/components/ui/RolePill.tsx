@@ -11,28 +11,28 @@ export type RolePillProps = {
 
 export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete, onPercentChange }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [percentStr, setPercentStr] = useState(role.percentStr || role.percent.toString());
+  const [tempPercentStr, setTempPercentStr] = useState(role.percentStr || role.percentNum.toString());
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     // Allow empty or numeric digits only (up to 3 digits)
     if (v === '' || /^\d{0,3}$/.test(v)) {
-      setPercentStr(v);
+      setTempPercentStr(v);
     }
   };
 
   const handleBlur = () => {
     setIsEditing(false);
-    const parsed = parseInt(percentStr, 10);
-    const final = isNaN(parsed) ? 0 : Math.min(parsed, 100);
+    const parsed = parseInt(tempPercentStr, 10);
+    const final = isNaN(parsed) || tempPercentStr === '' ? 0 : Math.max(0, Math.min(parsed, 100));
     
     // Update the role's percent if we have a callback
     if (onPercentChange) {
       onPercentChange(final);
     }
     
-    // Sync string state
-    setPercentStr(final.toString());
+    // Sync string state with final value
+    setTempPercentStr(final.toString());
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -40,15 +40,22 @@ export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete, onPe
       handleBlur();
     }
     if (e.key === 'Escape') {
-      setPercentStr(role.percentStr || role.percent.toString());
+      setTempPercentStr(role.percentStr || role.percentNum.toString());
       setIsEditing(false);
     }
   };
 
-  // Sync with role prop changes
+  const handleFocus = () => {
+    setIsEditing(true);
+    setTempPercentStr(role.percentStr || role.percentNum.toString());
+  };
+
+  // Sync with role prop changes when not editing
   React.useEffect(() => {
-    setPercentStr(role.percentStr || role.percent.toString());
-  }, [role.percentStr, role.percent]);
+    if (!isEditing) {
+      setTempPercentStr(role.percentStr || role.percentNum.toString());
+    }
+  }, [role.percentStr, role.percentNum, isEditing]);
 
   return (
     <span
@@ -60,19 +67,20 @@ export const RolePill: React.FC<RolePillProps> = ({ role, onEdit, onDelete, onPe
       {isEditing ? (
         <input
           type="text"
-          value={percentStr}
+          value={tempPercentStr}
           onChange={handleChange}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           className="ml-1 w-12 bg-transparent border-none outline-none font-mono tracking-tight text-center"
           autoFocus
+          placeholder="0"
         />
       ) : (
         <span 
           className="ml-1 font-mono tracking-tight cursor-pointer hover:bg-accent/10 px-1 rounded"
-          onClick={() => setIsEditing(true)}
+          onClick={handleFocus}
         >
-          {role.percentNum || role.percent}%
+          {role.percentNum || 0}%
         </span>
       )}
       {onEdit && (
