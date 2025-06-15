@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -33,6 +34,12 @@ const Index: React.FC = () => {
         <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.15] hero-title py-2 mt-2 max-w-3xl">
           TALENT &gt; MONEY
         </h1>
+        {/* Sub-line copy as requested */}
+        <div
+          className="text-[18px] text-[#E0E0E0] tracking-[0.5px] max-w-[480px] mx-auto text-center mb-4"
+        >
+          Launch a drop, mint the funds, stream the payouts.
+        </div>
         <div className="hero-tagline tagline mb-4 max-w-xl w-full text-lg md:text-xl text-success text-center mx-auto">
           Launch your project, mint the funds, stream the payouts.
         </div>
@@ -87,3 +94,4 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+
