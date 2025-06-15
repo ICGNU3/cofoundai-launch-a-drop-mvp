@@ -560,6 +560,7 @@ export type Database = {
           pledge_usdc: number | null
           project_idea: string
           project_type: string
+          status: string | null
           streams_active: boolean | null
           token_address: string | null
           tx_hash: string | null
@@ -579,6 +580,7 @@ export type Database = {
           pledge_usdc?: number | null
           project_idea: string
           project_type: string
+          status?: string | null
           streams_active?: boolean | null
           token_address?: string | null
           tx_hash?: string | null
@@ -598,6 +600,7 @@ export type Database = {
           pledge_usdc?: number | null
           project_idea?: string
           project_type?: string
+          status?: string | null
           streams_active?: boolean | null
           token_address?: string | null
           tx_hash?: string | null

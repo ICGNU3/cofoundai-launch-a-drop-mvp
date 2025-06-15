@@ -14,6 +14,8 @@ interface SaveProjectParams {
   walletAddress: string | null;
   fundingTarget: number;
   expenseSum: number;
+  tokenAddress: string;
+  txHash: string;
 }
 
 export const useProjectSave = () => {
@@ -21,12 +23,12 @@ export const useProjectSave = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (params: SaveProjectParams & { tokenAddress: string; txHash: string }) => {
+    mutationFn: async (params: SaveProjectParams) => {
       if (!user?.id) throw new Error("User not authenticated");
 
       const pledgeNum = Number(params.pledgeUSDC) || 0;
 
-      // Create project
+      // Create project with status: 'minted'
       const { data: project, error: projectError } = await supabase
         .from("projects")
         .insert({
@@ -41,6 +43,7 @@ export const useProjectSave = () => {
           tx_hash: params.txHash,
           escrow_funded_amount: pledgeNum,
           streams_active: false,
+          status: "minted",
         })
         .select()
         .single();

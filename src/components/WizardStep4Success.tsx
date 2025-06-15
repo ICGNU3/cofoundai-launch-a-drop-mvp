@@ -15,6 +15,7 @@ import { ProjectActionButtons } from "./ProjectActionButtons";
 import { AIContentGenerationHub } from "./AIContentGenerationHub";
 import Confetti from "react-confetti";
 import { useToast } from "@/hooks/use-toast";
+import { useProjectById } from "@/hooks/useProjectById";
 
 interface WizardStep4SuccessProps {
   projectIdea: string;
@@ -67,16 +68,19 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   // Keep track of latest cover IPFS
   const [coverIpfs, setCoverIpfs] = useState<string | null>(null);
 
+  // Store projectId when created so we can query it later
+  const [projectId, setProjectId] = useState<string | null>(null);
+
+  // Fetch project from DB after mint
+  const { data: projectRow, isLoading: isProjectLoading } = useProjectById(projectId);
+
+  // Mint handler: sets loading, disables button, and saves project in DB with status 'minted'
   const handleMintAndFund = async () => {
     if (!walletAddress) return;
     setLoadingMint(true);
     try {
-      // infer tokenSymbol, e.g. from projectIdea or user input. Here set fallback:
-      const tokenSymbol = "DROP"; // REPLACE as needed to pull actual symbol
-
-      // pass coverBase64 + symbol to simulateMinting
+      const tokenSymbol = "DROP";
       const mintData = await simulateMinting({ coverBase64, tokenSymbol });
-
       setCoverIpfs(mintData.ipfsHash);
       const project = await saveProjectMutation.mutateAsync({
         projectIdea,
@@ -89,7 +93,6 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
         expenseSum,
         tokenAddress: mintData.tokenAddress,
         txHash: mintData.txHash,
-        // Do NOT pass coverIpfs: ... (fixes build error)
       });
       setProjectId(project.id);
       sessionStorage.setItem('autoNavigateToProject', project.id);
@@ -98,13 +101,20 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
       pollUSDCxBalance();
     } catch (error) {
       console.error("Mint and fund error:", error);
-      // Overlay will show "Mint failed" as handled in MintingLoadingOverlay
     } finally {
       setLoadingMint(false);
     }
   };
 
-  // Show confetti when projectId exists and minting is "complete"
+  // Redirect if projectRow exists & status !== 'complete'
+  useEffect(() => {
+    if (projectRow && projectRow.status !== "complete" && projectRow.id) {
+      // Always redirect to dashboard unless status=complete
+      navigate(`/project/${projectRow.id}/dashboard`);
+    }
+  }, [projectRow, navigate]);
+
+  // Show confetti if complete
   useEffect(() => {
     if (projectId && currentStep === "complete") {
       setShowConfetti(true);
@@ -144,6 +154,18 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
         });
       });
   };
+
+  // Render loading or main UI
+  if (isProjectLoading || (projectId && !projectRow)) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <span className="text-body-text/80">Loading drop details...</span>
+      </div>
+    );
+  }
+
+  // If projectRow is minted, show collect link & pledge status
+  const isMinted = projectRow?.status === "minted";
 
   return (
     <div className="space-y-6 relative" ref={containerRef}>
@@ -215,6 +237,28 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
             expenseSum={expenseSum}
             fundingTarget={fundingTarget}
           />
+
+          {isMinted && (
+            <div className="text-center my-4">
+              <a
+                href={projectRow?.token_address ? `https://zora.co/collect/${projectRow.token_address}` : "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded shadow hover:bg-primary/90"
+                style={{ pointerEvents: projectRow?.token_address ? "auto" : "none", opacity: projectRow?.token_address ? 1 : 0.5 }}
+              >
+                Collect Drop
+              </a>
+              <div className="mt-2 text-sm">
+                <span className="font-semibold text-accent">Pledge status:</span>{" "}
+                <span>
+                  {projectRow?.pledge_usdc && Number(projectRow.pledge_usdc) > 0
+                    ? `Pledged ${projectRow.pledge_usdc} USDC`
+                    : "No pledge"}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Show Share button after successful launch */}
           {projectId && currentStep === "complete" && (
