@@ -28,10 +28,10 @@ const Index: React.FC = () => {
           </button>
         </div>
         <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.15] hero-title py-4 mt-4 max-w-3xl">
-          Launch Music, Art, or Ideas — with a single tap.
+          Talent stalls when money is missing.
         </h1>
         <div className="hero-tagline tagline mb-4 max-w-xl text-lg md:text-xl text-success">
-          Type your idea, assign roles and expenses, tap Launch. Mint, fund, and collaborate instantly with anyone.
+          CoFound AI unlocks funds in sixty seconds: mint a creator coin, lock fair splits, and stream cash to your crew the moment you hit Launch.
         </div>
         <AccentButton
           className="mt-4 sm:mt-6 px-8 py-4 text-lg rounded-xl shadow-lg hover:scale-105 transition-all"
