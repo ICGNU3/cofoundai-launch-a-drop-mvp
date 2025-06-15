@@ -20,6 +20,7 @@ import { ProjectChat } from "@/components/TeamManagement/ProjectChat";
 
 type ProjectWithDetails = {
   id: string;
+  owner_id: string;
   project_idea: string;
   project_type: string;
   token_address: string | null;
