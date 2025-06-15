@@ -68,7 +68,9 @@ const AdvancedTokenCustomization: React.FC<{
 
   // For simulation preview step
   const canProceed = () => {
-    return !!tokenName && !!tokenSymbol && totalSupply > 0 && Object.values(distribution).reduce((a, b) => a + b, 0) === 100;
+    // Typecast values as numbers to avoid TypeScript error
+    return !!tokenName && !!tokenSymbol && totalSupply > 0 &&
+      Object.values(distribution).reduce((a, b) => (a as number) + (b as number), 0) === 100;
   };
 
   return (

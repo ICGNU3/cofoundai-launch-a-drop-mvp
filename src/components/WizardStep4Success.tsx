@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,6 +21,25 @@ import { Wizard4MintingOverlaySection } from "./wizard4success/Wizard4MintingOve
 import { Wizard4SummarySection } from "./wizard4success/Wizard4SummarySection";
 import { Wizard4AIContentSection } from "./wizard4success/Wizard4AIContentSection";
 
+// --- TokenCustomization type for prop typing ---
+type TokenCustomization = {
+  name: string;
+  symbol: string;
+  tokenType: "erc20" | "erc721";
+  totalSupply: number;
+  mintingType: "fixed" | "inflation" | "deflation";
+  inflationRate: number;
+  deflationRate: number;
+  distribution: { team: number; treasury: number; publicSale: number };
+  vesting: { team: number; early: number };
+  utility: {
+    governance: boolean;
+    access: boolean;
+    staking: boolean;
+    custom: string;
+  };
+};
+
 interface WizardStep4SuccessProps {
   projectIdea: string;
   projectType: ProjectType;
@@ -29,6 +49,7 @@ interface WizardStep4SuccessProps {
   walletAddress: string | null;
   onRestart: () => void;
   coverBase64?: string | null; // add prop to pass cover image
+  tokenCustomization?: TokenCustomization; // Add this line
 }
 
 export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
@@ -40,6 +61,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   walletAddress,
   onRestart,
   coverBase64,
+  tokenCustomization,
 }) => {
   const navigate = useNavigate();
   const [projectId, setProjectId] = useState<string | null>(null);

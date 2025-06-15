@@ -9,9 +9,10 @@ import LandingFeaturesSection from "@/components/LandingFeaturesSection";
 import CreatorCarousel from "@/components/CreatorCarousel";
 import LiveCounterBar from "@/components/LiveCounterBar";
 import CrewSplitSliderDemo from "@/components/CrewSplitSliderDemo";
-
 // Import Avatar for carousel
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+// Add missing import for AdvancedTokenCustomization
+import AdvancedTokenCustomization from "@/components/AdvancedTokenCustomization/AdvancedTokenCustomization";
 
 const Index: React.FC = () => {
   const wizard = useWizardState();
