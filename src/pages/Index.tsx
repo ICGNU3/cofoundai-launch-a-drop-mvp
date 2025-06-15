@@ -100,11 +100,11 @@ const Index: React.FC = () => {
           </button>
         </div>
         <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.15] hero-title py-2 mt-2 max-w-3xl relative z-10">
-          TALENT &gt; MONEY
+          TALENT = MONEY
         </h1>
-        {/* Sub-headline with social proof */}
+        {/* Sub-headline without em dash and emojis */}
         <div className="text-lg text-[#E0E0E0] mt-4 max-w-xl mx-auto font-medium">
-          Build and fund creative projects with your team—experience instant streaming of funds as soon as you deliver.
+          Build and fund creative projects with your team. Experience instant streaming of funds as soon as you deliver.
         </div>
         {/* --- LIVE COUNTER BAR --- */}
         <LiveCounterBar counter={counter} />
@@ -116,7 +116,7 @@ const Index: React.FC = () => {
           aria-label="Launch a Drop"
         >
           <span className="inline-flex items-center gap-2">
-            <span className="text-gold">🌟</span> Launch a Drop <span className="text-gold">→</span>
+            Launch a Drop
           </span>
         </AccentButton>
         {/* NEW: Advanced Token Customization */}
@@ -125,7 +125,7 @@ const Index: React.FC = () => {
           onClick={() => setTokenModalOpen(true)}
         >
           <span className="inline-flex items-center gap-2">
-            <span className="text-gold">🪙</span> Advanced Token Customization
+            Advanced Token Customization
           </span>
         </AccentButton>
         {/* CREATOR CAROUSEL */}
