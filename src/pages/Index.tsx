@@ -86,10 +86,10 @@ const Index: React.FC = () => {
   const liveMetrics = (
     <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-3 text-success font-mono text-lg font-bold mb-1 select-none">
       <span className="sm:border-r sm:border-[#45e36e88] pr-4">
-        ${counter.total.toLocaleString()} streamed
+        ${counter.total.toLocaleString()} funded by everyday creators
       </span>
       <span className="pl-0 sm:pl-4">
-        {counter.drops} drops funded
+        {counter.drops} drops launched
       </span>
     </div>
   );
@@ -97,19 +97,19 @@ const Index: React.FC = () => {
   // Steps
   const steps = [
     {
-      label: "Describe & Launch",
-      desc: "Enter your project idea, choose roles — one click to go live.",
-      emoji: "✍️",
+      label: "Share Your Idea",
+      desc: "Describe what you want to create—no technical skills or jargon.",
+      emoji: "💡",
     },
     {
-      label: "Fund & Collaborate",
-      desc: "Share your drop link; everyone pledges, no wallet guessing.",
-      emoji: "💸",
+      label: "Invite Anyone to Join",
+      desc: "Friends or strangers can support you, even with tiny amounts.",
+      emoji: "🤝",
     },
     {
-      label: "Mint & Stream",
-      desc: "Funds are streamed as you deliver. Your team always gets paid.",
-      emoji: "🚀",
+      label: "Build & Earn Together",
+      desc: "Funds are split as you deliver. Everyone gets paid, no big upfronts.",
+      emoji: "🌱",
     },
   ];
 
@@ -135,12 +135,13 @@ const Index: React.FC = () => {
           </button>
         </div>
         {/* HEADLINE */}
-        <h1 className="text-center font-headline font-bold text-[2.5rem] md:text-[3rem] lg:text-[3.2rem] leading-[1.13] hero-title py-2 mt-2 max-w-3xl relative z-10">
-          Unlock Onchain Teamwork for Creators
+        <h1 className="text-center font-headline font-bold text-[2.3rem] md:text-[2.7rem] lg:text-[3rem] leading-[1.13] hero-title py-2 mt-2 max-w-3xl relative z-10">
+          Launch Creative Projects <span className="text-accent">With Almost No Money</span>
         </h1>
         {/* SUBHEADLINE */}
         <div className="text-lg text-[#e4f9ea] mt-4 max-w-xl mx-auto font-medium text-center mb-1">
-          Launch projects, invite your crew, and stream funds as you create. No code, no gatekeepers.
+          Invite your team, share your idea, and let anyone back your project.<br />
+          You don’t need a big budget—or any wallet know-how—to get started.
         </div>
         {/* LIVE METRICS */}
         {liveMetrics}
@@ -150,16 +151,28 @@ const Index: React.FC = () => {
           className="hero-cta mt-7 px-8 py-4 text-lg rounded-xl shadow-lg hover:scale-105 transition-all font-bold z-20"
           style={{ background: 'linear-gradient(90deg,#5D5FEF 0%,#9A4DFF 100%)', boxShadow: '0 0 16px rgba(93,95,239,.6)' }}
           onClick={wizard.openWizard}
-          aria-label="Launch a Drop"
+          aria-label="Launch a Project"
         >
-          Launch My Drop
+          Start My Project Free
         </AccentButton>
 
         {/* HOW IT WORKS */}
         <div className="w-full flex flex-col items-center gap-3 mt-12 mb-2">
           <h2 className="text-xl md:text-2xl font-bold text-accent mb-3">How it works</h2>
           <div className="flex flex-col md:flex-row gap-5 md:gap-7 justify-center">
-            {steps.map(({label, desc, emoji}, i) => (
+            {[{
+              label: "Share Your Idea",
+              desc: "Describe what you want to create—no technical skills or jargon.",
+              emoji: "💡",
+            }, {
+              label: "Invite Anyone to Join",
+              desc: "Friends or strangers can support you, even with tiny amounts.",
+              emoji: "🤝",
+            }, {
+              label: "Build & Earn Together",
+              desc: "Funds are split as you deliver. Everyone gets paid, no big upfronts.",
+              emoji: "🌱",
+            }].map(({label, desc, emoji}) => (
               <div key={label} className="bg-card border border-accent/20 rounded-xl px-5 py-6 md:py-7 flex flex-col items-center max-w-xs shadow-md">
                 <div className="text-3xl mb-2">{emoji}</div>
                 <div className="font-headline text-accent font-bold mb-1">{label}</div>
@@ -210,7 +223,9 @@ const Index: React.FC = () => {
       {/* FOOTER */}
       <footer className="py-8 border-t border-border bg-[#101910] w-full text-center mt-auto z-[5]">
         <div className="flex flex-col md:flex-row justify-center items-center gap-3 mb-2 text-sm text-tagline font-mono">
-          <span>Audited, non-custodial, open source.</span>
+          <span>
+            100% non-custodial, no-code, free to start. 
+          </span>
           <a href="https://discord.com/invite/lovable" target="_blank" rel="noopener noreferrer" className="mx-2 hover:text-accent underline">Join Discord</a>
           <a href="https://x.com/lovableai" target="_blank" rel="noopener noreferrer" className="mx-2 hover:text-accent underline">X (Twitter)</a>
           <a href="https://docs.lovable.dev" target="_blank" rel="noopener noreferrer" className="mx-2 hover:text-accent underline">Docs</a>

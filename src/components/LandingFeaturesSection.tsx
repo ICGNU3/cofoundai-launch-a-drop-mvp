@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Rocket, Users, DollarSign } from "lucide-react";
 
@@ -8,8 +9,8 @@ const features = [
         <Rocket className="text-white w-7 h-7 drop-shadow-lg" />
       </div>
     ),
-    title: "Instant Onchain Launch",
-    desc: "Start a drop, invite your team, and fund in minutes. No gatekeeping.",
+    title: "Start With Zero Upfront",
+    desc: "No big budgets required to launch—just your idea and a community.",
   },
   {
     icon: (
@@ -17,8 +18,8 @@ const features = [
         <Users className="text-white w-7 h-7 drop-shadow-lg" />
       </div>
     ),
-    title: "Crystal Clear Roles",
-    desc: "Define each collaborator’s share up front for total transparency.",
+    title: "Anyone Can Back You",
+    desc: "Collect support from friends, fans, or collaborators—even small amounts matter.",
   },
   {
     icon: (
@@ -26,15 +27,15 @@ const features = [
         <DollarSign className="text-white w-7 h-7 drop-shadow-lg" />
       </div>
     ),
-    title: "Wallet & Mint Built In",
-    desc: "Pledge, mint, and payout in a single flow. Works on desktop & mobile.",
+    title: "Get Paid as You Build",
+    desc: "Funds are split automatically as you and your team deliver.",
   },
 ];
 
 const LandingFeaturesSection: React.FC = () => (
   <section className="w-full max-w-4xl mx-auto py-10 px-2 grid gap-8">
     <h2 className="text-2xl font-headline font-bold text-center text-success mb-7 drop-shadow">
-      Why creators choose us
+      Built for Everyone, Not Just Crypto Natives
     </h2>
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
       {features.map(({ icon, title, desc }) => (
@@ -52,3 +53,4 @@ const LandingFeaturesSection: React.FC = () => (
 );
 
 export default LandingFeaturesSection;
+
