@@ -158,7 +158,9 @@ export const WizardModal: React.FC<{
         const USDC = "0xd35CceEAD182dcee0F148EbaC9447DA2c4D449c4";
         const USDCX = "0x4086eBf75233e8492bA044F4b5632F3A63fC25bA";
 
-        const sf = await getSuperfluidFramework(84532, signer.provider);
+        // Ensure provider param is ethers.providers.Web3Provider or JsonRpcProvider
+        const provider = signer.provider as ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
+        const sf = await getSuperfluidFramework(84532, provider);
         const usdcx = await loadSuperToken(sf, USDCX);
 
         // Approve USDC -> USDCx if necessary
@@ -194,8 +196,9 @@ export const WizardModal: React.FC<{
     try {
       if (!signer) throw new Error("No signer - connect your wallet.");
 
-      // Prepare Superfluid framework
-      const sf = await getSuperfluidFramework(84532, signer.provider);
+      // Ensure correct provider type for Superfluid
+      const provider = signer.provider as ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
+      const sf = await getSuperfluidFramework(84532, provider);
 
       // USDCx contract (Base Sepolia)
       const USDCX = "0x4086eBf75233e8492bA044F4b5632F3A63fC25bA";

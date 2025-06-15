@@ -1,4 +1,5 @@
 
+
 import { Framework, type SuperToken } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
 
@@ -26,7 +27,8 @@ export async function upgradeToSuperToken(
   signer: ethers.Signer
 ) {
   // This method returns a transaction operation, then executes it
-  const upgradeOp = superToken.upgrade({ amount });
+  // Some SuperToken SDK typings may miss .upgrade -- force as any if needed
+  const upgradeOp = (superToken as any).upgrade({ amount });
   return await upgradeOp.exec(signer);
 }
 
@@ -55,3 +57,4 @@ export function calculateFlowRate(total: ethers.BigNumber, percent: number) {
   // Return as string for SDK
   return share.div(secondsInMonth).toString();
 }
+

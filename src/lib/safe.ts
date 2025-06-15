@@ -1,6 +1,7 @@
+
 // Fix for incompatible ethers version: use require() instead of direct import in EthersAdapter (Safe expects v5)
 import { ethers } from 'ethers';
-import SafeFactory, { SafeAccountConfig } from '@safe-global/protocol-kit';
+import SafeFactory, { SafeAccountConfig } from '@safe-global/protocol-kit'; // <-- Ensure this is default import
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 
 const RPC = 'https://sepolia.base.org'; // Base Sepolia
