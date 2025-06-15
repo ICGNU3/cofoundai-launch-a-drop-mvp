@@ -12,6 +12,8 @@ export interface Role {
   percentNum: number; // For calculations
   percentStr: string; // For input display
   isFixed: false;
+  description?: string; // ADDED: long text
+  skills?: string[];    // ADDED: flexible skills tag list
 }
 export interface Expense {
   expenseName: string;

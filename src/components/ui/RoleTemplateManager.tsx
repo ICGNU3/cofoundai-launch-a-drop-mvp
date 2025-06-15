@@ -1,8 +1,12 @@
-
 import React, { useState } from "react";
 import type { Role } from "@/hooks/useWizardState";
 import { useRoleTemplates } from "@/hooks/useRoleTemplates";
 import { useToast } from "@/hooks/use-toast";
+
+type RoleTemplate = {
+  name: string;
+  roles: Role[];
+};
 
 type RoleTemplateManagerProps = {
   roles: Role[];
@@ -60,7 +64,7 @@ export const RoleTemplateManager: React.FC<RoleTemplateManagerProps> = ({
         {showTemplateMenu ? "Hide Templates" : "Role Templates"}
       </button>
       {showTemplateMenu && (
-        <div className="rounded border border-border bg-card p-3 text-xs mt-2 space-y-3">
+        <div className="rounded border border-border bg-card p-3 text-xs mt-2 space-y-3 z-40">
           <div>
             <div className="font-semibold mb-2">Save Current as Template</div>
             <div className="flex gap-2">

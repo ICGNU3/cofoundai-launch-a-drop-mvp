@@ -11,21 +11,33 @@ export function useRoleTemplates() {
   const [templates, setTemplates] = useState<RoleTemplate[]>([]);
 
   const saveTemplate = (name: string, roles: Role[]) => {
-    // Overwrite if name exists, else add
     setTemplates(prev => {
       const idx = prev.findIndex(t => t.name === name);
+      // Deep copy skills & descriptions to prevent mutations
+      const deepRoles = roles.map(r => ({
+        ...r,
+        description: r.description || "",
+        skills: Array.isArray(r.skills) ? [...r.skills] : []
+      }));
       if (idx !== -1) {
         const copy = [...prev];
-        copy[idx] = { name, roles };
+        copy[idx] = { name, roles: deepRoles };
         return copy;
       }
-      return [...prev, { name, roles }];
+      return [...prev, { name, roles: deepRoles }];
     });
   };
 
   const loadTemplate = (name: string): Role[] | undefined => {
     const found = templates.find(t => t.name === name);
-    return found ? found.roles : undefined;
+    // Defensive copy again
+    return found
+      ? found.roles.map(r => ({
+          ...r,
+          description: r.description || "",
+          skills: Array.isArray(r.skills) ? [...r.skills] : []
+        }))
+      : undefined;
   };
 
   const deleteTemplate = (name: string) => {

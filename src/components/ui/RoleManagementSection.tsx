@@ -1,4 +1,3 @@
-
 import React from "react";
 import { PercentBar } from "./PercentBar";
 import { RolesList } from "./RolesList";
@@ -6,7 +5,7 @@ import { RolePercentageStatus } from "./RolePercentageStatus";
 import type { Role } from "@/hooks/useWizardState";
 
 type RoleManagementSectionProps = {
-  roles: Role[];
+  roles: any[]; // using any here to allow enhanced roles
   onEditRole: (idx: number) => void;
   onRemoveRole: (idx: number) => void;
   onAddRole: () => void;
@@ -25,7 +24,6 @@ export const RoleManagementSection: React.FC<RoleManagementSectionProps> = ({
   return (
     <>
       <PercentBar used={sumPercent} />
-      
       <RolesList
         roles={roles}
         onEditRole={onEditRole}
@@ -33,7 +31,6 @@ export const RoleManagementSection: React.FC<RoleManagementSectionProps> = ({
         onAddRole={onAddRole}
         onUpdateRolePercent={onUpdateRolePercent}
       />
-
       <RolePercentageStatus sumPercent={sumPercent} />
     </>
   );
