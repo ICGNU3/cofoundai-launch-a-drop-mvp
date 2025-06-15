@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -40,9 +39,7 @@ const Index: React.FC = () => {
         >
           Launch a drop, mint the funds, stream the payouts.
         </div>
-        <div className="hero-tagline tagline mb-4 max-w-xl w-full text-lg md:text-xl text-success text-center mx-auto">
-          Launch your project, mint the funds, stream the payouts.
-        </div>
+        {/* Removed duplicated tagline */}
         <AccentButton
           className="mt-4 sm:mt-6 px-8 py-4 text-lg rounded-xl shadow-lg hover:scale-105 transition-all"
           onClick={wizard.openWizard}
@@ -94,4 +91,3 @@ const Index: React.FC = () => {
 };
 
 export default Index;
-
