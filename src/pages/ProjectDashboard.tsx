@@ -14,6 +14,9 @@ import { FundingProgressSection } from "@/components/FundingProgressSection";
 import { ActiveStreamsSection } from "@/components/ActiveStreamsSection";
 import { AllRolesSection } from "@/components/AllRolesSection";
 import { NavigationSection } from "@/components/NavigationSection";
+import { TeamDirectory } from "@/components/TeamManagement/TeamDirectory";
+import { RolePermissionsPanel } from "@/components/TeamManagement/RolePermissionsPanel";
+import { ProjectChat } from "@/components/TeamManagement/ProjectChat";
 
 type ProjectWithDetails = {
   id: string;
@@ -116,6 +119,11 @@ const ProjectDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background px-4 py-8">
       <div className="max-w-4xl mx-auto">
+        {/* Team Management Module */}
+        <TeamDirectory projectId={projectId!} projectOwnerId={project.owner_id} currentUserId={user?.id || null} />
+        <RolePermissionsPanel projectId={projectId!} currentUserId={user?.id || null} userIsOwner={user?.id === project.owner_id} />
+        <ProjectChat projectId={projectId!} teamMemberId={null} />
+
         {/* Collaborators Section */}
         <CollaboratorsSection projectId={projectId!} />
 

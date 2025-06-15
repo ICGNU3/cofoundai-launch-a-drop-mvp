@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      contribution_checklists: {
+        Row: {
+          completed_at: string | null
+          description: string
+          id: string
+          is_completed: boolean | null
+          project_id: string
+          team_member_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          description: string
+          id?: string
+          is_completed?: boolean | null
+          project_id: string
+          team_member_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          description?: string
+          id?: string
+          is_completed?: boolean | null
+          project_id?: string
+          team_member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contribution_checklists_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contribution_checklists_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       funding_events: {
         Row: {
           amount: number
@@ -34,6 +76,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "funding_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_steps: {
+        Row: {
+          id: string
+          project_id: string | null
+          role_name: string
+          step_description: string | null
+          step_order: number | null
+          step_title: string
+        }
+        Insert: {
+          id?: string
+          project_id?: string | null
+          role_name: string
+          step_description?: string | null
+          step_order?: number | null
+          step_title: string
+        }
+        Update: {
+          id?: string
+          project_id?: string | null
+          role_name?: string
+          step_description?: string | null
+          step_order?: number | null
+          step_title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_steps_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -249,6 +326,167 @@ export type Database = {
           zora_coin_url?: string | null
         }
         Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          id: string
+          permission: string
+          project_id: string
+          role_name: string
+        }
+        Insert: {
+          id?: string
+          permission: string
+          project_id: string
+          role_name: string
+        }
+        Update: {
+          id?: string
+          permission?: string
+          project_id?: string
+          role_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_invitations: {
+        Row: {
+          accepted_at: string | null
+          assigned_role: string
+          created_at: string | null
+          declined_at: string | null
+          id: string
+          invited_by: string
+          invited_email: string | null
+          invited_wallet: string | null
+          project_id: string
+          status: string
+          token: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          assigned_role: string
+          created_at?: string | null
+          declined_at?: string | null
+          id?: string
+          invited_by: string
+          invited_email?: string | null
+          invited_wallet?: string | null
+          project_id: string
+          status?: string
+          token?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          assigned_role?: string
+          created_at?: string | null
+          declined_at?: string | null
+          id?: string
+          invited_by?: string
+          invited_email?: string | null
+          invited_wallet?: string | null
+          project_id?: string
+          status?: string
+          token?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invitations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          assigned_role: string
+          exited_at: string | null
+          id: string
+          invited_email: string | null
+          joined_at: string | null
+          onboarded: boolean | null
+          project_id: string
+          status: string
+          user_id: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          assigned_role: string
+          exited_at?: string | null
+          id?: string
+          invited_email?: string | null
+          joined_at?: string | null
+          onboarded?: boolean | null
+          project_id: string
+          status?: string
+          user_id?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          assigned_role?: string
+          exited_at?: string | null
+          id?: string
+          invited_email?: string | null
+          joined_at?: string | null
+          onboarded?: boolean | null
+          project_id?: string
+          status?: string
+          user_id?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          message_type: string | null
+          project_id: string
+          team_member_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          project_id: string
+          team_member_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          project_id?: string
+          team_member_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_messages_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
