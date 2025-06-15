@@ -1,12 +1,12 @@
 
 import React from "react";
 import { AccentButton } from "./ui/AccentButton";
-import type { ProjectType } from "@/hooks/useWizardState";
+import type { ProjectType, WizardStateData } from "@/hooks/useWizardState";
 
 interface WizardStep1DescribeProps {
   projectIdea: string;
   projectType: ProjectType;
-  onSetField: <K extends keyof any>(k: K, v: any) => void;
+  onSetField: <K extends keyof WizardStateData>(k: K, v: WizardStateData[K]) => void;
   onLoadDefaultRoles: (type: ProjectType) => void;
   canProceed: boolean;
   onNext: () => void;
@@ -21,7 +21,7 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
   onNext,
 }) => {
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-6 space-y-4 h-full overflow-y-auto">
       <div>
         <h2 className="text-2xl font-bold text-headline mb-2">Describe Your Project</h2>
         <p className="text-body-text/70">
