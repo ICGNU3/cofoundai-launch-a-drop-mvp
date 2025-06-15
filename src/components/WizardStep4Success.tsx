@@ -24,6 +24,7 @@ interface WizardStep4SuccessProps {
   pledgeUSDC: string;
   walletAddress: string | null;
   onRestart: () => void;
+  coverBase64?: string | null; // add prop to pass cover image
 }
 
 export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
@@ -34,6 +35,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   pledgeUSDC,
   walletAddress,
   onRestart,
+  coverBase64,
 }) => {
   const navigate = useNavigate();
   const [projectId, setProjectId] = useState<string | null>(null);
@@ -43,16 +45,16 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const { 
-    isMinting, 
-    currentStep, 
-    mintingStatus, 
-    progress, 
-    mintingSteps, 
-    simulateMinting, 
-    completeMinting 
+  const {
+    isMinting,
+    currentStep,
+    mintingStatus,
+    progress,
+    mintingSteps,
+    simulateMinting,
+    completeMinting
   } = useMintingProcess();
-  
+
   const { usdcxBalanceConfirmed, isPollingBalance, pollUSDCxBalance } = useUSDCxBalance();
   const saveProjectMutation = useProjectSave();
 
@@ -61,12 +63,19 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   const pledgeNum = Number(pledgeUSDC) || 0;
   const fundingTarget = expenseSum + pledgeNum;
 
+  // Keep track of latest cover IPFS
+  const [coverIpfs, setCoverIpfs] = useState<string | null>(null);
+
   const handleMintAndFund = async () => {
     if (!walletAddress) return;
-
     try {
-      const mintData = await simulateMinting();
-      
+      // infer tokenSymbol, e.g. from projectIdea or user input. Here set fallback:
+      const tokenSymbol = "DROP"; // REPLACE as needed to pull actual symbol
+
+      // pass coverBase64 + symbol to simulateMinting
+      const mintData = await simulateMinting({ coverBase64, tokenSymbol });
+
+      setCoverIpfs(mintData.ipfsHash);
       const project = await saveProjectMutation.mutateAsync({
         projectIdea,
         projectType,
@@ -76,12 +85,12 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
         walletAddress,
         fundingTarget,
         expenseSum,
+        coverIpfs: mintData.ipfsHash,
         ...mintData,
       });
-
       setProjectId(project.id);
       sessionStorage.setItem('autoNavigateToProject', project.id);
-      
+
       completeMinting();
       pollUSDCxBalance();
 
@@ -165,6 +174,35 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
         </TabsList>
 
         <TabsContent value="summary" className="space-y-6">
+          {/* Show Cover Art (with IPFS link if available) */}
+          {(coverBase64 || coverIpfs) && (
+            <div className="w-full flex flex-col items-center">
+              <label className="mb-1 text-sm text-body-text/60">Your Cover Art:</label>
+              <a
+                href={coverIpfs ? `https://ipfs.io/ipfs/${coverIpfs}` : undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                tabIndex={0}
+                aria-label="Open uploaded cover on IPFS"
+                className="block rounded border-2 border-accent shadow-lg p-1 max-w-[240px] hover:scale-105 transition mb-2"
+                style={{ pointerEvents: coverIpfs ? "auto" : "none", opacity: coverIpfs ? 1 : 0.7 }}
+              >
+                <img
+                  src={coverBase64 || (coverIpfs ? `https://ipfs.io/ipfs/${coverIpfs}` : "")}
+                  alt="Uploaded Cover Art"
+                  className="rounded max-h-48 w-auto"
+                />
+              </a>
+              {coverIpfs && (
+                <small className="text-xs text-accent">
+                  <a href={`https://ipfs.io/ipfs/${coverIpfs}`} target="_blank" rel="noopener noreferrer">
+                    View on IPFS
+                  </a>
+                </small>
+              )}
+            </div>
+          )}
+
           <ProjectSummaryCard
             projectIdea={projectIdea}
             projectType={projectType}

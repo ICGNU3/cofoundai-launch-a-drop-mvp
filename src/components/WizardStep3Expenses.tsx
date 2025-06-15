@@ -1,9 +1,9 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { AccentButton } from "./ui/AccentButton";
 import { ExpensePill } from "./ui/ExpensePill";
 import { AddExpenseModal } from "./ui/AddExpenseModal";
-
+import { useToast } from "@/hooks/use-toast";
 import type { Expense } from "@/hooks/useWizardState";
 
 interface WizardStep3ExpensesProps {
@@ -15,7 +15,8 @@ interface WizardStep3ExpensesProps {
   pledgeUSDC: string;
   walletAddress: string | null;
   setStep: (s: 1 | 2 | 3 | 4) => void;
-  roles: any[]; // Add roles prop to check percentage sum
+  roles: any[];
+  coverBase64?: string | null;
 }
 
 export const WizardStep3Expenses: React.FC<WizardStep3ExpensesProps> = ({
@@ -27,9 +28,13 @@ export const WizardStep3Expenses: React.FC<WizardStep3ExpensesProps> = ({
   pledgeUSDC,
   walletAddress,
   setStep,
-  roles = [], // Default to empty array
+  roles = [],
+  coverBase64,
 }) => {
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  const [uploading, setUploading] = useState(false);
 
   const upfrontExpenses = expenses.filter(e => e.payoutType === "immediate");
   const uponOutcomeExpenses = expenses.filter(e => e.payoutType === "uponOutcome");
@@ -40,10 +45,30 @@ export const WizardStep3Expenses: React.FC<WizardStep3ExpensesProps> = ({
   // Calculate percentage sum from roles
   const percentSum = roles.reduce((sum, role) => sum + (role.percent || 0), 0);
 
-  // Determine if Mint & Fund should be disabled
-  const hasExpensesOrPledge = expenses.length > 0 || pledgeNum > 0;
-  const isPercentBalanced = percentSum === 100;
-  const canMintAndFund = isPercentBalanced || hasExpensesOrPledge;
+  // Include coverBase64 and file size validation
+  const canMintAndFund = percentSum === 100
+    && !!walletAddress
+    && !!coverBase64;
+
+  // COVER IMAGE HANDLER
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!["image/png", "image/jpeg"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Please upload a PNG/JPG under 5 MB.",
+        variant: "destructive"
+      });
+      setField("coverBase64", null);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const base64 = ev.target?.result as string;
+      setField("coverBase64", base64);
+    };
+    reader.readAsDataURL(file);
+  }
 
   return (
     <div>
@@ -84,6 +109,27 @@ export const WizardStep3Expenses: React.FC<WizardStep3ExpensesProps> = ({
           You need <span className="font-semibold text-accent">${expenseSum.toFixed(2)}</span> USDC +{' '}
           {pledgeNum > 0 ? <>{pledgeNum} (pledge)</> : <>any extra for revenue splits</>}
         </div>
+        
+        {/* COVER IMAGE UPLOAD */}
+        <label className="block text-sm mb-2 mt-6">Cover image (PNG/JPG, max 5 MB)</label>
+        <input
+          type="file"
+          id="coverFile"
+          accept="image/png,image/jpeg"
+          className="w-full rounded bg-[#1E1E1E] border border-[#444] p-3"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+        />
+        {/* Preview */}
+        {coverBase64 && (
+          <img
+            src={coverBase64}
+            alt="Cover Preview"
+            className="mt-4 max-h-48 rounded border border-accent"
+            style={{ display: "block" }}
+          />
+        )}
+
         <label className="block mt-5 mb-1 font-semibold text-body-text">
           (Optional) Pledge in USDC
         </label>
@@ -113,14 +159,14 @@ export const WizardStep3Expenses: React.FC<WizardStep3ExpensesProps> = ({
           )}
           <AccentButton
             className="w-full"
-            disabled={!walletAddress || !canMintAndFund}
+            disabled={!canMintAndFund}
             onClick={() => setStep(4)}
           >
             Mint &amp; Fund
           </AccentButton>
           {!canMintAndFund && (
             <div className="text-xs text-red-400 text-center">
-              Need balanced percentages (100%) or at least one expense/pledge
+              Need balanced percentages (100%), wallet, and a cover image
             </div>
           )}
           <AccentButton

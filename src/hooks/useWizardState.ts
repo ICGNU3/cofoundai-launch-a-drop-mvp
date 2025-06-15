@@ -35,6 +35,7 @@ export interface WizardStateData {
   pledgeUSDC: string;
   walletAddress: string | null;
   isWizardOpen: boolean;
+  coverBase64?: string | null; // ADDED: Uploaded cover art base64 string
 }
 
 const defaultIdea = "Lo-Fi Night Drive EP";
@@ -60,6 +61,7 @@ export function useWizardState() {
     pledgeUSDC: "",
     walletAddress: null,
     isWizardOpen: false,
+    coverBase64: null, // ADDED
   });
 
   const setStep = (step: WizardStep) => setState(s => ({ ...s, step }));
