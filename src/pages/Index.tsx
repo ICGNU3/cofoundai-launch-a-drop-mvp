@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -7,7 +6,7 @@ import FullWaveBackground from "@/components/FullWaveBackground";
 import { Web3WalletModule } from "@/components/Web3WalletModule";
 import { Wallet } from "lucide-react";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
-import { AdvancedTokenCustomization } from "@/components/AdvancedTokenCustomization/AdvancedTokenCustomization";
+import AdvancedTokenCustomization from "@/components/AdvancedTokenCustomization/AdvancedTokenCustomization";
 
 const Index: React.FC = () => {
   const wizard = useWizardState();
@@ -88,4 +87,3 @@ const Index: React.FC = () => {
 };
 
 export default Index;
-
