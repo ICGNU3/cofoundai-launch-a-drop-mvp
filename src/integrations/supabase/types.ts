@@ -117,6 +117,8 @@ export type Database = {
           name: string
           percent: number
           project_id: string | null
+          stream_active: boolean | null
+          stream_flow_rate: number | null
           wallet_address: string | null
         }
         Insert: {
@@ -124,6 +126,8 @@ export type Database = {
           name: string
           percent: number
           project_id?: string | null
+          stream_active?: boolean | null
+          stream_flow_rate?: number | null
           wallet_address?: string | null
         }
         Update: {
@@ -131,6 +135,8 @@ export type Database = {
           name?: string
           percent?: number
           project_id?: string | null
+          stream_active?: boolean | null
+          stream_flow_rate?: number | null
           wallet_address?: string | null
         }
         Relationships: [
@@ -147,6 +153,8 @@ export type Database = {
         Row: {
           cover_art_url: string | null
           created_at: string | null
+          escrow_funded_amount: number | null
+          expense_sum: number | null
           funding_target: number | null
           funding_total: number | null
           id: string
@@ -155,12 +163,17 @@ export type Database = {
           pledge_usdc: number | null
           project_idea: string
           project_type: string
+          streams_active: boolean | null
+          token_address: string | null
+          tx_hash: string | null
           wallet_address: string | null
           zora_coin_url: string | null
         }
         Insert: {
           cover_art_url?: string | null
           created_at?: string | null
+          escrow_funded_amount?: number | null
+          expense_sum?: number | null
           funding_target?: number | null
           funding_total?: number | null
           id?: string
@@ -169,12 +182,17 @@ export type Database = {
           pledge_usdc?: number | null
           project_idea: string
           project_type: string
+          streams_active?: boolean | null
+          token_address?: string | null
+          tx_hash?: string | null
           wallet_address?: string | null
           zora_coin_url?: string | null
         }
         Update: {
           cover_art_url?: string | null
           created_at?: string | null
+          escrow_funded_amount?: number | null
+          expense_sum?: number | null
           funding_target?: number | null
           funding_total?: number | null
           id?: string
@@ -183,6 +201,9 @@ export type Database = {
           pledge_usdc?: number | null
           project_idea?: string
           project_type?: string
+          streams_active?: boolean | null
+          token_address?: string | null
+          tx_hash?: string | null
           wallet_address?: string | null
           zora_coin_url?: string | null
         }
