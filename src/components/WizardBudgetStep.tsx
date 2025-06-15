@@ -285,7 +285,7 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
         defaultRole={editingRoleIdx !== null ? roles[editingRoleIdx] : undefined}
         onClose={() => setRoleModalOpen(false)}
         onSave={role => {
-          const roleWithPercent = {
+          const roleWithPercent: Role = {
             ...role,
             percentNum: role.percent || 10,
             percentStr: (role.percent || 10).toString(),
