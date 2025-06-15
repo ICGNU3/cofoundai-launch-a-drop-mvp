@@ -1,25 +1,17 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { Sparkles, Wand2, Share } from "lucide-react";
 import type { Role, Expense, ProjectType } from "@/hooks/useWizardState";
-import { useMintingProcess } from "@/hooks/useMintingProcess";
-import { useProjectSave } from "@/hooks/useProjectSave";
-import { useUSDCxBalance } from "@/hooks/useUSDCxBalance";
-import { MintingLoadingOverlay } from "./MintingLoadingOverlay";
-import { MintingStatusCard } from "./MintingStatusCard";
-import { ProjectSummaryCard } from "./ProjectSummaryCard";
-import { ProjectPreviewCard } from "./ProjectPreviewCard";
-import { ProjectActionButtons } from "./ProjectActionButtons";
-import { AIContentGenerationHub } from "./AIContentGenerationHub";
-import Confetti from "react-confetti";
-import { useToast } from "@/hooks/use-toast";
 import { useProjectById } from "@/hooks/useProjectById";
+import { useToast } from "@/hooks/use-toast";
 import { Wizard4MintingOverlaySection } from "./wizard4success/Wizard4MintingOverlaySection";
 import { Wizard4SummarySection } from "./wizard4success/Wizard4SummarySection";
 import { Wizard4AIContentSection } from "./wizard4success/Wizard4AIContentSection";
 import { MintingWorkflowModal } from "./MintingWorkflowModal";
+import Confetti from "react-confetti";
+import { useMintingWorkflow } from "./hooks/useMintingWorkflow";
 
 // --- TokenCustomization type for prop typing ---
 type TokenCustomization = {
@@ -48,8 +40,8 @@ interface WizardStep4SuccessProps {
   pledgeUSDC: string;
   walletAddress: string | null;
   onRestart: () => void;
-  coverBase64?: string | null; // add prop to pass cover image
-  tokenCustomization?: TokenCustomization; // Add this line
+  coverBase64?: string | null;
+  tokenCustomization?: TokenCustomization;
 }
 
 export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
@@ -64,91 +56,57 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
   tokenCustomization,
 }) => {
   const navigate = useNavigate();
-  const [projectId, setProjectId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("summary");
   const [generatedContent, setGeneratedContent] = useState<any>({});
   const [showConfetti, setShowConfetti] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [loadingMint, setLoadingMint] = useState(false);
   const { toast } = useToast();
-  const [mintModalOpen, setMintModalOpen] = useState(false);
-
-  const {
-    isMinting,
-    currentStep,
-    mintingStatus,
-    progress,
-    mintingSteps,
-    simulateMinting,
-    completeMinting
-  } = useMintingProcess();
-
-  const { usdcxBalanceConfirmed, isPollingBalance, pollUSDCxBalance } = useUSDCxBalance();
-  const saveProjectMutation = useProjectSave();
 
   // Calculate values
   const expenseSum = expenses.reduce((sum, exp) => sum + exp.amountUSDC, 0);
   const pledgeNum = Number(pledgeUSDC) || 0;
   const fundingTarget = expenseSum + pledgeNum;
 
-  // Keep track of latest cover IPFS
-  const [coverIpfs, setCoverIpfs] = useState<string | null>(null);
+  // Minting workflow extracted
+  const [completedProjectRow, setCompletedProjectRow] = useState<any>(null);
 
-  // Fetch project from DB after mint
+  const {
+    mintModalOpen,
+    setMintModalOpen,
+    handleMintAndFund,
+    handleMintFlow,
+    isMinting,
+    currentStep,
+    mintingStatus,
+    progress,
+    mintingSteps,
+    coverIpfs,
+    projectId,
+    loadingMint,
+    usdcxBalanceConfirmed,
+    isPollingBalance,
+    setProjectId,
+  } = useMintingWorkflow({
+    coverBase64,
+    projectIdea,
+    projectType,
+    roles,
+    expenses,
+    pledgeUSDC,
+    walletAddress,
+    expenseSum,
+    fundingTarget,
+    onSaveComplete: (projectRow: any) => {
+      setCompletedProjectRow(projectRow);
+    },
+  });
+
+  // Get project from DB after mint
   const { data: projectRow, isLoading: isProjectLoading } = useProjectById(projectId);
 
-  // Replace old handleMintAndFund logic with new modal UI workflow.
-  const handleMintAndFund = async () => {
-    setMintModalOpen(true);
-  };
-
-  // Controller for modal minting step logic
-  const handleMintFlow = async ({ gasSpeed }: { gasSpeed: "slow"|"standard"|"fast" }) => {
-    setLoadingMint(true);
-    try {
-      // 1. simulate minting step: wallet-sign -> sending-transaction -> txn-pending, etc.
-      // (simulate real-time clicking in wallet, then getting a tx hash)
-      setTimeout(() => {}, 10); // Dummy delay for UX
-      // Here, call simulateMinting with gas config (pass gasSpeed if supported downstream)
-      const tokenSymbol = "DROP";
-      const tokenName = "Drop";
-      const tokenSupply = 1000000;
-      const mintData = await simulateMinting({
-        coverBase64,
-        tokenSymbol,
-        tokenName,
-        tokenSupply,
-        userWallet: walletAddress,
-      });
-      setCoverIpfs(mintData.ipfsHash);
-      const project = await saveProjectMutation.mutateAsync({
-        projectIdea,
-        projectType,
-        roles,
-        expenses,
-        pledgeUSDC,
-        walletAddress,
-        fundingTarget,
-        expenseSum,
-        tokenAddress: mintData.tokenAddress,
-        txHash: mintData.txHash,
-      });
-      setProjectId(project.id);
-      sessionStorage.setItem('autoNavigateToProject', project.id);
-      completeMinting();
-      pollUSDCxBalance();
-      setLoadingMint(false);
-      return { txHash: mintData.txHash, step: "txn-pending" as const };
-    } catch (error: any) {
-      setLoadingMint(false);
-      return { error: error?.message || "An error occurred", step: "error" as const };
-    }
-  };
-
-  // Redirect if projectRow exists & status !== 'complete'
+  // Redirect after mint if project is not complete
   useEffect(() => {
     if (projectRow && projectRow.status !== "complete" && projectRow.id) {
-      // Always redirect to dashboard unless status=complete
       navigate(`/project/${projectRow.id}/dashboard`);
     }
   }, [projectRow, navigate]);
@@ -194,7 +152,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
       });
   };
 
-  // Render loading or main UI
+  // Loading UI
   if (isProjectLoading || (projectId && !projectRow)) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -203,12 +161,11 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
     );
   }
 
-  // If projectRow is minted, show collect link & pledge status
   const isMinted = projectRow?.status === "minted";
 
   return (
     <div className="space-y-6 relative" ref={containerRef}>
-      {/* Confetti celebration effect */}
+      {/* Confetti celebration */}
       {showConfetti && (
         <Confetti
           width={typeof window !== "undefined" ? window.innerWidth : 600}
@@ -227,7 +184,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
         mintingSteps={mintingSteps}
       />
 
-      {/* MINTING MODAL: pops up on "Mint & Fund" */}
+      {/* Mint/Fund Modal */}
       <MintingWorkflowModal
         open={mintModalOpen}
         onClose={() => setMintModalOpen(false)}
