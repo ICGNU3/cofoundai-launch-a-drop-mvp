@@ -20,12 +20,13 @@ export default {
 		extend: {
 			fontFamily: {
 				headline: [
+					'"Playfair Display"',
 					"Helvetica Neue",
 					"Helvetica",
 					"Arial",
 					"sans-serif",
-					"Satoshi",
 				],
+				playfair: ['"Playfair Display"', "serif"],
 				sans: ["Inter", "sans-serif"],
 			},
 			fontWeight: {

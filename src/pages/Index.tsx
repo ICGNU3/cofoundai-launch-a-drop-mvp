@@ -124,7 +124,7 @@ const Index: React.FC = () => {
       <FullWaveBackground />
       <section className="relative w-full pt-16 md:pt-20 pb-10 px-4 z-10 flex flex-col items-center pb-24">
         {/* HERO GRADIENT */}
-        <div className="hero-gradient pointer-events-none" aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 80%,rgba(154,77,255,.28) 0%,transparent 70%)', zIndex: 0 }} />
+        <div className="hero-gradient pointer-events-none" aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 80%,rgba(154,77,255,.18) 0%,transparent 72%)', zIndex: 0 }} />
         <div className="w-full max-w-5xl flex justify-end">
           <button
             onClick={() => setWalletOpen(true)}
@@ -135,13 +135,13 @@ const Index: React.FC = () => {
           </button>
         </div>
         {/* HEADLINE */}
-        <h1 className="text-center font-headline font-bold text-[2.3rem] md:text-[2.7rem] lg:text-[3rem] leading-[1.13] hero-title py-2 mt-2 max-w-3xl relative z-10">
+        <h1 className="text-center font-headline font-bold text-[2.3rem] md:text-[2.7rem] lg:text-[3rem] leading-[1.13] hero-title py-2 mt-2 max-w-3xl relative z-10 font-playfair tracking-tight drop-shadow">
           TALENT = MONEY
         </h1>
         {/* SUBHEADLINE */}
         <div className="text-lg text-[#e4f9ea] mt-4 max-w-xl mx-auto font-medium text-center mb-1">
           Invite your team, share your idea, and let anyone back your project.<br />
-          You don’t need a big budget—or any wallet know-how—to get started.
+          You don’t need a big budget or any wallet know-how to get started.
         </div>
         {/* LIVE METRICS */}
         {liveMetrics}
