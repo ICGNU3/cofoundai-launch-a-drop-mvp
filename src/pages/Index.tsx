@@ -17,7 +17,7 @@ const Index: React.FC = () => {
       <FullWaveBackground />
       {/* --- HERO SECTION --- */}
       <div className="w-full pt-24 pb-10 px-4 z-10 relative flex flex-col items-center">
-        {/* --- Hero SVG animation layer --- */}
+        {/* --- Hero Canvas Animation Layer (custom canvas, not SVG) --- */}
         <HeroMotionCanvas />
         {/* Wallet button right-aligned (desktop), mobile top-right */}
         <div className="w-full max-w-5xl flex justify-end">
