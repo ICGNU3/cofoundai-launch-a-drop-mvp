@@ -1,68 +1,61 @@
 
 import React from "react";
 import { BudgetItem, type BudgetItemType } from "./BudgetItem";
-import type { Role, Expense } from "@/hooks/useWizardState";
+import type { Role, Expense, WizardStateData } from "@/hooks/useWizardState";
 
 type BudgetItemsListProps = {
   roles: Role[];
   expenses: Expense[];
-  onEditRole: (index: number) => void;
-  onEditExpense: (index: number) => void;
-  onDeleteRole: (index: number) => void;
-  onDeleteExpense: (index: number) => void;
-  onUpdateRolePercent?: (idx: number, newPercent: number) => void;
+  pledgeUSDC: string;
+  editingRoleIdx: number | null;
+  editingExpenseIdx: number | null;
+  onSaveExpense: (expense: Expense, index: number | null) => void;
+  onRemoveExpense: (index: number) => void;
+  onSetField: <K extends keyof WizardStateData>(key: K, value: WizardStateData[K]) => void;
+  onUpdateRolePercent: (idx: number, newPercent: number) => void;
 };
 
 export const BudgetItemsList: React.FC<BudgetItemsListProps> = ({
   roles,
   expenses,
-  onEditRole,
-  onEditExpense,
-  onDeleteRole,
-  onDeleteExpense,
+  pledgeUSDC,
+  editingRoleIdx,
+  editingExpenseIdx,
+  onSaveExpense,
+  onRemoveExpense,
+  onSetField,
   onUpdateRolePercent,
 }) => {
+  const handleEditRole = (index: number) => {
+    onSetField("editingRoleIdx", index);
+  };
+
+  const handleEditExpense = (index: number) => {
+    onSetField("editingExpenseIdx", index);
+  };
+
+  const handleDeleteRole = (index: number) => {
+    // This should be handled by the parent component
+    console.log("Delete role:", index);
+  };
+
+  const handleDeleteExpense = (index: number) => {
+    onRemoveExpense(index);
+  };
+
   // Create unified budget items list
   const budgetItems: BudgetItemType[] = [
     ...roles.map(role => ({ ...role, type: "share" as const })),
     ...expenses.map(expense => ({ ...expense, type: "fixed" as const }))
   ];
 
-  const handleEditItem = (index: number, type: "role" | "expense") => {
-    if (type === "role") {
-      const roleIndex = roles.findIndex(r => 
-        r.roleName === budgetItems[index].roleName && 
-        r.walletAddress === budgetItems[index].walletAddress
-      );
-      onEditRole(roleIndex);
-    } else {
-      const expenseIndex = expenses.findIndex(e => 
-        e.expenseName === budgetItems[index].expenseName
-      );
-      onEditExpense(expenseIndex);
-    }
-  };
-
-  const handleDeleteItem = (index: number, type: "role" | "expense") => {
-    if (type === "role") {
-      const roleIndex = roles.findIndex(r => 
-        r.roleName === budgetItems[index].roleName && 
-        r.walletAddress === budgetItems[index].walletAddress
-      );
-      onDeleteRole(roleIndex);
-    } else {
-      const expenseIndex = expenses.findIndex(e => 
-        e.expenseName === budgetItems[index].expenseName
-      );
-      onDeleteExpense(expenseIndex);
-    }
-  };
-
   return (
     <div className="space-y-2 min-h-[200px]">
       {budgetItems.map((item, index) => {
         const isRole = item.type === "share";
-        const roleIndex = isRole ? roles.findIndex(r => r.roleName === item.roleName && r.walletAddress === item.walletAddress) : -1;
+        const originalIndex = isRole 
+          ? roles.findIndex(r => r.roleName === item.roleName && r.walletAddress === item.walletAddress)
+          : expenses.findIndex(e => e.expenseName === item.expenseName);
         
         return (
           <div
@@ -71,9 +64,9 @@ export const BudgetItemsList: React.FC<BudgetItemsListProps> = ({
           >
             <BudgetItem
               item={item}
-              onEdit={() => handleEditItem(index, isRole ? "role" : "expense")}
-              onDelete={() => handleDeleteItem(index, isRole ? "role" : "expense")}
-              onPercentChange={isRole && onUpdateRolePercent ? (newPercent) => onUpdateRolePercent(roleIndex, newPercent) : undefined}
+              onEdit={() => isRole ? handleEditRole(originalIndex) : handleEditExpense(originalIndex)}
+              onDelete={() => isRole ? handleDeleteRole(originalIndex) : handleDeleteExpense(originalIndex)}
+              onPercentChange={isRole ? (newPercent) => onUpdateRolePercent(originalIndex, newPercent) : undefined}
             />
           </div>
         );

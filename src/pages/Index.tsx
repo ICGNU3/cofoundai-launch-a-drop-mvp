@@ -30,18 +30,11 @@ const Index: React.FC = () => {
           </AccentButton>
         </div>
       </div>
-      {/* Wizard modal (overlay) */}
+      
       <WizardModal
-        state={wizard.state}
-        setField={wizard.setField}
-        setStep={wizard.setStep}
-        close={wizard.closeWizard}
-        saveRole={wizard.saveRole}
-        removeRole={wizard.removeRole}
-        updateRolePercent={wizard.updateRolePercent}
-        saveExpense={wizard.saveExpense}
-        removeExpense={wizard.removeExpense}
-        loadDefaultRoles={wizard.loadDefaultRoles}
+        isOpen={wizard.state.isWizardOpen}
+        onClose={wizard.closeWizard}
+        walletAddress={null}
       />
     </div>
   );

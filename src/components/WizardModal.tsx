@@ -1,7 +1,6 @@
 
 import React from "react";
 import { X } from "lucide-react";
-import { ScrollArea } from "./ui/scroll-area";
 import { WizardStep1Describe } from "./WizardStep1Describe";
 import { WizardStep2Roles } from "./WizardStep2Roles";
 import { WizardBudgetStep } from "./WizardBudgetStep";
