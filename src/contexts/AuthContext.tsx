@@ -36,9 +36,17 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, authenticated, login, logout } = usePrivy();
+  const privyAuth = usePrivy();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Safely destructure Privy auth with fallbacks
+  const { 
+    user = null, 
+    authenticated = false, 
+    login = () => {}, 
+    logout = () => {} 
+  } = privyAuth || {};
 
   // Create or fetch user profile when authenticated
   useEffect(() => {
@@ -93,8 +101,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     };
 
-    handleAuthState();
-  }, [authenticated, user]);
+    // Only run if privyAuth is available
+    if (privyAuth) {
+      handleAuthState();
+    }
+  }, [authenticated, user, privyAuth]);
 
   const updateProfile = async (data: Partial<UserProfile>) => {
     if (!user || !profile) return;

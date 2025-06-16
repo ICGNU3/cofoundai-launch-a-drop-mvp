@@ -11,9 +11,22 @@ import { Toaster } from '@/components/ui/sonner';
 const queryClient = new QueryClient();
 
 function App() {
+  const privyAppId = import.meta.env.VITE_PRIVY_APP_ID || 'clpispdcl00lu356f5oh7yl54';
+
+  if (!privyAppId) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-xl font-bold mb-2">Configuration Error</h1>
+          <p>Privy App ID is not configured. Please check your environment variables.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <PrivyProvider
-      appId={import.meta.env.VITE_PRIVY_APP_ID || 'clpispdcl00lu356f5oh7yl54'}
+      appId={privyAppId}
       config={{
         loginMethods: ['wallet', 'email'],
         appearance: {

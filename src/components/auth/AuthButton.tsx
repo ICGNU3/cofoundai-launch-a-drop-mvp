@@ -9,10 +9,25 @@ import { OnboardingModal } from './OnboardingModal';
 import { User } from 'lucide-react';
 
 export const AuthButton: React.FC = () => {
-  const { isAuthenticated, profile, isLoading } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+
+  // Safely use auth context with error boundary
+  let authData;
+  try {
+    authData = useAuth();
+  } catch (error) {
+    console.error('Auth context error:', error);
+    return (
+      <Button variant="outline" disabled className="gap-2">
+        <User className="w-4 h-4" />
+        Auth Error
+      </Button>
+    );
+  }
+
+  const { isAuthenticated, profile, isLoading } = authData;
 
   React.useEffect(() => {
     if (isAuthenticated && profile && !profile.onboarded) {
