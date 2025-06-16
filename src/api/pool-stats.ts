@@ -63,6 +63,30 @@ const DAILY_STATS_QUERY = `
   }
 `;
 
+const TRENDING_POOLS_QUERY = `
+  query GetTrendingPools($orderBy: String!, $orderDirection: String!) {
+    poolStats(
+      orderBy: $orderBy
+      orderDirection: $orderDirection
+      first: 20
+    ) {
+      id
+      coin {
+        id
+        symbol
+        name
+        creator
+      }
+      volume24h
+      depth
+      feeAPR
+      totalVolumeUSD
+      totalRoyalties
+      lastUpdated
+    }
+  }
+`;
+
 interface PoolStatsResponse {
   depth: string;
   volume24h: string;
@@ -186,4 +210,24 @@ export async function fetchPoolStats(coinAddress: string): Promise<PoolStatsResp
   };
 
   return response;
+}
+
+export async function fetchTrendingPools(sortBy: 'feeAPR' | 'volume24h' | 'totalVolumeUSD' = 'feeAPR') {
+  const data = await fetchSubgraphData(TRENDING_POOLS_QUERY, {
+    orderBy: sortBy,
+    orderDirection: 'desc'
+  });
+
+  return data.poolStats.map((pool: any) => ({
+    id: pool.coin.id,
+    symbol: pool.coin.symbol,
+    name: pool.coin.name,
+    creator: pool.coin.creator,
+    depth: pool.depth,
+    volume24h: pool.volume24h,
+    feeAPR: pool.feeAPR,
+    totalVolumeUSD: pool.totalVolumeUSD,
+    totalRoyalties: pool.totalRoyalties,
+    lastUpdated: pool.lastUpdated
+  }));
 }

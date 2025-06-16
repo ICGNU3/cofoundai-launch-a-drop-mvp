@@ -81,6 +81,7 @@ export default {
 				gold: "#FFD166",
 				yellow: "#FDE68A",
 				"body-text": "#e8e8e8",
+				text: "#e8e8e8",
 				"headline": "#e8e8e8",
 				tagline: "#e8e8e8",
 				"slider-track": "#3A3A3A",

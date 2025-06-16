@@ -1,172 +1,167 @@
 
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../integrations/supabase/client";
 import { usePrivy } from "@privy-io/react-auth";
-import { Link, useNavigate } from "react-router-dom";
-
-type Project = {
-  id: string;
-  project_idea: string;
-  project_type: string;
-  minted_at: string | null;
-  funding_total: number | null;
-  funding_target: number | null;
-  zora_coin_url: string | null;
-  cover_art_url: string | null;
-  token_address: string | null;
-  tx_hash: string | null;
-  streams_active: boolean | null;
-  escrow_funded_amount: number | null;
-};
+import { Link } from "react-router-dom";
+import { ProjectPreviewCard } from "@/components/ProjectPreviewCard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SwapCard } from "@/components/SwapCard";
+import { LiquidityDashboard } from "@/components/LiquidityDashboard";
+import { usePoolStats } from "@/hooks/usePoolStats";
 
 const Dashboard: React.FC = () => {
-  const { user, ready } = usePrivy();
-  const navigate = useNavigate();
+  const { user } = usePrivy();
+  const [claimLoading, setClaimLoading] = useState(false);
 
-  const { data: projects, isLoading, refetch } = useQuery({
-    queryKey: ["my-projects", user?.id],
+  const { data: projects, isLoading } = useQuery({
+    queryKey: ["userProjects", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       const { data, error } = await supabase
         .from("projects")
         .select("*")
         .eq("owner_id", user.id)
-        .order("minted_at", { ascending: false });
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data || [];
     },
     enabled: !!user?.id,
   });
 
-  // Auto-refresh every 30 seconds for live updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refetch();
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [refetch]);
-
-  // Auto-navigate to latest project dashboard if user refreshes after minting
-  useEffect(() => {
-    if (projects && projects.length > 0 && ready) {
-      const latestProject = projects[0];
-      const isRecentlyMinted = latestProject.minted_at && 
-        new Date(latestProject.minted_at).getTime() > Date.now() - 5 * 60 * 1000; // Last 5 minutes
-      
-      if (isRecentlyMinted && latestProject.token_address) {
-        // Auto-navigate to latest project dashboard if recently minted
-        const shouldAutoNavigate = sessionStorage.getItem('autoNavigateToProject');
-        if (shouldAutoNavigate === latestProject.id) {
-          sessionStorage.removeItem('autoNavigateToProject');
-          navigate(`/project/${latestProject.id}/dashboard`);
-        }
-      }
+  // Mock trending coins data - would come from API
+  const mockTrendingCoins = [
+    {
+      id: '0x1234567890123456789012345678901234567890',
+      symbol: 'MUSIC',
+      name: 'Music Creator Coin',
+      logoUrl: undefined
+    },
+    {
+      id: '0x0987654321098765432109876543210987654321',
+      symbol: 'ART',
+      name: 'Digital Art Coin',
+      logoUrl: undefined
     }
-  }, [projects, ready, navigate]);
+  ];
+
+  // Mock liquidity positions
+  const mockPositions = [
+    {
+      id: '1',
+      coinSymbol: 'MUSIC',
+      coinName: 'Music Creator Coin',
+      liquidity: '1250.50',
+      unclaimedRoyalties: '12.34',
+      feeAPR: '8.5'
+    },
+    {
+      id: '2',
+      coinSymbol: 'ART',
+      coinName: 'Digital Art Coin',
+      liquidity: '890.25',
+      unclaimedRoyalties: '5.67',
+      feeAPR: '12.1'
+    }
+  ];
+
+  const handleClaim = async (positionId: string) => {
+    setClaimLoading(true);
+    try {
+      console.log('Claiming royalties for position:', positionId);
+      // Mock claim process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Royalties claimed successfully');
+    } catch (error) {
+      console.error('Failed to claim royalties:', error);
+    } finally {
+      setClaimLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-body-text">Loading dashboard...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center pt-8 px-4">
-      <div className="flex items-center justify-between w-full max-w-3xl mb-4">
-        <h1 className="text-3xl font-bold">My Drops Dashboard</h1>
-        <button
-          onClick={() => refetch()}
-          className="px-4 py-2 bg-accent/20 text-accent border border-accent rounded-lg hover:bg-accent/30 transition"
-        >
-          Refresh
-        </button>
-      </div>
-      
-      {isLoading && <div>Loading...</div>}
-      
-      <div className="max-w-3xl w-full">
-        <div className="w-full mb-6 flex justify-end">
+    <div className="min-h-screen bg-background px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-headline">Dashboard</h1>
           <Link
             to="/"
-            className="bg-accent px-4 py-2 rounded-full text-white text-sm shadow hover:bg-opacity-80 transition"
-          >+ Launch New Drop</Link>
+            className="px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
+          >
+            Launch New Drop
+          </Link>
         </div>
-        <div>
-          {projects && projects.length > 0 ? (
-            <ul className="w-full grid gap-6">
-              {projects.map((proj: Project) => (
-                <li key={proj.id}>
-                  <div className="rounded-lg border bg-card hover:shadow-lg transition p-6 relative">
-                    <div className="flex">
-                      {proj.cover_art_url ? (
-                        <img src={proj.cover_art_url} className="w-20 h-20 rounded-md mr-5 object-cover" alt="cover" />
-                      ) : (
-                        <div className="w-20 h-20 rounded-md mr-5 bg-background/40 flex items-center justify-center text-3xl">🎨</div>
-                      )}
-                      <div className="flex-1">
-                        <div className="text-lg font-semibold">{proj.project_idea}</div>
-                        <div className="text-sm text-zinc-400 mb-2">{proj.project_type} • Minted {proj.minted_at ? new Date(proj.minted_at).toLocaleString() : "—"}</div>
-                        
-                        {/* Status indicators */}
-                        <div className="flex gap-4 mb-3">
-                          <div className="flex items-center gap-1">
-                            <div className={`w-2 h-2 rounded-full ${proj.token_address ? 'bg-green-400' : 'bg-yellow-400'}`}></div>
-                            <span className="text-xs text-body-text/70">
-                              {proj.token_address ? 'Minted' : 'Pending'}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className={`w-2 h-2 rounded-full ${proj.streams_active ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                            <span className="text-xs text-body-text/70">
-                              {proj.streams_active ? 'Streaming' : 'No Streams'}
-                            </span>
-                          </div>
-                          {proj.escrow_funded_amount && (
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-                              <span className="text-xs text-body-text/70">
-                                ${proj.escrow_funded_amount.toFixed(2)} Escrowed
-                              </span>
-                            </div>
-                          )}
-                        </div>
 
-                        <div className="mb-3">
-                          Funding: <span className="font-mono">{proj.funding_total?.toLocaleString("en", {minimumFractionDigits:2}) || "0.00"}</span> / <span className="font-mono">{proj.funding_target?.toLocaleString("en", {minimumFractionDigits:2}) || "0.00"}</span> USDC
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <Link 
-                            to={`/project/${proj.id}`} 
-                            className="text-sm text-accent hover:underline"
-                          >
-                            View Details
-                          </Link>
-                          {proj.token_address && (
-                            <Link 
-                              to={`/project/${proj.id}/dashboard`} 
-                              className="text-sm text-accent hover:underline font-semibold"
-                            >
-                              Dashboard
-                            </Link>
-                          )}
-                          {proj.zora_coin_url && (
-                            <a href={proj.zora_coin_url} target="_blank" rel="noopener noreferrer" className="text-sm text-accent hover:underline">
-                              View on Zora
-                            </a>
-                          )}
-                          {proj.tx_hash && (
-                            <a href={`https://etherscan.io/tx/${proj.tx_hash}`} target="_blank" rel="noopener noreferrer" className="text-sm text-accent hover:underline">
-                              View TX
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            !isLoading && <div className="text-zinc-400 mt-6 text-center">No Drops yet. <Link to="/" className="text-accent underline">Launch your first Drop.</Link></div>
-          )}
-        </div>
+        <Tabs defaultValue="trending" className="space-y-6">
+          <TabsList className="bg-card border border-border">
+            <TabsTrigger value="trending" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+              Trending
+            </TabsTrigger>
+            <TabsTrigger value="positions" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+              My Positions
+            </TabsTrigger>
+            <TabsTrigger value="projects" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+              My Projects
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="trending" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {mockTrendingCoins.map((coin) => {
+                // Mock pool stats for each coin
+                const mockPoolStats = {
+                  depth: '125000.50',
+                  volume24h: '45000.25',
+                  feeAPR: '8.5'
+                };
+                return (
+                  <SwapCard 
+                    key={coin.id}
+                    coin={coin}
+                    poolStats={mockPoolStats}
+                  />
+                );
+              })}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="positions">
+            <LiquidityDashboard 
+              positions={mockPositions}
+              onClaim={handleClaim}
+              isClaimLoading={claimLoading}
+            />
+          </TabsContent>
+
+          <TabsContent value="projects" className="space-y-6">
+            {projects && projects.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {projects.map((project) => (
+                  <ProjectPreviewCard key={project.id} project={project} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <h3 className="text-xl font-semibold text-headline mb-4">No projects yet</h3>
+                <p className="text-body-text mb-6">Create your first project to get started!</p>
+                <Link
+                  to="/"
+                  className="inline-flex px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
+                >
+                  Launch Your First Drop
+                </Link>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
