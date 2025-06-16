@@ -4,6 +4,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGasEstimator } from "./hooks/useGasEstimator";
+import { WalletConnectionCheck } from "./WalletConnectionCheck";
 import { DropSummarySection } from "./minting/DropSummarySection";
 import { WalletStatusSection } from "./minting/WalletStatusSection";
 import { GasOptionsSection } from "./minting/GasOptionsSection";
@@ -111,15 +112,17 @@ export const MintingWorkflowModal: React.FC<MintingWorkflowModalProps> = ({
     switch (stage) {
       case "wallet-connection":
         return (
-          <div>
-            <WalletStatusSection
-              walletConnected={walletConnected}
-              walletAddress={walletAddress}
-            />
-            <div className="text-center text-sm text-body-text/80 mt-2">
-              Please connect your wallet to begin minting your Drop.
+          <WalletConnectionCheck requiredChainId={chainId}>
+            <div>
+              <WalletStatusSection
+                walletConnected={walletConnected}
+                walletAddress={walletAddress}
+              />
+              <div className="text-center text-sm text-body-text/80 mt-2">
+                Wallet connected! Ready to proceed with minting.
+              </div>
             </div>
-          </div>
+          </WalletConnectionCheck>
         );
       case "gas-selection":
         return (
@@ -137,8 +140,8 @@ export const MintingWorkflowModal: React.FC<MintingWorkflowModalProps> = ({
               gasSpeed={gasSpeed}
               setGasSpeed={setGasSpeed}
             />
-            <Button className="w-full mt-4" onClick={() => setStage("wallet-sign")}>
-              Confirm Transaction
+            <Button className="w-full mt-4" onClick={handleStartMint}>
+              Start Blockchain Minting
             </Button>
           </div>
         );
@@ -148,7 +151,7 @@ export const MintingWorkflowModal: React.FC<MintingWorkflowModalProps> = ({
             <Loader className="animate-spin mx-auto mb-2" />
             <div className="font-medium mb-2">Awaiting Wallet Confirmation...</div>
             <div className="text-sm text-body-text/80">
-              Please approve the transaction in your wallet. Check your wallet popup.
+              Please approve the transaction in your wallet to mint your token on the blockchain.
             </div>
           </div>
         );
@@ -184,7 +187,7 @@ export const MintingWorkflowModal: React.FC<MintingWorkflowModalProps> = ({
       <DialogContent className="sm:max-w-xl bg-surface font-sans">
         <div className="flex flex-col gap-1">
           <div className="text-accent font-bold uppercase text-xs tracking-wider mb-3 text-center">
-            Mint &amp; Fund Drop
+            Blockchain Token Minting
           </div>
           {renderStepContent()}
         </div>

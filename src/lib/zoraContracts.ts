@@ -1,0 +1,71 @@
+
+import { ethers } from "ethers";
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+
+// Zora V4 contract addresses on Base Sepolia testnet
+export const ZORA_CONTRACTS = {
+  FACTORY: "0x777777C338d93e2C7adf08D102d45CA7CC4Ed021",
+  CREATOR_IMPL: "0x3678862f04290E565cCA2EF163BAeb92Bb76790C",
+} as const;
+
+// Zora Factory ABI (minimal for coin creation)
+export const ZORA_FACTORY_ABI = [
+  {
+    "inputs": [
+      {
+        "components": [
+          { "name": "name", "type": "string" },
+          { "name": "symbol", "type": "string" },
+          { "name": "initialSupply", "type": "uint256" },
+          { "name": "creator", "type": "address" },
+          { "name": "uri", "type": "string" }
+        ],
+        "name": "coinParams",
+        "type": "tuple"
+      }
+    ],
+    "name": "createCoin",
+    "outputs": [
+      { "name": "coinAddress", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+] as const;
+
+export interface ZoraCoinParams {
+  name: string;
+  symbol: string;
+  initialSupply: bigint;
+  creator: string;
+  uri: string;
+}
+
+export function useZoraMinting() {
+  const { address } = useAccount();
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const mintCoin = async (params: ZoraCoinParams) => {
+    if (!address) throw new Error("Wallet not connected");
+
+    return writeContract({
+      address: ZORA_CONTRACTS.FACTORY,
+      abi: ZORA_FACTORY_ABI,
+      functionName: "createCoin",
+      args: [params],
+    });
+  };
+
+  return {
+    mintCoin,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+}

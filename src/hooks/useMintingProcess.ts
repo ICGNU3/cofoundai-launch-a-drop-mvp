@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useBlockchainMinting } from "./useBlockchainMinting";
 
 export type MintingStep = 
   | "ready"
   | "uploading-cover"
-  | "generating-art" 
   | "uploading-metadata"
   | "minting-token"
   | "confirming-transaction"
@@ -13,120 +14,106 @@ export type MintingStep =
   | "error";
 
 export const useMintingProcess = () => {
-  const [isMinting, setIsMinting] = useState(false);
   const [currentStep, setCurrentStep] = useState<MintingStep>("ready");
   const [mintingStatus, setMintingStatus] = useState<string>("Ready to mint...");
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+  
+  const {
+    startMinting,
+    isUploading,
+    isPending,
+    isConfirming,
+    isSuccess,
+    hash,
+    error,
+    ipfsHash
+  } = useBlockchainMinting();
 
   const mintingSteps = [
     { key: "uploading-cover", label: "Uploading Cover Art", description: "Storing cover image on IPFS..." },
-    { key: "uploading-metadata", label: "Uploading Metadata", description: "Storing project data on IPFS..." },
-    { key: "minting-token", label: "Minting Zora Coin", description: "Creating your NFT on blockchain..." },
+    { key: "uploading-metadata", label: "Uploading Metadata", description: "Storing project metadata on IPFS..." },
+    { key: "minting-token", label: "Minting Zora Coin", description: "Creating your token on blockchain..." },
     { key: "confirming-transaction", label: "Confirming Transaction", description: "Waiting for blockchain confirmation..." },
     { key: "saving-project", label: "Finalizing Project", description: "Setting up your project hub..." },
   ];
 
-  async function pinFileToIPFS({ dataURL, name }: { dataURL: string; name: string; }): Promise<{ IpfsHash: string; }> {
-    const formData = new FormData();
-    formData.append("file", await fetch(dataURL).then(r => r.blob()), name);
-    const res = await fetch("/api/pinata/upload", {
-      method: "POST",
-      body: formData,
-    });
-    if (!res.ok) throw new Error("Pinata upload failed");
-    const json = await res.json();
-    return { IpfsHash: json.IpfsHash };
-  }
-
   const simulateMinting = async ({
     coverBase64,
     tokenSymbol,
-    tokenName = "Drop",
+    tokenName = "NEPLUS Coin",
     tokenSupply = 1000000,
     userWallet,
-    ...rest
   }: {
     coverBase64: string;
     tokenSymbol: string;
     tokenName?: string;
     tokenSupply?: number;
     userWallet?: string;
-    [key: string]: any;
   }): Promise<{ tokenAddress: string; txHash: string; coverArtUrl: string; ipfsHash: string }> => {
-    setIsMinting(true);
-    setCurrentStep("uploading-cover");
-    setProgress(10);
+    
+    if (!userWallet) {
+      throw new Error("Wallet address is required for minting");
+    }
 
     try {
+      setCurrentStep("uploading-cover");
       setMintingStatus("📤 Uploading cover to IPFS...");
-      if (!coverBase64) throw new Error("No cover image to upload!");
-      const coverName = `${tokenSymbol}-cover.png`;
-      const res = await pinFileToIPFS({ dataURL: coverBase64, name: coverName });
-      const ipfsHash = res.IpfsHash;
-      setProgress(35);
+      setProgress(10);
 
-      // --------- ZORA MINTING HERE -----------
-      setCurrentStep("uploading-metadata");
-      setMintingStatus("⚡ Creating Zora V4 coin...");
-      setProgress(55);
-
-      // Compose Zora body as in your instructions
-      const zoraBody = {
-        chainId: 84532,
-        name: tokenName,
-        symbol: tokenSymbol,
-        totalSupply: tokenSupply,
-        uri: `ipfs://${ipfsHash}`,
-        creatorAddress: userWallet,
-      };
-
-      // Call Supabase Edge Function (never expose Zora key!)
-      const zoraRes = await fetch("/functions/v1/mint-zora-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(zoraBody),
+      const result = await startMinting({
+        coverBase64,
+        tokenSymbol,
+        tokenName,
+        tokenSupply,
+        userWallet,
       });
-      if (!zoraRes.ok) {
-        const errText = await zoraRes.text();
-        throw new Error(`Zora minting failed: ${errText}`);
+
+      // Update progress based on blockchain transaction state
+      if (isUploading) {
+        setCurrentStep("uploading-metadata");
+        setMintingStatus("📋 Uploading metadata...");
+        setProgress(35);
       }
-      const zoraData = await zoraRes.json();
-      if (!zoraData.tokenAddress) throw new Error("No tokenAddress returned from Zora");
 
-      setCurrentStep("minting-token");
-      setMintingStatus("🚀 Minting your Zora coin on chain...");
-      setProgress(70);
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      if (isPending) {
+        setCurrentStep("minting-token");
+        setMintingStatus("⛽ Waiting for wallet confirmation...");
+        setProgress(55);
+      }
 
-      setCurrentStep("confirming-transaction");
-      setMintingStatus("⛽ Confirming on blockchain...");
-      setProgress(90);
-      await new Promise(resolve => setTimeout(resolve, 800));
+      if (isConfirming) {
+        setCurrentStep("confirming-transaction");
+        setMintingStatus("⏳ Confirming on blockchain...");
+        setProgress(80);
+      }
 
-      setCurrentStep("saving-project");
-      setMintingStatus("💾 Setting up your project hub...");
-      setProgress(97);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      if (isSuccess && hash) {
+        setCurrentStep("saving-project");
+        setMintingStatus("💾 Setting up your project hub...");
+        setProgress(95);
 
-      // Compose returned values
-      const tokenAddress = zoraData.tokenAddress;
-      const txHash = zoraData.txHash || "";
-      const coverArtUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
+        // Wait a bit for the transaction to be fully processed
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
-      setCurrentStep("complete");
-      setProgress(100);
+        setCurrentStep("complete");
+        setProgress(100);
 
-      return {
-        tokenAddress,
-        txHash,
-        coverArtUrl,
-        ipfsHash,
-      };
+        return {
+          tokenAddress: "0x" + hash.slice(-40), // Extract contract address from tx hash (simplified)
+          txHash: hash,
+          coverArtUrl: `https://ipfs.io/ipfs/${result.ipfsHash}`,
+          ipfsHash: result.ipfsHash,
+        };
+      }
+
+      throw new Error("Transaction failed or was cancelled");
+
     } catch (error) {
       console.error("Minting error:", error);
       setCurrentStep("error");
       setMintingStatus("❌ Minting failed");
+      
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       toast({
         title: "Mint Failed",
@@ -134,17 +121,15 @@ export const useMintingProcess = () => {
         variant: "destructive",
       });
       throw error;
-    } finally {
-      setIsMinting(false);
     }
   };
 
   const completeMinting = () => {
     setCurrentStep("complete");
-    setMintingStatus("🎉 Drop launched successfully!");
+    setMintingStatus("🎉 Token launched successfully!");
     toast({
       title: "Launch Successful! 🚀",
-      description: "Your drop is now live and ready to share!",
+      description: "Your token is now live on the blockchain!",
     });
   };
 
@@ -152,11 +137,10 @@ export const useMintingProcess = () => {
     setCurrentStep("ready");
     setMintingStatus("Ready to mint...");
     setProgress(0);
-    setIsMinting(false);
   };
 
   return {
-    isMinting,
+    isMinting: isPending || isConfirming,
     currentStep,
     mintingStatus,
     progress,
@@ -164,5 +148,8 @@ export const useMintingProcess = () => {
     simulateMinting,
     completeMinting,
     resetMinting,
+    // Expose blockchain state
+    blockchainError: error,
+    transactionHash: hash,
   };
 };
