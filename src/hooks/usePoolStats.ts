@@ -1,5 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
+import { fetchPoolStats } from '../api/pool-stats';
 
 interface PoolStatsData {
   depth: string;
@@ -31,18 +32,11 @@ export function usePoolStats(coinAddress: string | null) {
         throw new Error('Coin address is required');
       }
 
-      const response = await fetch(`/api/pool-stats?coin=${encodeURIComponent(coinAddress)}`);
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch pool stats');
-      }
-
-      return response.json();
+      return fetchPoolStats(coinAddress);
     },
     enabled: !!coinAddress,
     staleTime: 15000, // 15 seconds
-    cacheTime: 60000, // 1 minute
+    gcTime: 60000, // 1 minute (formerly cacheTime)
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 }
