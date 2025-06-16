@@ -43,6 +43,11 @@ export function useBlockchainMinting() {
 
   const startMinting = async (params: BlockchainMintParams) => {
     try {
+      // Validate wallet address format
+      if (!params.userWallet || !params.userWallet.startsWith('0x')) {
+        throw new Error("Invalid wallet address format");
+      }
+
       // Step 1: Upload cover art to IPFS
       toast({ title: "Uploading cover art...", description: "Storing your image on IPFS" });
       const coverHash = await uploadToIPFS(params.coverBase64, `${params.tokenSymbol}-cover.png`);

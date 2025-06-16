@@ -37,7 +37,7 @@ export interface ZoraCoinParams {
   name: string;
   symbol: string;
   initialSupply: bigint;
-  creator: string;
+  creator: `0x${string}`;
   uri: string;
 }
 
