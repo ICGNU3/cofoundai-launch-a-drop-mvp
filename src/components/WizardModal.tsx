@@ -1,10 +1,10 @@
 
 import React from "react";
 import { useWizardState } from "@/hooks/useWizardState";
-import { WizardHeader } from "./WizardHeader";
-import { WizardProgressBar } from "./WizardProgressBar";
-import { WizardStepContent } from "./WizardStepContent";
-import { SkippingStepLoader } from "./SkippingStepLoader";
+import { useWizardSkipLogic } from "@/hooks/wizard/useWizardSkipLogic";
+import { useWizardStepTitles } from "@/hooks/wizard/useWizardStepTitles";
+import { WizardContainer } from "./wizard/WizardContainer";
+import { WizardStepRenderer } from "./wizard/WizardStepRenderer";
 
 export const WizardModal: React.FC<{
   isOpen: boolean;
@@ -35,7 +35,6 @@ export const WizardModal: React.FC<{
   const lastStep = totalSteps;
   const progressStep = Math.max(1, Math.min(state.step, totalSteps));
 
-  // ADDITIONAL CONSOLE LOGS for debugging
   console.log("[WizardModal]---", {
     step: state.step,
     doAdvancedToken: state.doAdvancedToken,
@@ -45,39 +44,19 @@ export const WizardModal: React.FC<{
     progressStep
   });
 
-  // Auto-skip step 5 if user doesn't want advanced customization, only if a further step exists
-  const hasSkippedStep5 = React.useRef(false);
-  
-  React.useEffect(() => {
-    // Debug output for skip logic
-    console.log("[WizardModal][USEEFFECT] Check skip logic", {
-      step: state.step,
-      doAdvancedToken: state.doAdvancedToken,
-      lastStep,
-      hasSkippedStep5: hasSkippedStep5.current,
-    });
+  const { resetSkipFlag } = useWizardSkipLogic({
+    step: state.step,
+    doAdvancedToken: !!state.doAdvancedToken,
+    lastStep,
+    setStep,
+  });
 
-    if (
-      state.step === 5 &&
-      !state.doAdvancedToken &&
-      lastStep > 5 &&
-      !hasSkippedStep5.current
-    ) {
-      // Added console log
-      console.log("[WizardModal] Auto-skipping step 5, going to step", lastStep);
-      hasSkippedStep5.current = true;
-      setStep(lastStep);
-    }
-    // Reset skip flag when off step 5
-    if (state.step !== 5) {
-      hasSkippedStep5.current = false;
-    }
-  }, [state.step, state.doAdvancedToken, lastStep, setStep]);
+  const { getStepTitle } = useWizardStepTitles(state.step, wantsAdvanced, lastStep);
 
   if (!isOpen) return null;
 
   const handleRestart = () => {
-    hasSkippedStep5.current = false;
+    resetSkipFlag();
     setStep(1);
     setField("projectIdea", "");
     setField("projectType", "Music");
@@ -89,124 +68,33 @@ export const WizardModal: React.FC<{
     setTokenCustomization(undefined);
   };
 
-  const getStepTitle = () => {
-    if (state.step === 1) return "Describe Your Project";
-    if (state.step === 2) return "Define Roles & Revenue Split";
-    if (state.step === 3) return "Budget Breakdown";
-    if (state.step === 4) return "Token Customization";
-    if (wantsAdvanced && state.step === 5) return "Advanced Token Customization";
-    if (state.step === lastStep) return "Launch Your Drop";
-    return "Create Your Drop";
+  const stepRendererProps = {
+    state,
+    setStep,
+    setField,
+    setMode,
+    saveRole,
+    removeRole,
+    updateRolePercent,
+    saveExpense,
+    removeExpense,
+    loadDefaultRoles,
+    setTokenCustomization,
+    setDoAdvancedToken,
+    handleRestart,
+    walletAddress,
+    wantsAdvanced,
+    lastStep,
   };
 
-  // Show skipping loader only if auto-skipping to a future step (step 6)
-  if (
-    state.step === 5 &&
-    !state.doAdvancedToken &&
-    lastStep > 5
-  ) {
-    console.log("[WizardModal] Showing SkippingStepLoader (skipping to next step)...");
-    return (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
-          <WizardHeader 
-            title="Skipping Advanced Customization" 
-            currentStep={progressStep} 
-            totalSteps={totalSteps} 
-            onClose={onClose} 
-          />
-          <WizardProgressBar 
-            totalSteps={totalSteps} 
-            progressStep={progressStep}
-          />
-          <div className="flex-1 overflow-hidden">
-            <SkippingStepLoader />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // If on step 5, advanced not wanted, and this is the last step (no more steps) -- show final step content
-  if (
-    state.step === 5 &&
-    !state.doAdvancedToken &&
-    lastStep === 5
-  ) {
-    // "Render" step 5 as if it's the final (success) step
-    console.log("[WizardModal] At step 5, NOT advanced, but lastStep = 5 (showing success content)");
-    return (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
-          <WizardHeader 
-            title="Launch Your Drop" 
-            currentStep={progressStep} 
-            totalSteps={totalSteps} 
-            onClose={onClose} 
-          />
-          <WizardProgressBar 
-            totalSteps={totalSteps} 
-            progressStep={progressStep}
-          />
-          <div className="flex-1 overflow-hidden">
-            <WizardStepContent
-              state={state}
-              setStep={setStep}
-              setField={setField}
-              setMode={setMode}
-              saveRole={saveRole}
-              removeRole={removeRole}
-              updateRolePercent={updateRolePercent}
-              saveExpense={saveExpense}
-              removeExpense={removeExpense}
-              loadDefaultRoles={loadDefaultRoles}
-              setTokenCustomization={setTokenCustomization}
-              setDoAdvancedToken={setDoAdvancedToken}
-              handleRestart={handleRestart}
-              walletAddress={walletAddress}
-              wantsAdvanced={wantsAdvanced}
-              lastStep={lastStep}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
-        <WizardHeader 
-          title={getStepTitle()} 
-          currentStep={progressStep} 
-          totalSteps={totalSteps} 
-          onClose={onClose} 
-        />
-        <WizardProgressBar 
-          totalSteps={totalSteps} 
-          progressStep={progressStep}
-        />
-        <div className="flex-1 overflow-hidden">
-          <WizardStepContent
-            state={state}
-            setStep={setStep}
-            setField={setField}
-            setMode={setMode}
-            saveRole={saveRole}
-            removeRole={removeRole}
-            updateRolePercent={updateRolePercent}
-            saveExpense={saveExpense}
-            removeExpense={removeExpense}
-            loadDefaultRoles={loadDefaultRoles}
-            setTokenCustomization={setTokenCustomization}
-            setDoAdvancedToken={setDoAdvancedToken}
-            handleRestart={handleRestart}
-            walletAddress={walletAddress}
-            wantsAdvanced={wantsAdvanced}
-            lastStep={lastStep}
-          />
-        </div>
-      </div>
-    </div>
+    <WizardContainer
+      title={getStepTitle()}
+      currentStep={progressStep}
+      totalSteps={totalSteps}
+      onClose={onClose}
+    >
+      <WizardStepRenderer {...stepRendererProps} />
+    </WizardContainer>
   );
 };
