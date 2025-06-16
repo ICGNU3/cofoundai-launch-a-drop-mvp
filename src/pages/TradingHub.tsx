@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { LiveTradingDashboard } from '@/components/LiveTradingDashboard';
-import { ModernNavigation } from '@/components/ModernNavigation';
+import ModernNavigation from '@/components/ModernNavigation';
 
 // Mock token data - in production this would come from your database
 const DEMO_TOKENS = [

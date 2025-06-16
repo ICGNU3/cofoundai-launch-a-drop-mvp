@@ -60,7 +60,7 @@ export function useSwapExecution() {
         args: [commands, [inputs]]
       });
 
-      setTxHash(hash);
+      setTxHash(hash as string);
       
       toast({
         title: "Swap Initiated",

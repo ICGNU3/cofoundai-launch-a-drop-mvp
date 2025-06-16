@@ -1,16 +1,17 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from "@/components/ui/tooltip"
 
-import Index from '@/pages';
+import Index from '@/pages/Index';
 import HowItWorks from '@/pages/HowItWorks';
 import Dashboard from '@/pages/Dashboard';
 import ProjectDashboard from '@/pages/ProjectDashboard';
 import ProjectOverview from '@/pages/ProjectOverview';
 import ProjectWorkspace from '@/pages/ProjectWorkspace';
-import ProjectLaunchHubRoute from '@/pages/ProjectLaunchHubRoute';
+import { ProjectLaunchHubRoute } from '@/pages/ProjectLaunchHubRoute';
 import NotFound from '@/pages/NotFound';
 
 import TradingHub from "@/pages/TradingHub";

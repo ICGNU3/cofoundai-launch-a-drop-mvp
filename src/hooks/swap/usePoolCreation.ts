@@ -57,7 +57,7 @@ export function usePoolCreation() {
         args: [poolKey, parseUnits(params.initialPrice, 18)]
       });
 
-      setTxHash(hash);
+      setTxHash(hash as string);
       
       toast({
         title: "Pool Creation Initiated",
