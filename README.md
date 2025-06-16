@@ -1,8 +1,8 @@
 
-# CoFound AI – Launch-a-Drop MVP
+# NEPLUS – Launch-a-Drop MVP
 
 Turns any music, film, fashion, or art idea into a funded token economy in 60 seconds.<br>
-Describe the project → set each collaborator’s cut → add fixed expenses → click **Mint & Fund**.<br>
+Describe the project → set each collaborator's cut → add fixed expenses → click **Mint & Fund**.<br>
 The app mints a Zora Coins V4 creator-token, pins cover art to IPFS, locks funds on Base, and streams payouts when the work ships.
 
 ---
@@ -15,9 +15,9 @@ The app mints a Zora Coins V4 creator-token, pins cover art to IPFS, locks funds
 | **Fixed Expenses**    | One-off costs—studio time, camera rentals, fabric orders—paid before revenue streams.                         |
 | **Tokens**            | Zora Coins V4 on Base testnet. Collect page auto-listed on Zora.                                              |
 | **Funding**           | Optional USDC pledge wraps to USDCx and locks in escrow.                                                      |
-| **Auto-Pay**          | Superfluid CFA starts continuous streams to every wallet at “Mark Complete.”                                  |
+| **Auto-Pay**          | Superfluid CFA starts continuous streams to every wallet at "Mark Complete."                                  |
 | **Flex Badges**       | Zora Editions mint to contributors as on-chain proof of work.                                                 |
-| **Dark UI**           | Satin-black background, Satoshi headings, Inter body, electric-purple accents.                                |
+| **Dark UI**           | Satin-black background, Satoshi headings, Inter body, electric-yellow accents.                                |
 
 ---
 
@@ -30,7 +30,7 @@ Pinata IPFS · Zora Coins V4 SDK · Superfluid SDK · Base Testnet · Privy + Sa
 
 ### Live demo
 
-`https://cofoundai.com` → **Launch a Drop**  
+`https://neplus.com` → **Launch a Drop**  
 (Testnet wallet required—Base Sepolia or Base Goerli.)
 
 ---
@@ -38,8 +38,8 @@ Pinata IPFS · Zora Coins V4 SDK · Superfluid SDK · Base Testnet · Privy + Sa
 ### Getting started (local)
 
 ```bash
-git clone https://github.com/yourname/cofoundai.git
-cd cofoundai
+git clone https://github.com/yourname/neplus.git
+cd neplus
 pnpm install
 cp .env.example .env      # add keys below
 pnpm dev                  # http://localhost:3000
@@ -55,6 +55,7 @@ PINATA_JWT=
 ZORA_AUTH=Bearer …
 SUPERFLUID_KEY=
 NEXT_PUBLIC_BASE_RPC=https://sepolia.base.org
+NEXT_PUBLIC_APP_NAME=NEPLUS
 ```
 
 ---

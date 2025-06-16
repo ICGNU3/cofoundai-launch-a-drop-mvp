@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -106,14 +107,14 @@ const Index: React.FC = () => {
       <SignInButton />
       <FullWaveBackground />
       <section className="relative w-full max-w-7xl mx-auto pt-16 md:pt-20 pb-10 px-4 z-10 flex flex-col items-center pb-24">
-        <div className="hero-gradient pointer-events-none" aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 80%,rgba(154,77,255,.18) 0%,transparent 72%)', zIndex: 0 }} />
+        <div className="hero-gradient pointer-events-none" aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 80%,rgba(255,209,102,.18) 0%,transparent 72%)', zIndex: 0 }} />
         <div className="w-full max-w-4xl mx-auto">
           <HeroSection
             counter={counter}
             onCtaClick={wizard.openWizard}
             countUpDollarRef={countUpDollarRef}
             countUpDropRef={countUpDropRef}
-            onAIFinish={handleAIKickoffFinish} // (now unused)
+            onAIFinish={handleAIKickoffFinish}
           />
         </div>
         <div className="w-full flex items-center justify-center mt-6 mb-2">

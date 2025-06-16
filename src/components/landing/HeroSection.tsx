@@ -34,26 +34,24 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   onCtaClick,
   countUpDollarRef,
   countUpDropRef,
-  onAIFinish, // NEW PROP (now unused)
+  onAIFinish,
 }) => {
-  // Remove all AI modal logic
-
   return (
     <div className="w-full text-center">
       {/* HEADLINE */}
       <h1 className="text-center font-headline font-bold text-[2rem] md:text-[2.7rem] lg:text-[3rem] leading-[1.13] hero-title py-2 mt-2 max-w-3xl mx-auto relative z-10 font-playfair tracking-tight drop-shadow">
-        TALENT = MONEY
+        Launch on-chain drops with NEPLUS
       </h1>
       {/* SUBHEADLINE */}
       <div className="text-base md:text-lg text-[#e4f9ea] mt-4 max-w-xl mx-auto font-medium text-center mb-1 px-4">
-        Invite your team, share your idea, and let anyone back your project.<br />
+        Mint a Coin, seed liquidity, share it on Farcaster, grow your market in real time.<br />
         You don't need a big budget or any wallet know-how to get started.
       </div>
       {/* CTA */}
       <div className="flex justify-center mt-7 px-4">
         <AccentButton
           className="hero-cta px-6 md:px-8 py-3 md:py-4 text-base md:text-lg rounded-xl shadow-lg hover:scale-105 transition-all font-bold z-20 w-full max-w-xs"
-          style={{ background: 'linear-gradient(90deg,#5D5FEF 0%,#9A4DFF 100%)', boxShadow: '0 0 16px rgba(93,95,239,.6)' }}
+          style={{ background: 'linear-gradient(90deg,#FFD166 0%,#F2AA4CFF 100%)', boxShadow: '0 0 16px rgba(255,209,102,.6)' }}
           onClick={onCtaClick}
           aria-label="Launch Project Wizard"
         >

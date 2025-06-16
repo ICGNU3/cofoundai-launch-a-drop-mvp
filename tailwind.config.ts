@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -68,22 +69,22 @@ export default {
 				pill: '20px',
 			},
 			colors: {
-				background: "#0A0A0A",
-				surface: "#161C18", // a subtle green-black
+				background: "#0d0d0d",
+				surface: "#0d0d0d",
 				card: "#1E1E1E",
 				cardnew: "#1E1E1E",
 				border: "#2A2A2A",
-				accent: "#22C55E", // modern success green
-				"accent-start": "#22C55E", // vibrant green for gradients
-				"accent-end": "#A3E635",   // lime-green for gradients
-				success: "#4ADE80", // pastel green
-				gold: "#FFD700",
+				accent: "#FFD166",
+				"accent-start": "#FFD166",
+				"accent-end": "#F2AA4C",
+				success: "#FFD166",
+				gold: "#FFD166",
 				yellow: "#FDE68A",
-				"body-text": "#C3C3C3",
-				"headline": "#F9F9F9",
-				tagline: "#E0E0E0",
+				"body-text": "#e8e8e8",
+				"headline": "#e8e8e8",
+				tagline: "#e8e8e8",
 				"slider-track": "#3A3A3A",
-				"slider-thumb": "#22C55E",
+				"slider-thumb": "#FFD166",
 				"toast": "#1E1E1E",
 			},
 			maxWidth: {
@@ -91,10 +92,10 @@ export default {
 			},
 			boxShadow: {
 				coverart: "0 0 0 4px #FFF inset",
-				"slider-thumb": "0 2px 12px 0 #5D5FEF66",
-				btn: "0 3px #22C55E",
+				"slider-thumb": "0 2px 12px 0 #FFD16666",
+				btn: "0 3px #FFD166",
 				"card-inner": "inset 0 0 4px 0 #2226",
-				"card-elevated": "0 4px 12px rgba(34,197,94, 0.15)",
+				"card-elevated": "0 4px 12px rgba(255,209,102, 0.15)",
 			},
 			keyframes: {
 				"btn-raise": {

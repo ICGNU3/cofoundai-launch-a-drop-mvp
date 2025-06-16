@@ -1,3 +1,4 @@
+
 @import "./styles/fonts.css";
 
 @tailwind base;
@@ -7,7 +8,7 @@
 /* GLOBAL web3 2025 STYLES — Neue Montreal (UI) + Satoshi (body) */
 body {
   @apply bg-background text-base font-satoshi font-normal m-0 p-0 min-h-screen leading-[1.5];
-  color: #E0E0E0;
+  color: #e8e8e8;
 }
 
 .hero-title, h1.headline, h1 {
@@ -15,16 +16,16 @@ body {
   font-weight: 700;
   font-size: 54px;
   line-height: 1.13;
-  color: #F9F9F9;
+  color: #e8e8e8;
   padding-top: 24px;
   padding-bottom: 24px;
-  background: linear-gradient(98deg, #36DF8C 8%, #8399FF 50%, #FFD700 94%);
+  background: linear-gradient(98deg, #FFD166 8%, #F2AA4C 50%, #FFD700 94%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
           background-clip: text;
           text-fill-color: transparent;
   letter-spacing: -0.01em;
-  text-shadow: 0 2px 24px rgba(34, 197, 94, 0.11), 0 2px 4px #353ad03a;
+  text-shadow: 0 2px 24px rgba(255, 209, 102, 0.11), 0 2px 4px #ffd16630;
 }
 
 @media (max-width: 1024px) {
@@ -46,8 +47,8 @@ h2, .section-heading {
   font-family: 'Neue Montreal','Montserrat','Inter',system-ui,sans-serif;
   font-weight: 700;
   font-size: 22px;
-  color: #36DF8C;
-  background: linear-gradient(90deg, #36DF8C 12%, #8399FF 80%);
+  color: #FFD166;
+  background: linear-gradient(90deg, #FFD166 12%, #F2AA4C 80%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -57,7 +58,7 @@ h2, .section-heading {
 }
 
 .hero-tagline, .tagline, p, .body-text {
-  color: #E0E0E0;
+  color: #e8e8e8;
   font-family: "Satoshi", "Inter", "Montserrat", system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.6;
@@ -74,13 +75,13 @@ h2, .section-heading {
   font-family: 'Satoshi', 'Inter', 'Montserrat', system-ui, sans-serif !important;
 }
 
-/* Card/Surface with green glow */
+/* Card/Surface with yellow glow */
 .card, .wizard-card {
-  background: #161C18;
-  border: 2px solid #22C55E33;
+  background: #0d0d0d;
+  border: 2px solid #FFD16633;
   border-radius: 12px;
   max-width: 620px;
-  box-shadow: 0 4px 18px rgba(34, 197, 94, 0.16);
+  box-shadow: 0 4px 18px rgba(255, 209, 102, 0.16);
   padding: 2.5rem;
 }
 @media (max-width: 640px) {
@@ -89,18 +90,18 @@ h2, .section-heading {
   }
 }
 
-/* Gradient Accent Button: success theme, subtle gold glow */
+/* Gradient Accent Button: NEPLUS theme, yellow glow */
 button.accent-btn, .accent-btn {
   @apply rounded-lg text-white font-semibold h-12 px-6;
-  background: linear-gradient(92deg, #36DF8C 9%, #8399FF 52%, #FFD700 98%);
-  box-shadow: 0 0 16px #8399ff30, 0 0 6px #36df8c55;
+  background: linear-gradient(92deg, #FFD166 9%, #F2AA4C 52%, #FFD700 98%);
+  box-shadow: 0 0 16px #ffd16630, 0 0 6px #ffd16655;
   border: none;
   font-size: 16px;
   cursor: pointer;
 }
 button.accent-btn:hover, .accent-btn:hover {
   filter: brightness(109%);
-  box-shadow: 0 0 36px #8399ff59, 0 0 12px #36df8c66;
+  box-shadow: 0 0 36px #ffd16659, 0 0 12px #ffd16666;
 }
 button.accent-btn:active, .accent-btn:active {
   transform: scale(0.95);
@@ -108,14 +109,14 @@ button.accent-btn:active, .accent-btn:active {
 }
 button.accent-btn.secondary, .accent-btn.secondary {
   background: transparent !important;
-  border: 2px solid #22C55E !important;
-  color: #22C55E !important;
+  border: 2px solid #FFD166 !important;
+  color: #FFD166 !important;
   box-shadow: none;
 }
 
-/* Gradient Progress Bar with greens + gold */
+/* Gradient Progress Bar with yellows + gold */
 .progress-bar {
-  background: linear-gradient(90deg, #22C55E 0%, #A3E635 78%, #FFD700 100%);
+  background: linear-gradient(90deg, #FFD166 0%, #F2AA4C 78%, #FFD700 100%);
   height: 6px;
   border-radius: 9999px;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -125,9 +126,9 @@ button.accent-btn.secondary, .accent-btn.secondary {
 input, textarea, select {
   @apply font-sans text-base font-normal;
   border-radius: 8px;
-  background: #181E15;
-  color: #E0E0E0;
-  border: 1px solid #22C55E44;
+  background: #1a1a1a;
+  color: #e8e8e8;
+  border: 1px solid #FFD16644;
   padding: 12px 14px;
   outline: none;
 }
@@ -139,17 +140,17 @@ input, textarea, select {
   padding: 6px 10px;
   margin: 4px 4px 4px 0;
   border-radius: 20px;
-  border: 1.5px solid #22C55E77;
+  border: 1.5px solid #FFD16677;
   display: inline-flex;
   align-items: center;
-  background: #181E15;
-  color: #A3E635;
+  background: #1a1a1a;
+  color: #FFD166;
 }
 .role-pill {
-  background: #131D14;
+  background: #1a1a1a;
 }
 .expense-pill {
-  background: #181E15;
+  background: #1a1a1a;
 }
 
 /* Mobile-responsive pills for viewport ≤ 480px */
@@ -201,16 +202,16 @@ input, textarea, select {
   border-radius: 9999px;
 }
 .slider-thumb {
-  background: #22C55E;
-  box-shadow: 0 2px 12px 0 #22C55E66;
+  background: #FFD166;
+  box-shadow: 0 2px 12px 0 #FFD16666;
   border-radius: 9999px;
   width: 28px;
   height: 28px;
   border: none;
 }
 .toast {
-  background: #161C18;
-  color: #A3E635;
+  background: #0d0d0d;
+  color: #FFD166;
 }
 
 /* Focus outlines for accessibility */
@@ -220,7 +221,7 @@ textarea:focus-visible,
 select:focus-visible,
 [tabindex]:focus-visible,
 a:focus-visible {
-  outline: 2px solid #A3E635;
+  outline: 2px solid #FFD166;
   outline-offset: 2px;
 }
 
@@ -265,7 +266,7 @@ a:focus-visible {
   .card.wizard-card {
     padding: 1rem;
     max-width: 97vw;
-    box-shadow: 0 2px 6px rgba(34,197,94,0.12);
+    box-shadow: 0 2px 6px rgba(255,209,102,0.12);
     margin-top: 18vw;
     margin-bottom: 8vw;
   }
