@@ -1,12 +1,11 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { WalletConnection } from './WalletConnection';
 import { PriceChart } from './PriceChart';
 import { TradingAnalytics } from './TradingAnalytics';
 import { TradingInterface } from './TradingInterface';
+import { TokenSelector } from './trading/TokenSelector';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 
 interface Token {
@@ -22,7 +21,7 @@ interface EnhancedTradingDashboardProps {
   featuredToken: Token;
 }
 
-// Mock data for charts and analytics
+// Mock data generators
 const generateMockPriceData = (basePrice: number) => {
   const data = [];
   const now = Date.now();
@@ -72,55 +71,15 @@ export function EnhancedTradingDashboard({ tokens, featuredToken }: EnhancedTrad
 
   return (
     <div className="space-y-8">
-      {/* Wallet Connection */}
       <WalletConnection />
       
-      {/* Token Selector */}
-      <Card className="bg-surface border-border">
-        <CardHeader>
-          <CardTitle>Select Token to Trade</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {tokens.map((token) => (
-              <Card
-                key={token.address}
-                className={`cursor-pointer transition-all ${
-                  selectedToken.address === token.address
-                    ? 'ring-2 ring-accent bg-accent/10'
-                    : 'hover:bg-surface/80'
-                }`}
-                onClick={() => setSelectedToken(token)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    {token.logoUrl ? (
-                      <img src={token.logoUrl} alt={token.symbol} className="w-8 h-8 rounded-full" />
-                    ) : (
-                      <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-sm font-bold text-black">
-                        {token.symbol.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <div className="font-semibold">{token.symbol}</div>
-                      <div className="text-xs text-text/70 truncate">{token.name}</div>
-                    </div>
-                  </div>
-                  {selectedToken.address === token.address && (
-                    <Badge className="mt-2 bg-accent text-black">
-                      Selected
-                    </Badge>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <TokenSelector
+        tokens={tokens}
+        selectedToken={selectedToken}
+        onTokenSelect={setSelectedToken}
+      />
 
-      {/* Main Trading Interface */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Trading Interface */}
         <div className="lg:col-span-1">
           <TradingInterface
             tokenAddress={selectedToken.address}
@@ -130,7 +89,6 @@ export function EnhancedTradingDashboard({ tokens, featuredToken }: EnhancedTrad
           />
         </div>
 
-        {/* Charts and Analytics */}
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="chart" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
