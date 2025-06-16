@@ -7,27 +7,8 @@ type HeroSectionProps = {
   onCtaClick: () => void;
   countUpDollarRef: React.RefObject<HTMLSpanElement>;
   countUpDropRef: React.RefObject<HTMLSpanElement>;
-  // New! allows parent to handle AI wizard handoff
   onAIFinish?: (aiData: { projectIdea: string; projectType: string; roleSplits?: Array<{ role: string; percent: number }> }) => void;
 };
-
-const steps = [
-  {
-    label: "Share Your Idea",
-    desc: "Describe what you want to create—no technical skills or jargon.",
-    emoji: "💡",
-  },
-  {
-    label: "Invite Anyone to Join",
-    desc: "Friends or strangers can support you, even with tiny amounts.",
-    emoji: "🤝",
-  },
-  {
-    label: "Build & Earn Together",
-    desc: "Funds are split as you deliver. Everyone gets paid, no big upfronts.",
-    emoji: "🌱",
-  },
-];
 
 const HeroSection: React.FC<HeroSectionProps> = ({
   counter,
@@ -37,38 +18,55 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   onAIFinish,
 }) => {
   return (
-    <div className="w-full text-center">
-      {/* HEADLINE */}
-      <h1 className="text-center font-headline font-bold text-[2rem] md:text-[2.7rem] lg:text-[3rem] leading-[1.13] hero-title py-2 mt-2 max-w-3xl mx-auto relative z-10 font-playfair tracking-tight drop-shadow">
-        Launch on-chain drops with NEPLUS
-      </h1>
-      {/* SUBHEADLINE */}
-      <div className="text-base md:text-lg text-[#e4f9ea] mt-4 max-w-xl mx-auto font-medium text-center mb-1 px-4">
-        Mint a Coin, seed liquidity, share it on Farcaster, grow your market in real time.<br />
-        You don't need a big budget or any wallet know-how to get started.
-      </div>
-      {/* CTA */}
-      <div className="flex justify-center mt-7 px-4">
-        <AccentButton
-          className="hero-cta px-6 md:px-8 py-3 md:py-4 text-base md:text-lg rounded-xl shadow-lg hover:scale-105 transition-all font-bold z-20 w-full max-w-xs"
-          style={{ background: 'linear-gradient(90deg,#FFD166 0%,#F2AA4CFF 100%)', boxShadow: '0 0 16px rgba(255,209,102,.6)' }}
-          onClick={onCtaClick}
-          aria-label="Launch Project Wizard"
-        >
-          Start My Project
-        </AccentButton>
-      </div>
-      {/* HOW IT WORKS */}
-      <div className="w-full flex flex-col items-center gap-3 mt-12 mb-2 px-4">
-        <h2 className="text-lg md:text-2xl font-bold text-accent mb-3 text-center">How it works</h2>
-        <div className="flex flex-col md:flex-row gap-4 md:gap-7 justify-center w-full max-w-4xl">
-          {steps.map(({ label, desc, emoji }) => (
-            <div key={label} className="bg-card border border-accent/20 rounded-xl px-4 md:px-5 py-5 md:py-7 flex flex-col items-center max-w-xs mx-auto shadow-md">
-              <div className="text-2xl md:text-3xl mb-2">{emoji}</div>
-              <div className="font-headline text-accent font-bold mb-1 text-center text-sm md:text-base">{label}</div>
-              <div className="text-tagline text-xs md:text-sm text-center">{desc}</div>
-            </div>
-          ))}
+    <div className="container mx-auto px-6 pt-16 md:pt-24">
+      <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+        {/* Main Headline */}
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tighter mb-6 leading-tight">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">Launch</span> on-chain drops with NEPLUS
+        </h1>
+        
+        {/* Subheadline */}
+        <p className="text-gray-300 text-xl md:text-2xl mb-8 max-w-3xl font-light tracking-wide">
+          Mint a Coin, seed liquidity, share it on Farcaster, grow your market in real time. 
+          No big budget or wallet expertise required.
+        </p>
+        
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 mt-4">
+          <button 
+            className="bg-white text-black font-medium rounded-md px-8 py-3 hover:bg-opacity-90 transition-all"
+            onClick={onCtaClick}
+          >
+            Get started
+          </button>
+          <a href="#how-it-works" className="flex items-center justify-center text-gray-300 hover:text-white transition-colors py-3 px-2 group">
+            Learn more
+            <span className="material-symbols-outlined ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </a>
+        </div>
+        
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 max-w-4xl mx-auto">
+          <div>
+            <p className="text-4xl font-light mb-1 tracking-tight">
+              <span ref={countUpDollarRef}>${counter.total.toLocaleString()}</span>
+            </p>
+            <p className="text-gray-400 font-extralight">Total value locked</p>
+          </div>
+          <div>
+            <p className="text-4xl font-light mb-1 tracking-tight">
+              <span ref={countUpDropRef}>{counter.drops}</span>+
+            </p>
+            <p className="text-gray-400 font-extralight">Active drops</p>
+          </div>
+          <div>
+            <p className="text-4xl font-light mb-1 tracking-tight">24/7</p>
+            <p className="text-gray-400 font-extralight">Liquidity available</p>
+          </div>
+          <div>
+            <p className="text-4xl font-light mb-1 tracking-tight">100%</p>
+            <p className="text-gray-400 font-extralight">On-chain verified</p>
+          </div>
         </div>
       </div>
     </div>

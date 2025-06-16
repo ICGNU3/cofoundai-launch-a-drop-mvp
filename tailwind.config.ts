@@ -20,48 +20,66 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				// UI, Headlines
+				// Primary: Geist-inspired with Inter fallback
+				geist: [
+					'"Geist"',
+					'"Inter"',
+					'system-ui',
+					'sans-serif'
+				],
+				// UI, Headlines - Modern, clean
 				neue: [
+					'"Inter"',
 					'"Neue Montreal"',
 					'Montserrat',
-					'Inter',
 					'system-ui',
 					'sans-serif'
 				],
-				// Body
+				// Body - Clean, readable
 				satoshi: [
+					'"Inter"',
 					'"Satoshi"',
-					'Inter',
 					'Montserrat',
 					'system-ui',
 					'sans-serif'
 				],
-				// Aliases for legacy utility classes
+				// Aliases for legacy and new usage
 				headline: [
+					'"Inter"',
 					'"Neue Montreal"',
 					'Montserrat',
-					'Inter',
 					'system-ui',
 					'sans-serif'
 				],
 				sans: [
+					'"Inter"',
 					'"Satoshi"',
-					'Inter',
 					'Montserrat',
 					'system-ui',
 					'sans-serif'
 				],
 			},
 			fontWeight: {
-				semi: 500,
+				extralight: 200,
+				light: 300,
 				normal: 400,
+				medium: 500,
+				semi: 600,
 				bold: 700,
 			},
 			fontSize: {
 				base: ['16px', '1.5'],
 				'hero': ['36px', '1.2'],
+				'hero-lg': ['4rem', '1.1'],
+				'hero-xl': ['5rem', '1.1'],
 				'pill': ['14px', '1.4'],
 				'section': ['20px', '1.4'],
+			},
+			letterSpacing: {
+				tighter: '-0.025em',
+				tight: '-0.015em',
+				normal: '0',
+				wide: '0.025em',
 			},
 			borderRadius: {
 				lg: '16px', 
@@ -69,34 +87,43 @@ export default {
 				pill: '20px',
 			},
 			colors: {
-				background: "#0d0d0d",
-				surface: "#0d0d0d",
-				card: "#1E1E1E",
-				cardnew: "#1E1E1E",
-				border: "#2A2A2A",
-				accent: "#FFD166",
-				"accent-start": "#FFD166",
-				"accent-end": "#F2AA4C",
-				success: "#FFD166",
+				background: "#000000",
+				surface: "#000000",
+				card: "#111111",
+				cardnew: "#111111",
+				border: "#1f1f1f",
+				accent: "#60a5fa",
+				"accent-start": "#60a5fa",
+				"accent-end": "#a855f7",
+				success: "#60a5fa",
+				blue: {
+					400: "#60a5fa",
+					500: "#3b82f6",
+				},
+				purple: {
+					400: "#a855f7",
+					500: "#8b5cf6",
+				},
 				gold: "#FFD166",
 				yellow: "#FDE68A",
-				"body-text": "#e8e8e8",
-				text: "#e8e8e8",
-				"headline": "#e8e8e8",
-				tagline: "#e8e8e8",
-				"slider-track": "#3A3A3A",
-				"slider-thumb": "#FFD166",
-				"toast": "#1E1E1E",
+				"body-text": "#d1d5db",
+				text: "#f9fafb",
+				"headline": "#f9fafb",
+				tagline: "#d1d5db",
+				"text-muted": "#9ca3af",
+				"slider-track": "#1f1f1f",
+				"slider-thumb": "#60a5fa",
+				"toast": "#111111",
 			},
 			maxWidth: {
 				card: "620px",
 			},
 			boxShadow: {
 				coverart: "0 0 0 4px #FFF inset",
-				"slider-thumb": "0 2px 12px 0 #FFD16666",
-				btn: "0 3px #FFD166",
-				"card-inner": "inset 0 0 4px 0 #2226",
-				"card-elevated": "0 4px 12px rgba(255,209,102, 0.15)",
+				"slider-thumb": "0 2px 12px 0 #60a5fa66",
+				btn: "0 3px #60a5fa",
+				"card-inner": "inset 0 0 4px 0 #1f1f1f33",
+				"card-elevated": "0 4px 12px rgba(96,165,250, 0.15)",
 			},
 			keyframes: {
 				"btn-raise": {
