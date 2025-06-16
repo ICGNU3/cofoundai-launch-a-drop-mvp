@@ -22,13 +22,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
         {/* Main Headline */}
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tighter mb-6 leading-tight">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">Launch</span> on-chain drops with NEPLUS
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">CREATE</span> Your OWN Economy
         </h1>
         
         {/* Subheadline */}
         <p className="text-gray-300 text-xl md:text-2xl mb-8 max-w-3xl font-light tracking-wide">
-          Mint a Coin, seed liquidity, share it on Farcaster, grow your market in real time. 
-          No big budget or wallet expertise required.
+          Build, fund, and grow your own economic ecosystem. From creative projects to business ventures - 
+          turn your ideas into thriving on-chain economies with your community.
         </p>
         
         {/* CTA Buttons */}
@@ -37,10 +37,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             className="bg-white text-black font-medium rounded-md px-8 py-3 hover:bg-opacity-90 transition-all"
             onClick={onCtaClick}
           >
-            Get started
+            Start building
           </button>
           <a href="#how-it-works" className="flex items-center justify-center text-gray-300 hover:text-white transition-colors py-3 px-2 group">
-            Learn more
+            See how it works
             <span className="material-symbols-outlined ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
           </a>
         </div>
@@ -51,21 +51,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             <p className="text-4xl font-light mb-1 tracking-tight">
               <span ref={countUpDollarRef}>${counter.total.toLocaleString()}</span>
             </p>
-            <p className="text-gray-400 font-extralight">Total value locked</p>
+            <p className="text-gray-400 font-extralight">Economies created</p>
           </div>
           <div>
             <p className="text-4xl font-light mb-1 tracking-tight">
               <span ref={countUpDropRef}>{counter.drops}</span>+
             </p>
-            <p className="text-gray-400 font-extralight">Active drops</p>
+            <p className="text-gray-400 font-extralight">Active projects</p>
           </div>
           <div>
             <p className="text-4xl font-light mb-1 tracking-tight">24/7</p>
-            <p className="text-gray-400 font-extralight">Liquidity available</p>
+            <p className="text-gray-400 font-extralight">Community driven</p>
           </div>
           <div>
             <p className="text-4xl font-light mb-1 tracking-tight">100%</p>
-            <p className="text-gray-400 font-extralight">On-chain verified</p>
+            <p className="text-gray-400 font-extralight">Decentralized</p>
           </div>
         </div>
       </div>
