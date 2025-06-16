@@ -6,7 +6,7 @@ import Dashboard from './pages/Dashboard';
 import ProjectDashboard from './pages/ProjectDashboard';
 import ProjectOverview from './pages/ProjectOverview';
 import ProjectWorkspace from './pages/ProjectWorkspace';
-import ProjectLaunchHubRoute from './pages/ProjectLaunchHubRoute';
+import { ProjectLaunchHubRoute } from './pages/ProjectLaunchHubRoute';
 import TradingHub from './pages/TradingHub';
 import FarcasterIntegration from './pages/FarcasterIntegration';
 import FarcasterFramePage from './pages/FarcasterFramePage';
