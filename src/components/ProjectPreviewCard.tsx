@@ -1,35 +1,36 @@
 
 import React from "react";
-import type { Role, Expense } from "@/hooks/useWizardState";
 
 interface ProjectPreviewCardProps {
-  roles: Role[];
-  expenses: Expense[];
+  project: {
+    id: string;
+    name?: string;
+    description?: string;
+    created_at?: string;
+    [key: string]: any;
+  };
 }
 
 export const ProjectPreviewCard: React.FC<ProjectPreviewCardProps> = ({
-  roles,
-  expenses,
+  project,
 }) => {
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <h3 className="font-semibold text-body-text mb-3">Team & Budget</h3>
-      <div className="space-y-2 text-sm">
-        {roles.map((role, i) => (
-          <div key={i} className="flex justify-between">
-            <span>{role.roleName}</span>
-            <span>{role.percent}%</span>
-          </div>
-        ))}
-      </div>
-      <hr className="my-3 border-border" />
-      <div className="space-y-1 text-sm">
-        {expenses.map((expense, i) => (
-          <div key={i} className="flex justify-between">
-            <span>{expense.expenseName}</span>
-            <span>${expense.amountUSDC} {expense.payoutType === "immediate" ? "(Upfront)" : "(On Success)"}</span>
-          </div>
-        ))}
+    <div className="bg-card border border-border rounded-lg p-6">
+      <h3 className="font-semibold text-headline text-lg mb-2">
+        {project.name || "Untitled Project"}
+      </h3>
+      {project.description && (
+        <p className="text-text text-sm mb-4 line-clamp-3">
+          {project.description}
+        </p>
+      )}
+      <div className="flex justify-between items-center text-sm text-text/70">
+        <span>Project ID: {project.id.slice(0, 8)}...</span>
+        {project.created_at && (
+          <span>
+            Created: {new Date(project.created_at).toLocaleDateString()}
+          </span>
+        )}
       </div>
     </div>
   );
