@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../integrations/supabase/client";
@@ -9,6 +10,7 @@ import { TradingTab } from "@/components/dashboard/TradingTab";
 import { AnalyticsTab } from "@/components/dashboard/AnalyticsTab";
 import { PositionsTab } from "@/components/dashboard/PositionsTab";
 import { ProjectsTab } from "@/components/dashboard/ProjectsTab";
+import { StreamlinedWizardButton } from "@/components/StreamlinedWizardButton";
 import ModernNavigation from "@/components/ModernNavigation";
 
 const Dashboard: React.FC = () => {
@@ -44,6 +46,9 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  // Get wallet address from user
+  const walletAddress = user?.wallet?.address || null;
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -62,12 +67,14 @@ const Dashboard: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-headline">Dashboard</h1>
-            <Link
-              to="/"
-              className="px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
+            <StreamlinedWizardButton 
+              walletAddress={walletAddress}
+              variant="default"
+              size="default"
+              className="bg-accent text-black hover:bg-accent/90"
             >
               Launch New Drop
-            </Link>
+            </StreamlinedWizardButton>
           </div>
 
           <Tabs defaultValue="portfolio" className="space-y-6">
