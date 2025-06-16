@@ -13,15 +13,24 @@ export const ZORA_FACTORY_ABI = [
   {
     "inputs": [
       {
-        "components": [
-          { "name": "name", "type": "string" },
-          { "name": "symbol", "type": "string" },
-          { "name": "initialSupply", "type": "uint256" },
-          { "name": "creator", "type": "address" },
-          { "name": "uri", "type": "string" }
-        ],
-        "name": "coinParams",
-        "type": "tuple"
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "symbol", 
+        "type": "string"
+      },
+      {
+        "name": "initialSupply",
+        "type": "uint256"
+      },
+      {
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "name": "uri",
+        "type": "string"
       }
     ],
     "name": "createCoin",
@@ -56,7 +65,13 @@ export function useZoraMinting() {
       address: ZORA_CONTRACTS.FACTORY,
       abi: ZORA_FACTORY_ABI,
       functionName: "createCoin",
-      args: [params],
+      args: [
+        params.name,
+        params.symbol,
+        params.initialSupply,
+        params.creator,
+        params.uri
+      ],
     });
   };
 
