@@ -4,15 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../integrations/supabase/client";
 import { usePrivy } from "@privy-io/react-auth";
 import { Link } from "react-router-dom";
-import { ProjectPreviewCard } from "@/components/ProjectPreviewCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SwapCard } from "@/components/SwapCard";
-import { LiquidityDashboard } from "@/components/LiquidityDashboard";
-import { CreatorAnalyticsDashboard } from "@/components/CreatorAnalyticsDashboard";
-import { TokenHoldings } from "@/components/TokenHoldings";
-import { RecentTradingActivity } from "@/components/RecentTradingActivity";
-import { PortfolioMetrics } from "@/components/PortfolioMetrics";
-import { usePoolStats } from "@/hooks/usePoolStats";
+import { PortfolioTab } from "@/components/dashboard/PortfolioTab";
+import { TradingTab } from "@/components/dashboard/TradingTab";
+import { AnalyticsTab } from "@/components/dashboard/AnalyticsTab";
+import { PositionsTab } from "@/components/dashboard/PositionsTab";
+import { ProjectsTab } from "@/components/dashboard/ProjectsTab";
 
 const Dashboard: React.FC = () => {
   const { user } = usePrivy();
@@ -32,124 +29,6 @@ const Dashboard: React.FC = () => {
     },
     enabled: !!user?.id,
   });
-
-  // Mock portfolio data - in a real app, this would come from user's wallet and trading history
-  const mockTokenHoldings = [
-    {
-      tokenAddress: '0x1234567890123456789012345678901234567890',
-      symbol: 'FILMX',
-      name: 'Film Production Token',
-      balance: '1,250.50',
-      valueUSD: 562.25,
-      priceChange24h: 5.67,
-      logoUrl: undefined
-    },
-    {
-      tokenAddress: '0x2345678901234567890123456789012345678901',
-      symbol: 'MUSICX',
-      name: 'Music Creation Token',
-      balance: '890.25',
-      valueUSD: 401.25,
-      priceChange24h: -2.34,
-      logoUrl: undefined
-    },
-    {
-      tokenAddress: '0x3456789012345678901234567890123456789012',
-      symbol: 'GAMEX',
-      name: 'Game Development Token',
-      balance: '2,100.00',
-      valueUSD: 945.00,
-      priceChange24h: 12.45,
-      logoUrl: undefined
-    }
-  ];
-
-  const mockTradingActivity = [
-    {
-      id: '1',
-      type: 'buy' as const,
-      tokenSymbol: 'FILMX',
-      tokenName: 'Film Production Token',
-      amount: '500.00',
-      priceUSD: 0.45,
-      totalUSD: 225.00,
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      txHash: '0xabcd1234567890abcd1234567890abcd12345678'
-    },
-    {
-      id: '2',
-      type: 'sell' as const,
-      tokenSymbol: 'MUSICX',
-      tokenName: 'Music Creation Token',
-      amount: '200.00',
-      priceUSD: 0.51,
-      totalUSD: 102.00,
-      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-      txHash: '0xefgh5678901234efgh5678901234efgh56789012'
-    },
-    {
-      id: '3',
-      type: 'buy' as const,
-      tokenSymbol: 'GAMEX',
-      tokenName: 'Game Development Token',
-      amount: '1,000.00',
-      priceUSD: 0.42,
-      totalUSD: 420.00,
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-      txHash: '0xijkl9012345678ijkl9012345678ijkl90123456'
-    }
-  ];
-
-  const mockPortfolioData = [
-    { timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1750.00, dayChange: -2.1 },
-    { timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1820.50, dayChange: 4.0 },
-    { timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1780.25, dayChange: -2.2 },
-    { timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1845.75, dayChange: 3.7 },
-    { timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1890.00, dayChange: 2.4 },
-    { timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1925.30, dayChange: 1.9 },
-    { timestamp: new Date().toISOString(), totalValue: 1908.50, dayChange: -0.9 }
-  ];
-
-  const portfolioTotalValue = mockTokenHoldings.reduce((sum, holding) => sum + holding.valueUSD, 0);
-  const portfolioDayChange = -0.9; // Mock day change
-  const portfolioWeekChange = 9.1; // Mock week change
-  const totalTrades = mockTradingActivity.length;
-
-  // Mock trending coins data - would come from API
-  const mockTrendingCoins = [
-    {
-      id: '0x1234567890123456789012345678901234567890',
-      symbol: 'MUSIC',
-      name: 'Music Creator Coin',
-      logoUrl: undefined
-    },
-    {
-      id: '0x0987654321098765432109876543210987654321',
-      symbol: 'ART',
-      name: 'Digital Art Coin',
-      logoUrl: undefined
-    }
-  ];
-
-  // Mock liquidity positions
-  const mockPositions = [
-    {
-      id: '1',
-      coinSymbol: 'MUSIC',
-      coinName: 'Music Creator Coin',
-      liquidity: '1250.50',
-      unclaimedRoyalties: '12.34',
-      feeAPR: '8.5'
-    },
-    {
-      id: '2',
-      coinSymbol: 'ART',
-      coinName: 'Digital Art Coin',
-      liquidity: '890.25',
-      unclaimedRoyalties: '5.67',
-      feeAPR: '12.1'
-    }
-  ];
 
   const handleClaim = async (positionId: string) => {
     setClaimLoading(true);
@@ -205,119 +84,27 @@ const Dashboard: React.FC = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="portfolio" className="space-y-6">
-            <PortfolioMetrics
-              totalValue={portfolioTotalValue}
-              dayChange={portfolioDayChange}
-              weekChange={portfolioWeekChange}
-              totalTrades={totalTrades}
-              historicalData={mockPortfolioData}
-            />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TokenHoldings
-                holdings={mockTokenHoldings}
-                totalValue={portfolioTotalValue}
-                totalChange24h={portfolioDayChange}
-              />
-              
-              <RecentTradingActivity activities={mockTradingActivity} />
-            </div>
+          <TabsContent value="portfolio">
+            <PortfolioTab />
           </TabsContent>
 
-          <TabsContent value="trading" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mockTrendingCoins.map((coin) => {
-                // Mock pool stats for each coin
-                const mockPoolStats = {
-                  depth: '125000.50',
-                  volume24h: '45000.25',
-                  feeAPR: '8.5'
-                };
-                return (
-                  <SwapCard 
-                    key={coin.id}
-                    coin={coin}
-                    poolStats={mockPoolStats}
-                  />
-                );
-              })}
-            </div>
+          <TabsContent value="trading">
+            <TradingTab />
           </TabsContent>
 
           <TabsContent value="analytics">
-            {projects && projects.length > 0 ? (
-              <div className="space-y-8">
-                {projects
-                  .filter(project => project.token_address)
-                  .map((project) => (
-                    <div key={project.id}>
-                      <div className="mb-4">
-                        <h3 className="text-xl font-semibold">{project.project_idea}</h3>
-                        <p className="text-text/70 text-sm">Token: {project.token_address}</p>
-                      </div>
-                      <CreatorAnalyticsDashboard
-                        tokenAddress={project.token_address!}
-                        tokenSymbol={project.project_type || 'TOKEN'}
-                        creatorAddress={project.wallet_address || user?.wallet?.address || ''}
-                      />
-                    </div>
-                  ))
-                }
-                {projects.filter(project => project.token_address).length === 0 && (
-                  <div className="text-center py-12">
-                    <h3 className="text-xl font-semibold text-headline mb-4">No Analytics Available</h3>
-                    <p className="text-body-text mb-6">Deploy a token to start tracking analytics!</p>
-                    <Link
-                      to="/"
-                      className="inline-flex px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
-                    >
-                      Launch Your First Drop
-                    </Link>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <h3 className="text-xl font-semibold text-headline mb-4">No Projects Yet</h3>
-                <p className="text-body-text mb-6">Create your first project to start tracking analytics!</p>
-                <Link
-                  to="/"
-                  className="inline-flex px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
-                >
-                  Launch Your First Drop
-                </Link>
-              </div>
-            )}
+            <AnalyticsTab projects={projects} />
           </TabsContent>
 
           <TabsContent value="positions">
-            <LiquidityDashboard 
-              positions={mockPositions}
+            <PositionsTab 
               onClaim={handleClaim}
               isClaimLoading={claimLoading}
             />
           </TabsContent>
 
-          <TabsContent value="projects" className="space-y-6">
-            {projects && projects.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects.map((project) => (
-                  <ProjectPreviewCard key={project.id} project={project} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <h3 className="text-xl font-semibold text-headline mb-4">No projects yet</h3>
-                <p className="text-body-text mb-6">Create your first project to get started!</p>
-                <Link
-                  to="/"
-                  className="inline-flex px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
-                >
-                  Launch Your First Drop
-                </Link>
-              </div>
-            )}
+          <TabsContent value="projects">
+            <ProjectsTab projects={projects} />
           </TabsContent>
         </Tabs>
       </div>
