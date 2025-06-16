@@ -9,6 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwapCard } from "@/components/SwapCard";
 import { LiquidityDashboard } from "@/components/LiquidityDashboard";
 import { CreatorAnalyticsDashboard } from "@/components/CreatorAnalyticsDashboard";
+import { TokenHoldings } from "@/components/TokenHoldings";
+import { RecentTradingActivity } from "@/components/RecentTradingActivity";
+import { PortfolioMetrics } from "@/components/PortfolioMetrics";
 import { usePoolStats } from "@/hooks/usePoolStats";
 
 const Dashboard: React.FC = () => {
@@ -29,6 +32,88 @@ const Dashboard: React.FC = () => {
     },
     enabled: !!user?.id,
   });
+
+  // Mock portfolio data - in a real app, this would come from user's wallet and trading history
+  const mockTokenHoldings = [
+    {
+      tokenAddress: '0x1234567890123456789012345678901234567890',
+      symbol: 'FILMX',
+      name: 'Film Production Token',
+      balance: '1,250.50',
+      valueUSD: 562.25,
+      priceChange24h: 5.67,
+      logoUrl: undefined
+    },
+    {
+      tokenAddress: '0x2345678901234567890123456789012345678901',
+      symbol: 'MUSICX',
+      name: 'Music Creation Token',
+      balance: '890.25',
+      valueUSD: 401.25,
+      priceChange24h: -2.34,
+      logoUrl: undefined
+    },
+    {
+      tokenAddress: '0x3456789012345678901234567890123456789012',
+      symbol: 'GAMEX',
+      name: 'Game Development Token',
+      balance: '2,100.00',
+      valueUSD: 945.00,
+      priceChange24h: 12.45,
+      logoUrl: undefined
+    }
+  ];
+
+  const mockTradingActivity = [
+    {
+      id: '1',
+      type: 'buy' as const,
+      tokenSymbol: 'FILMX',
+      tokenName: 'Film Production Token',
+      amount: '500.00',
+      priceUSD: 0.45,
+      totalUSD: 225.00,
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      txHash: '0xabcd1234567890abcd1234567890abcd12345678'
+    },
+    {
+      id: '2',
+      type: 'sell' as const,
+      tokenSymbol: 'MUSICX',
+      tokenName: 'Music Creation Token',
+      amount: '200.00',
+      priceUSD: 0.51,
+      totalUSD: 102.00,
+      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+      txHash: '0xefgh5678901234efgh5678901234efgh56789012'
+    },
+    {
+      id: '3',
+      type: 'buy' as const,
+      tokenSymbol: 'GAMEX',
+      tokenName: 'Game Development Token',
+      amount: '1,000.00',
+      priceUSD: 0.42,
+      totalUSD: 420.00,
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      txHash: '0xijkl9012345678ijkl9012345678ijkl90123456'
+    }
+  ];
+
+  const mockPortfolioData = [
+    { timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1750.00, dayChange: -2.1 },
+    { timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1820.50, dayChange: 4.0 },
+    { timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1780.25, dayChange: -2.2 },
+    { timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1845.75, dayChange: 3.7 },
+    { timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1890.00, dayChange: 2.4 },
+    { timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), totalValue: 1925.30, dayChange: 1.9 },
+    { timestamp: new Date().toISOString(), totalValue: 1908.50, dayChange: -0.9 }
+  ];
+
+  const portfolioTotalValue = mockTokenHoldings.reduce((sum, holding) => sum + holding.valueUSD, 0);
+  const portfolioDayChange = -0.9; // Mock day change
+  const portfolioWeekChange = 9.1; // Mock week change
+  const totalTrades = mockTradingActivity.length;
 
   // Mock trending coins data - would come from API
   const mockTrendingCoins = [
@@ -101,10 +186,13 @@ const Dashboard: React.FC = () => {
           </Link>
         </div>
 
-        <Tabs defaultValue="trending" className="space-y-6">
+        <Tabs defaultValue="portfolio" className="space-y-6">
           <TabsList className="bg-card border border-border">
-            <TabsTrigger value="trending" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
-              Trending
+            <TabsTrigger value="portfolio" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+              Portfolio
+            </TabsTrigger>
+            <TabsTrigger value="trading" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+              Trading
             </TabsTrigger>
             <TabsTrigger value="analytics" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
               Creator Analytics
@@ -117,7 +205,27 @@ const Dashboard: React.FC = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="trending" className="space-y-6">
+          <TabsContent value="portfolio" className="space-y-6">
+            <PortfolioMetrics
+              totalValue={portfolioTotalValue}
+              dayChange={portfolioDayChange}
+              weekChange={portfolioWeekChange}
+              totalTrades={totalTrades}
+              historicalData={mockPortfolioData}
+            />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <TokenHoldings
+                holdings={mockTokenHoldings}
+                totalValue={portfolioTotalValue}
+                totalChange24h={portfolioDayChange}
+              />
+              
+              <RecentTradingActivity activities={mockTradingActivity} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="trading" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {mockTrendingCoins.map((coin) => {
                 // Mock pool stats for each coin
