@@ -36,7 +36,7 @@ export const WizardStepContent: React.FC<WizardStepContentProps> = (props) => {
   }
 
   const { component: StepComponent, props: stepProps, requiresScrollWrapper } = currentStepConfig;
-  const componentProps = stepProps();
+  const componentProps = stepProps(props);
 
   const stepElement = <StepComponent {...componentProps} />;
 
