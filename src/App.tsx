@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { PrivyProvider } from '@privy-io/react-auth';
 import Index from "./pages/Index";
+import HowItWorks from "./pages/HowItWorks";
 import Dashboard from "./pages/Dashboard";
 import ProjectOverview from "./pages/ProjectOverview";
 import ProjectDashboard from "./pages/ProjectDashboard";
@@ -52,6 +54,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/project/:projectId" element={<ProjectOverview />} />
               <Route path="/project/:projectId/dashboard" element={<ProjectDashboard />} />

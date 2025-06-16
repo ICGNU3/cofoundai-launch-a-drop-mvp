@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -6,7 +5,6 @@ import CreatorCarousel from "@/components/CreatorCarousel";
 import LogoRow from "@/components/LogoRow";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
 import HeroSection from "@/components/landing/HeroSection";
-import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import LandingFooter from "@/components/landing/LandingFooter";
 import AdvancedTokenCustomizationModal from "@/components/landing/AdvancedTokenCustomizationModal";
 import ModernNavigation from "@/components/ModernNavigation";
@@ -117,8 +115,6 @@ const Index: React.FC = () => {
             countUpDropRef={countUpDropRef}
             onAIFinish={handleAIKickoffFinish}
           />
-          
-          <HowItWorksSection />
           
           <section id="features" className="w-full max-w-7xl mx-auto px-4 mt-20">
             <LandingFeaturesSection />

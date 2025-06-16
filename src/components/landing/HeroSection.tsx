@@ -1,6 +1,7 @@
 
 import React from "react";
 import { AccentButton } from "@/components/ui/AccentButton";
+import { Link } from "react-router-dom";
 
 type HeroSectionProps = {
   counter: { total: number; drops: number };
@@ -39,10 +40,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           >
             Start building
           </button>
-          <a href="#how-it-works" className="flex items-center justify-center text-gray-300 hover:text-white transition-colors py-3 px-2 group">
+          <Link to="/how-it-works" className="flex items-center justify-center text-gray-300 hover:text-white transition-colors py-3 px-2 group">
             See how it works
             <span className="material-symbols-outlined ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
-          </a>
+          </Link>
         </div>
         
         {/* Stats Grid */}
