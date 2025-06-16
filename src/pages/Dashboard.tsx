@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../integrations/supabase/client";
@@ -10,6 +9,7 @@ import { TradingTab } from "@/components/dashboard/TradingTab";
 import { AnalyticsTab } from "@/components/dashboard/AnalyticsTab";
 import { PositionsTab } from "@/components/dashboard/PositionsTab";
 import { ProjectsTab } from "@/components/dashboard/ProjectsTab";
+import ModernNavigation from "@/components/ModernNavigation";
 
 const Dashboard: React.FC = () => {
   const { user } = usePrivy();
@@ -46,67 +46,73 @@ const Dashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-body-text">Loading dashboard...</div>
+      <div className="min-h-screen bg-background">
+        <ModernNavigation />
+        <div className="flex items-center justify-center pt-20">
+          <div className="text-body-text">Loading dashboard...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-headline">Dashboard</h1>
-          <Link
-            to="/"
-            className="px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
-          >
-            Launch New Drop
-          </Link>
+    <div className="min-h-screen bg-background">
+      <ModernNavigation />
+      <div className="px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-bold text-headline">Dashboard</h1>
+            <Link
+              to="/"
+              className="px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
+            >
+              Launch New Drop
+            </Link>
+          </div>
+
+          <Tabs defaultValue="portfolio" className="space-y-6">
+            <TabsList className="bg-card border border-border">
+              <TabsTrigger value="portfolio" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+                Portfolio
+              </TabsTrigger>
+              <TabsTrigger value="trading" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+                Trading
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+                Creator Analytics
+              </TabsTrigger>
+              <TabsTrigger value="positions" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+                My Positions
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+                My Projects
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="portfolio">
+              <PortfolioTab />
+            </TabsContent>
+
+            <TabsContent value="trading">
+              <TradingTab />
+            </TabsContent>
+
+            <TabsContent value="analytics">
+              <AnalyticsTab projects={projects} />
+            </TabsContent>
+
+            <TabsContent value="positions">
+              <PositionsTab 
+                onClaim={handleClaim}
+                isClaimLoading={claimLoading}
+              />
+            </TabsContent>
+
+            <TabsContent value="projects">
+              <ProjectsTab projects={projects} />
+            </TabsContent>
+          </Tabs>
         </div>
-
-        <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="bg-card border border-border">
-            <TabsTrigger value="portfolio" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
-              Portfolio
-            </TabsTrigger>
-            <TabsTrigger value="trading" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
-              Trading
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
-              Creator Analytics
-            </TabsTrigger>
-            <TabsTrigger value="positions" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
-              My Positions
-            </TabsTrigger>
-            <TabsTrigger value="projects" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
-              My Projects
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="portfolio">
-            <PortfolioTab />
-          </TabsContent>
-
-          <TabsContent value="trading">
-            <TradingTab />
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <AnalyticsTab projects={projects} />
-          </TabsContent>
-
-          <TabsContent value="positions">
-            <PositionsTab 
-              onClaim={handleClaim}
-              isClaimLoading={claimLoading}
-            />
-          </TabsContent>
-
-          <TabsContent value="projects">
-            <ProjectsTab projects={projects} />
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   );
