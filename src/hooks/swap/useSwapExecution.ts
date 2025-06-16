@@ -12,7 +12,7 @@ export function useSwapExecution() {
   const [txHash, setTxHash] = useState<string | null>(null);
   
   const { address } = useAccount();
-  const { writeContract } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
   const { toast } = useToast();
 
   const { data: receipt, isLoading: isConfirming } = useWaitForTransactionReceipt({
@@ -44,7 +44,7 @@ export function useSwapExecution() {
       const commands = "0x00"; // V4_SWAP command
       const inputs = encodeSwapData(params.recipient || address, amountIn);
 
-      const hash = await writeContract({
+      const hash = await writeContractAsync({
         address: UNIVERSAL_ROUTER_ADDRESS as `0x${string}`,
         abi: [
           {
@@ -60,7 +60,7 @@ export function useSwapExecution() {
         args: [commands, [inputs]]
       });
 
-      setTxHash(hash as string);
+      setTxHash(hash);
       
       toast({
         title: "Swap Initiated",

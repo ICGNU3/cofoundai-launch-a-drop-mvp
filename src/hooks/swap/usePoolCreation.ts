@@ -12,7 +12,7 @@ export function usePoolCreation() {
   const [txHash, setTxHash] = useState<string | null>(null);
   
   const { address } = useAccount();
-  const { writeContract } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
   const { toast } = useToast();
 
   const { data: receipt, isLoading: isConfirming } = useWaitForTransactionReceipt({
@@ -34,7 +34,7 @@ export function usePoolCreation() {
       const poolKey = createPoolKey(params.tokenA, params.tokenB, params.fee);
       
       // Execute the pool creation transaction
-      const hash = await writeContract({
+      const hash = await writeContractAsync({
         address: POOL_MANAGER_ADDRESS as `0x${string}`,
         abi: [
           {
@@ -57,7 +57,7 @@ export function usePoolCreation() {
         args: [poolKey, parseUnits(params.initialPrice, 18)]
       });
 
-      setTxHash(hash as string);
+      setTxHash(hash);
       
       toast({
         title: "Pool Creation Initiated",
