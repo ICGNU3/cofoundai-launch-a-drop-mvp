@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { useMintingProcess } from "@/hooks/useMintingProcess";
 import { useUSDCxBalance } from "@/hooks/useUSDCxBalance";
 import { useProjectSave } from "@/hooks/useProjectSave";
 import { useToast } from "@/hooks/use-toast";
+import { deployCoinWithRoyalties, getCoinHelperText } from "@/lib/zoraCoin";
 
 // extracted from WizardStep4Success
 export function useMintingWorkflow({
@@ -57,9 +57,19 @@ export function useMintingWorkflow({
   const handleMintFlow = async ({ gasSpeed }: { gasSpeed: "slow"|"standard"|"fast" }) => {
     setLoadingMint(true);
     try {
-      const tokenSymbol = "DROP";
-      const tokenName = "Drop";
+      const tokenSymbol = "NPLUS";
+      const tokenName = "NEPLUS Coin";
       const tokenSupply = 1000000;
+      
+      // Deploy coin with royalty hook
+      const coinDeployment = await deployCoinWithRoyalties({
+        name: tokenName,
+        symbol: tokenSymbol,
+        supply: tokenSupply,
+        royaltyBps: 500, // 5% royalty
+        creator: walletAddress || undefined
+      });
+
       const mintData = await simulateMinting({
         coverBase64,
         tokenSymbol,
@@ -67,6 +77,7 @@ export function useMintingWorkflow({
         tokenSupply,
         userWallet: walletAddress,
       });
+      
       setCoverIpfs(mintData.ipfsHash);
       const project = await saveProjectMutation.mutateAsync({
         projectIdea,
@@ -77,7 +88,7 @@ export function useMintingWorkflow({
         walletAddress,
         fundingTarget,
         expenseSum,
-        tokenAddress: mintData.tokenAddress,
+        tokenAddress: coinDeployment.coinAddress,
         txHash: mintData.txHash,
       });
       setProjectId(project.id);
@@ -85,10 +96,10 @@ export function useMintingWorkflow({
       completeMinting();
       pollUSDCxBalance();
 
-      // SUCCESS TOAST
+      // SUCCESS TOAST with royalty info
       toast({
-        title: "Drop Minted Successfully!",
-        description: "Your drop is live and ready to share.",
+        title: "NEPLUS Coin Minted Successfully!",
+        description: `Your coin is live with ${coinDeployment.royaltyBps / 100}% creator royalties.`,
         variant: "default",
       });
 
@@ -167,7 +178,7 @@ export function useMintingWorkflow({
     usdcxBalanceConfirmed,
     isPollingBalance,
     setProjectId,
-    lastError, // for external monitoring if needed
+    lastError,
+    helperText: getCoinHelperText(), // Add helper text for UI
   };
 }
-
