@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Share } from "lucide-react";
 import { ProjectSummaryCard } from "../ProjectSummaryCard";
 import { MintingStatusCard } from "../MintingStatusCard";
-import { ProjectPreviewCard } from "../ProjectPreviewCard";
+import { TeamBudgetPreviewCard } from "../TeamBudgetPreviewCard";
 import { ProjectActionButtons } from "../ProjectActionButtons";
 // Import ProjectType for strict typing
 import type { ProjectType } from "@/hooks/useWizardState";
@@ -136,7 +135,7 @@ export const Wizard4SummarySection: React.FC<Wizard4SummarySectionProps> = ({
       isPollingBalance={isPollingBalance}
     />
 
-    <ProjectPreviewCard roles={roles} expenses={expenses} />
+    <TeamBudgetPreviewCard roles={roles} expenses={expenses} />
 
     <ProjectActionButtons
       projectId={projectId}
@@ -148,4 +147,3 @@ export const Wizard4SummarySection: React.FC<Wizard4SummarySectionProps> = ({
     />
   </div>
 );
-
