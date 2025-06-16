@@ -1,39 +1,104 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 
-import React from "react";
-import { usePrivy } from "@privy-io/react-auth";
-import { Button } from "./ui/button";
-import { Link } from "react-router-dom";
+const ModernNavigation = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-const ModernNavigation: React.FC = () => {
-  const { authenticated, login } = usePrivy();
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
-    <nav className="container mx-auto px-6 py-6 relative z-20">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <Link to="/" className="flex items-center">
-            <svg className="h-8 w-8 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
-            </svg>
-            <span className="ml-3 text-xl tracking-tight font-medium">NEPLUS</span>
+    <nav className="bg-surface/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
+              <span className="text-black font-bold text-lg">N</span>
+            </div>
+            <span className="text-xl font-bold text-headline">NEPLUS</span>
           </Link>
-        </div>
-        <div className="hidden md:flex space-x-10 text-sm text-gray-300">
-          <a href="#features" className="hover:text-white transition-colors">Features</a>
-          <Link to="/how-it-works" className="hover:text-white transition-colors">How it Works</Link>
-          <a href="#community" className="hover:text-white transition-colors">Community</a>
-          <a href="#docs" className="hover:text-white transition-colors">Docs</a>
-        </div>
-        <div>
-          {!authenticated && (
-            <Button
-              className="text-sm border border-gray-700 rounded-md px-4 py-2 hover:bg-white/5 transition-all bg-transparent text-white"
-              onClick={login}
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link 
+              to="/dashboard" 
+              className="text-text hover:text-accent transition-colors"
             >
-              Sign in
-            </Button>
-          )}
+              Dashboard
+            </Link>
+            <Link 
+              to="/trading" 
+              className="text-text hover:text-accent transition-colors"
+            >
+              Trading Hub
+            </Link>
+            <Link 
+              to="/farcaster" 
+              className="text-text hover:text-accent transition-colors"
+            >
+              Social Trading
+            </Link>
+            <Link 
+              to="/how-it-works" 
+              className="text-text hover:text-accent transition-colors"
+            >
+              How It Works
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={toggleMenu}
+            className="md:hidden text-text hover:text-accent transition-colors"
+            aria-label="Toggle Menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+
+          {/* User Menu (Placeholder) */}
+          <div className="hidden md:flex items-center space-x-4">
+            {/* Add user authentication and menu here */}
+          </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden border-t border-border py-4">
+            <div className="flex flex-col space-y-4">
+              <Link 
+                to="/dashboard" 
+                className="text-text hover:text-accent transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link 
+                to="/trading" 
+                className="text-text hover:text-accent transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Trading Hub
+              </Link>
+              <Link 
+                to="/farcaster" 
+                className="text-text hover:text-accent transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Social Trading
+              </Link>
+              <Link 
+                to="/how-it-works" 
+                className="text-text hover:text-accent transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                How It Works
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
