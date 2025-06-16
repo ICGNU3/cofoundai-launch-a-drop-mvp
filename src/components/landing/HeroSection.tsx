@@ -1,6 +1,5 @@
 
 import React from "react";
-import { AccentButton } from "@/components/ui/AccentButton";
 import { Link } from "react-router-dom";
 
 type HeroSectionProps = {
@@ -8,7 +7,6 @@ type HeroSectionProps = {
   onCtaClick: () => void;
   countUpDollarRef: React.RefObject<HTMLSpanElement>;
   countUpDropRef: React.RefObject<HTMLSpanElement>;
-  onAIFinish?: (aiData: { projectIdea: string; projectType: string; roleSplits?: Array<{ role: string; percent: number }> }) => void;
 };
 
 const HeroSection: React.FC<HeroSectionProps> = ({
@@ -16,7 +14,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   onCtaClick,
   countUpDollarRef,
   countUpDropRef,
-  onAIFinish,
 }) => {
   return (
     <div className="container mx-auto px-6 pt-16 md:pt-24">

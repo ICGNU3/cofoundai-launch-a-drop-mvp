@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { StreamlinedWizardModal } from "./wizard/StreamlinedWizardModal";
 import { Zap } from "lucide-react";
@@ -10,6 +10,8 @@ interface StreamlinedWizardButtonProps {
   size?: "sm" | "default" | "lg";
   className?: string;
   children?: React.ReactNode;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const StreamlinedWizardButton: React.FC<StreamlinedWizardButtonProps> = ({
@@ -18,13 +20,26 @@ export const StreamlinedWizardButton: React.FC<StreamlinedWizardButtonProps> = (
   size = "default",
   className = "",
   children,
+  isOpen: controlledOpen,
+  onOpenChange,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  const isControlled = controlledOpen !== undefined;
+  const isModalOpen = isControlled ? controlledOpen : internalOpen;
+  
+  const handleOpenChange = (open: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(open);
+    } else {
+      setInternalOpen(open);
+    }
+  };
 
   return (
     <>
       <Button
-        onClick={() => setIsOpen(true)}
+        onClick={() => handleOpenChange(true)}
         variant={variant}
         size={size}
         className={`gap-2 ${className}`}
@@ -34,8 +49,8 @@ export const StreamlinedWizardButton: React.FC<StreamlinedWizardButtonProps> = (
       </Button>
       
       <StreamlinedWizardModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        isOpen={isModalOpen}
+        onClose={() => handleOpenChange(false)}
         walletAddress={walletAddress}
       />
     </>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { WizardModal } from "@/components/WizardModal";
-import { useWizardState } from "@/hooks/useWizardState";
+import { StreamlinedWizardButton } from "@/components/StreamlinedWizardButton";
 import CreatorCarousel from "@/components/CreatorCarousel";
 import LogoRow from "@/components/LogoRow";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
@@ -9,9 +8,10 @@ import LandingFooter from "@/components/landing/LandingFooter";
 import AdvancedTokenCustomizationModal from "@/components/landing/AdvancedTokenCustomizationModal";
 import ModernNavigation from "@/components/ModernNavigation";
 import SplineBackground from "@/components/SplineBackground";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index: React.FC = () => {
-  const wizard = useWizardState();
+  const { user } = useAuth();
   const [tokenModalOpen, setTokenModalOpen] = useState(false);
 
   // Live counter state
@@ -20,38 +20,8 @@ const Index: React.FC = () => {
   // Latest projects for creator carousel
   const [carousel, setCarousel] = useState<any[]>([]);
 
-  // === AI Kickoff Integration ===
-  // Hold AI modal desired wizard prefill info
-  const [wizardPrefill, setWizardPrefill] = useState<any>(null);
-
-  // Pass to HeroSection for AI modal (now unused, remains for compat)
-  const handleAIKickoffFinish = (aiData: {
-    projectIdea: string;
-    projectType: string;
-    roleSplits?: Array<{role: string; percent: number}>;
-  }) => {
-    setWizardPrefill(aiData);
-    wizard.openWizard();
-  };
-
-  // When wizard is opened with prefill, populate initial fields
-  useEffect(() => {
-    if (wizardPrefill && wizard.state.isWizardOpen) {
-      // Prefill wizard state (projectIdea, projectType, roles)
-      if (wizardPrefill.projectIdea) wizard.setField("projectIdea", wizardPrefill.projectIdea);
-      if (wizardPrefill.projectType) wizard.setField("projectType", wizardPrefill.projectType);
-      if (wizardPrefill.roleSplits && wizardPrefill.roleSplits.length > 0) {
-        // Convert AI roles to wizard role format
-        const rolesArr = wizardPrefill.roleSplits.map(r => ({
-          name: r.role,
-          percent: r.percent,
-          address: "", // left blank for user to fill
-        }));
-        wizard.setField("roles", rolesArr);
-      }
-      setWizardPrefill(null); // Prevent repeat
-    }
-  }, [wizardPrefill, wizard]);
+  // Streamlined wizard state
+  const [streamlinedWizardOpen, setStreamlinedWizardOpen] = useState(false);
 
   // Fetch stats (Edge function) and projects (from supabase)
   useEffect(() => {
@@ -100,6 +70,9 @@ const Index: React.FC = () => {
     }
   }, []);
 
+  // Get wallet address from user context
+  const walletAddress = user?.wallet_addresses?.[0] || null;
+
   return (
     <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-hidden">
       <SplineBackground />
@@ -110,10 +83,9 @@ const Index: React.FC = () => {
         <main className="relative w-full z-10 flex flex-col items-center">
           <HeroSection
             counter={counter}
-            onCtaClick={wizard.openWizard}
+            onCtaClick={() => setStreamlinedWizardOpen(true)}
             countUpDollarRef={countUpDollarRef}
             countUpDropRef={countUpDropRef}
-            onAIFinish={handleAIKickoffFinish}
           />
           
           <section id="features" className="w-full max-w-7xl mx-auto px-4 mt-20">
@@ -130,11 +102,15 @@ const Index: React.FC = () => {
         </main>
 
         <AdvancedTokenCustomizationModal isOpen={tokenModalOpen} onClose={() => setTokenModalOpen(false)} />
-        <WizardModal
-          isOpen={wizard.state.isWizardOpen}
-          onClose={wizard.closeWizard}
-          walletAddress={null}
+        
+        {/* Use the new streamlined wizard */}
+        <StreamlinedWizardButton 
+          walletAddress={walletAddress}
+          className="hidden" // Hide the button since we're controlling it manually
+          isOpen={streamlinedWizardOpen}
+          onOpenChange={setStreamlinedWizardOpen}
         />
+        
         <LandingFooter />
       </div>
     </div>
