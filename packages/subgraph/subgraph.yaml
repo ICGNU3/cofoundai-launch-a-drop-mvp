@@ -1,0 +1,55 @@
+
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: ZoraFactory
+    network: zora-testnet
+    source:
+      address: "0x0000000000000000000000000000000000000000" # TODO: Update with actual ZoraFactory address
+      abi: ZoraFactory
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Coin
+        - PoolStat
+      abis:
+        - name: ZoraFactory
+          file: ./abis/ZoraFactory.json
+        - name: Pool
+          file: ./abis/Pool.json
+      eventHandlers:
+        - event: CoinCreated(indexed address,indexed address,string,string)
+          handler: handleCoinCreated
+      file: ./src/mapping.ts
+templates:
+  - kind: ethereum/contract
+    name: Pool
+    network: zora-testnet
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - PoolStat
+        - RoyaltyFlow
+        - LPPosition
+      abis:
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: CreatorRoyaltyHook
+          file: ./abis/CreatorRoyaltyHook.json
+      eventHandlers:
+        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24,uint128,uint128)
+          handler: handleSwap
+        - event: RoyaltyPaid(address,uint256)
+          handler: handleRoyaltyPaid
+        - event: ModifyLiquidity(indexed address,indexed int24,indexed int24,int256,bytes32)
+          handler: handleModifyLiquidity
+      file: ./src/mapping.ts
