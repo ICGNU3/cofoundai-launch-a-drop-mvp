@@ -34,7 +34,7 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
         percentNum: 100,
         percentStr: "100",
         address: walletAddress,
-        isFixed: true,
+        isFixed: false,
       }]);
     }
   };

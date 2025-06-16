@@ -4,22 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, ArrowLeft, Plus, X } from "lucide-react";
-import type { StreamlinedWizardState } from "@/hooks/wizard/useStreamlinedWizard";
-
-interface Role {
-  name: string;
-  percent: number;
-  percentNum: number;
-  percentStr: string;
-  address: string;
-  isFixed: boolean;
-}
-
-interface Expense {
-  name: string;
-  amountUSDC: number;
-  description: string;
-}
+import type { StreamlinedWizardState, Role, Expense } from "@/hooks/wizard/useStreamlinedWizard";
 
 interface WizardStep2TeamBudgetProps {
   state: StreamlinedWizardState;

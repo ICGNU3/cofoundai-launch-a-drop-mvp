@@ -1,6 +1,23 @@
 
 import { useState } from "react";
-import type { ProjectType, ProjectMode, Role, Expense } from "./types";
+
+export type ProjectType = "Music" | "Film" | "Fashion" | "Art" | "Other";
+export type ProjectMode = "solo" | "team";
+
+export interface Role {
+  name: string;
+  percent: number;
+  percentNum: number;
+  percentStr: string;
+  address: string;
+  isFixed: boolean;
+}
+
+export interface Expense {
+  name: string;
+  amountUSDC: number;
+  description: string;
+}
 
 export interface StreamlinedWizardState {
   step: 1 | 2 | 3;
