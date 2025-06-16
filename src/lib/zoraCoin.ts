@@ -16,7 +16,7 @@ export const defaultCoinParams: CoinDeploymentParams = {
   royaltyBps: 500, // 5% default royalty
 };
 
-export const CREATOR_ROYALTY_HOOK = process.env.REACT_APP_CREATOR_ROYALTY_HOOK || "";
+export const CREATOR_ROYALTY_HOOK = import.meta.env.VITE_CREATOR_ROYALTY_HOOK || "";
 
 // Hook flags from deployment script - these need to match the hook permissions
 export const ROYALTY_HOOK_FLAGS = "0x4000000000000000000000000000000000000000"; // beforeSwap flag
@@ -36,7 +36,7 @@ export async function deployCoinWithRoyalties(params: CoinDeploymentParams) {
   }
 
   if (!CREATOR_ROYALTY_HOOK) {
-    throw new Error("CREATOR_ROYALTY_HOOK environment variable not set");
+    throw new Error("VITE_CREATOR_ROYALTY_HOOK environment variable not set");
   }
 
   if (royaltyBps && (royaltyBps < 0 || royaltyBps > 10000)) {
