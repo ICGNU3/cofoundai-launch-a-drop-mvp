@@ -1,10 +1,12 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Share } from "lucide-react";
+import { Share } from "lucide-react";
 import { ProjectSummaryCard } from "../ProjectSummaryCard";
 import { MintingStatusCard } from "../MintingStatusCard";
 import { TeamBudgetPreviewCard } from "../TeamBudgetPreviewCard";
 import { ProjectActionButtons } from "../ProjectActionButtons";
+import { Wizard4CoverArtDisplay } from "./Wizard4CoverArtDisplay";
 // Import ProjectType for strict typing
 import type { ProjectType } from "@/hooks/useWizardState";
 
@@ -57,33 +59,7 @@ export const Wizard4SummarySection: React.FC<Wizard4SummarySectionProps> = ({
   onRestart,
 }) => (
   <div className="space-y-6">
-    {(coverBase64 || coverIpfs) && (
-      <div className="w-full flex flex-col items-center">
-        <label className="mb-1 text-sm text-body-text/60">Your Cover Art:</label>
-        <a
-          href={coverIpfs ? `https://ipfs.io/ipfs/${coverIpfs}` : undefined}
-          target="_blank"
-          rel="noopener noreferrer"
-          tabIndex={0}
-          aria-label="Open uploaded cover on IPFS"
-          className="block rounded border-2 border-accent shadow-lg p-1 max-w-[240px] hover:scale-105 transition mb-2"
-          style={{ pointerEvents: coverIpfs ? "auto" : "none", opacity: coverIpfs ? 1 : 0.7 }}
-        >
-          <img
-            src={coverBase64 || (coverIpfs ? `https://ipfs.io/ipfs/${coverIpfs}` : "")}
-            alt="Uploaded Cover Art"
-            className="rounded max-h-48 w-auto"
-          />
-        </a>
-        {coverIpfs && (
-          <small className="text-xs text-accent">
-            <a href={`https://ipfs.io/ipfs/${coverIpfs}`} target="_blank" rel="noopener noreferrer">
-              View on IPFS
-            </a>
-          </small>
-        )}
-      </div>
-    )}
+    <Wizard4CoverArtDisplay coverBase64={coverBase64} coverIpfs={coverIpfs} />
 
     <ProjectSummaryCard
       projectIdea={projectIdea}
