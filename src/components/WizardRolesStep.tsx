@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
 import { AddRoleModal } from "./ui/AddRoleModal";
-import { ProjectTypeSelector } from "./ui/ProjectTypeSelector";
-import { RoleTemplateManager } from "./ui/RoleTemplateManager";
-import { RoleManagementSection } from "./ui/RoleManagementSection";
 import { WizardNavigationButtons } from "./ui/WizardNavigationButtons";
+import { RoleStepHeader } from "./wizard/step2/RoleStepHeader";
+import { TeamModeSection } from "./wizard/step2/TeamModeSection";
+import { SoloModeSection } from "./wizard/step2/SoloModeSection";
 import type { Role, ProjectType, ProjectMode } from "@/hooks/useWizardState";
 
 type WizardRolesStepProps = {
@@ -61,51 +61,22 @@ export const WizardRolesStep: React.FC<WizardRolesStepProps> = ({
 
   return (
     <div>
-      <h2 className="headline text-center mb-2">
-        {mode === "solo" ? "Solo Creator" : "Crew & Cut"}
-      </h2>
+      <RoleStepHeader mode={mode} />
       
       <div className="flex flex-col gap-2">
-        {mode === "team" && (
-          <>
-            <ProjectTypeSelector
-              projectType={projectType}
-              onProjectTypeChange={handleProjectTypeChange}
-              onLoadDefaultRoles={loadDefaultRoles}
-            />
-
-            <RoleTemplateManager
-              roles={roles}
-              onLoadTemplate={handleLoadTemplate}
-            />
-
-            <RoleManagementSection
-              roles={roles}
-              onEditRole={handleEditRole}
-              onRemoveRole={removeRole}
-              onAddRole={handleAddRole}
-            />
-          </>
-        )}
-
-        {mode === "solo" && (
-          <div className="space-y-4">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-lg">Creator</span>
-                  <span className="text-green-500 font-mono">100%</span>
-                </div>
-                <div className="text-sm text-green-500 flex items-center gap-1">
-                  <span>✓</span>
-                  <span>Cuts balanced</span>
-                </div>
-              </div>
-              <div className="mt-2 text-sm text-body-text/60">
-                Full ownership and control of your project
-              </div>
-            </div>
-          </div>
+        {mode === "team" ? (
+          <TeamModeSection
+            projectType={projectType}
+            roles={roles}
+            onProjectTypeChange={handleProjectTypeChange}
+            onLoadDefaultRoles={loadDefaultRoles}
+            onLoadTemplate={handleLoadTemplate}
+            onEditRole={handleEditRole}
+            onRemoveRole={removeRole}
+            onAddRole={handleAddRole}
+          />
+        ) : (
+          <SoloModeSection />
         )}
 
         <WizardNavigationButtons

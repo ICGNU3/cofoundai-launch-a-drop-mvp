@@ -1,13 +1,9 @@
 
 import React from "react";
-import { ScrollArea } from "./ui/scroll-area";
 import { WizardNavigationButtons } from "./ui/WizardNavigationButtons";
-import { BudgetValidationStatus } from "./ui/BudgetValidationStatus";
-import { BudgetItemsList } from "./ui/BudgetItemsList";
-import { InteractiveBudgetChart } from "./ui/InteractiveBudgetChart";
-import { ScenarioPlanner } from "./ui/ScenarioPlanner";
-import { BudgetOptimizer } from "./ui/BudgetOptimizer";
-import type { WizardStateData, Role, Expense } from "@/hooks/useWizardState";
+import { BudgetStepHeader } from "./wizard/step3/BudgetStepHeader";
+import { BudgetContentSection } from "./wizard/step3/BudgetContentSection";
+import type { WizardStateData, Expense } from "@/hooks/useWizardState";
 
 type WizardBudgetStepProps = {
   state: WizardStateData;
@@ -31,8 +27,6 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   // Compute sum including both role shares and all expenses
   const roleSum = state.roles.reduce((sum, r) => sum + (r.percentNum || r.percent), 0);
   const expensesSum = state.expenses.reduce((sum, e) => sum + (e.amountUSDC || 0), 0);
-  // Add up all roles (by %) and all expenses (by amount); this is a simplification
-  // If the sum should be 100, just as before, that's the test
   const sumPercent = roleSum + expensesSum;
   const epsilon = 0.1;
   const isRoleBalanceValid = Math.abs(sumPercent - 100) < epsilon;
@@ -43,9 +37,6 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
   // Allow proceed if (1) role+expense split sums ~100% OR (2) any expense/pledge
   const canProceed = isRoleBalanceValid || hasValidExpense || pledgeAmount > 0;
 
-  // Diagnostic logs for debugging
-  console.log('[WizardBudgetStep] sumPercent:', sumPercent, 'isRoleBalanceValid:', isRoleBalanceValid, 'hasValidExpense:', hasValidExpense, 'pledgeAmount:', pledgeAmount, 'canProceed:', canProceed);
-
   const handleLoadScenario = (scenario: any) => {
     onSetField("roles", scenario.roles);
     onSetField("expenses", scenario.expenses);
@@ -54,58 +45,18 @@ export const WizardBudgetStep: React.FC<WizardBudgetStepProps> = ({
 
   return (
     <div className="h-full flex flex-col px-6 py-4">
-      <div className="mb-4 flex-shrink-0">
-        <h2 className="text-2xl font-bold text-headline mb-2">Budget Breakdown</h2>
-        <p className="text-body-text/70">
-          Allocate your revenue share and manage project expenses. Use the interactive charts to visualize and adjust your budget.
-        </p>
-      </div>
+      <BudgetStepHeader />
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="space-y-6 pr-4">
-          {/* Budget Validation Status: Pass total sum including both shares and expenses */}
-          <BudgetValidationStatus 
-            sumPercent={sumPercent} 
-            hasExpenses={state.expenses.length > 0} 
-          />
-
-          <InteractiveBudgetChart
-            roles={state.roles}
-            expenses={state.expenses}
-            onRolePercentChange={onUpdateRolePercent}
-            pledgeAmount={pledgeAmount}
-          />
-
-          <BudgetItemsList
-            roles={state.roles}
-            expenses={state.expenses}
-            pledgeUSDC={state.pledgeUSDC}
-            editingRoleIdx={state.editingRoleIdx}
-            editingExpenseIdx={state.editingExpenseIdx}
-            onSaveExpense={onSaveExpense}
-            onRemoveExpense={onRemoveExpense}
-            onSetField={onSetField}
-            onUpdateRolePercent={onUpdateRolePercent}
-          />
-
-          <ScenarioPlanner
-            currentRoles={state.roles}
-            currentExpenses={state.expenses}
-            currentPledge={state.pledgeUSDC}
-            projectType={state.projectType}
-            onLoadScenario={handleLoadScenario}
-          />
-
-          <BudgetOptimizer
-            roles={state.roles}
-            expenses={state.expenses}
-            projectType={state.projectType}
-            pledgeAmount={pledgeAmount}
-          />
-
-          <div className="h-20" />
-        </div>
-      </div>
+      <BudgetContentSection
+        state={state}
+        sumPercent={sumPercent}
+        pledgeAmount={pledgeAmount}
+        onUpdateRolePercent={onUpdateRolePercent}
+        onSaveExpense={onSaveExpense}
+        onRemoveExpense={onRemoveExpense}
+        onSetField={onSetField}
+        onLoadScenario={handleLoadScenario}
+      />
 
       <div className="border-t border-border pt-4 mt-4 flex-shrink-0">
         <WizardNavigationButtons

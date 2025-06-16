@@ -1,12 +1,11 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SecureTextarea } from "@/components/ui/SecureTextarea";
-import { ProjectTypeSelector } from "@/components/ui/ProjectTypeSelector";
-import { ModeSelector } from "@/components/ui/ModeSelector";
 import { WizardNavigationButtons } from "@/components/ui/WizardNavigationButtons";
 import { useSecureForm } from "@/hooks/useSecureForm";
 import { projectContent } from "@/utils/contentSanitizer";
+import { ProjectIdeaSection } from "./wizard/step1/ProjectIdeaSection";
+import { ProjectTypeSection } from "./wizard/step1/ProjectTypeSection";
+import { ModeSelectionSection } from "./wizard/step1/ModeSelectionSection";
 import type { WizardStateData, ProjectType, ProjectMode } from "@/hooks/useWizardState";
 
 interface WizardStep1DescribeProps {
@@ -69,54 +68,32 @@ const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto px-6 py-4">
         <div className="space-y-6 pb-4">
-          <ModeSelector 
+          <ModeSelectionSection 
             mode={mode}
             onModeChange={handleModeChange}
           />
           
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                ✨ Describe Your Creative Project
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <SecureTextarea
-                id="project-idea"
-                label="What's your creative vision?"
-                value={values.projectIdea}
-                onChange={handleProjectIdeaChange}
-                onBlur={() => setTouched('projectIdea')}
-                error={errors.projectIdea}
-                placeholder="Describe your project idea, goals, and what makes it unique..."
-                required
-                maxLength={2000}
-                rows={6}
-              />
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Project Type <span className="text-red-500">*</span>
-                </label>
-                <ProjectTypeSelector 
-                  projectType={values.projectType}
-                  onProjectTypeChange={handleProjectTypeChange}
-                  onLoadDefaultRoles={onLoadDefaultRoles}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <ProjectIdeaSection
+            projectIdea={values.projectIdea}
+            onProjectIdeaChange={handleProjectIdeaChange}
+            onBlur={() => setTouched('projectIdea')}
+            error={errors.projectIdea}
+          />
           
-          {/* Add some bottom padding to ensure button visibility */}
+          <ProjectTypeSection
+            projectType={values.projectType}
+            onProjectTypeChange={handleProjectTypeChange}
+            onLoadDefaultRoles={onLoadDefaultRoles}
+          />
+          
           <div className="h-20" />
         </div>
       </div>
       
-      {/* Fixed button area at bottom */}
       <div className="border-t border-border p-4 bg-card flex-shrink-0">
         <WizardNavigationButtons
           canProceed={canProceed}
-          onBack={() => {}} // No back button on first step
+          onBack={() => {}}
           onNext={onNext}
           nextLabel="Next"
         />
