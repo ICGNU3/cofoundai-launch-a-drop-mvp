@@ -11,7 +11,7 @@ export function usePoolCreation() {
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
   
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
   const { writeContractAsync } = useWriteContract();
   const { toast } = useToast();
 
@@ -54,7 +54,9 @@ export function usePoolCreation() {
           }
         ] as const,
         functionName: 'initialize',
-        args: [poolKey, parseUnits(params.initialPrice, 18)]
+        args: [poolKey, parseUnits(params.initialPrice, 18)],
+        chain,
+        account: address
       });
 
       setTxHash(hash);

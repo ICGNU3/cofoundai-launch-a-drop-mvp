@@ -11,7 +11,7 @@ export function useSwapExecution() {
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
   
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
   const { writeContractAsync } = useWriteContract();
   const { toast } = useToast();
 
@@ -57,7 +57,9 @@ export function useSwapExecution() {
           }
         ] as const,
         functionName: 'execute',
-        args: [commands, [inputs]]
+        args: [commands, [inputs]],
+        chain,
+        account: address
       });
 
       setTxHash(hash);
