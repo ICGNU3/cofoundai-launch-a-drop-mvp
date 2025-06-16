@@ -11,7 +11,8 @@ import { ErrorDisplaySection } from "./minting/ErrorDisplaySection";
 import { ProgressDisplaySection } from "./minting/ProgressDisplaySection";
 import { CompletionDisplaySection } from "./minting/CompletionDisplaySection";
 import { identifyErrorType } from "./minting/mintingWorkflowUtils";
-import type { MintingStepKey, MintingWorkflowModalProps, ErrorInfo, stepLabels } from "./minting/mintingWorkflowTypes";
+import type { MintingStepKey, MintingWorkflowModalProps, ErrorInfo } from "./minting/mintingWorkflowTypes";
+import { stepLabels } from "./minting/mintingWorkflowTypes";
 
 export type { MintingStepKey } from "./minting/mintingWorkflowTypes";
 
