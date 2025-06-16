@@ -8,6 +8,7 @@ import { ProjectPreviewCard } from "@/components/ProjectPreviewCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwapCard } from "@/components/SwapCard";
 import { LiquidityDashboard } from "@/components/LiquidityDashboard";
+import { CreatorAnalyticsDashboard } from "@/components/CreatorAnalyticsDashboard";
 import { usePoolStats } from "@/hooks/usePoolStats";
 
 const Dashboard: React.FC = () => {
@@ -105,6 +106,9 @@ const Dashboard: React.FC = () => {
             <TabsTrigger value="trending" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
               Trending
             </TabsTrigger>
+            <TabsTrigger value="analytics" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
+              Creator Analytics
+            </TabsTrigger>
             <TabsTrigger value="positions" className="text-text data-[state=active]:bg-accent data-[state=active]:text-black">
               My Positions
             </TabsTrigger>
@@ -131,6 +135,52 @@ const Dashboard: React.FC = () => {
                 );
               })}
             </div>
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            {projects && projects.length > 0 ? (
+              <div className="space-y-8">
+                {projects
+                  .filter(project => project.token_address)
+                  .map((project) => (
+                    <div key={project.id}>
+                      <div className="mb-4">
+                        <h3 className="text-xl font-semibold">{project.project_idea}</h3>
+                        <p className="text-text/70 text-sm">Token: {project.token_address}</p>
+                      </div>
+                      <CreatorAnalyticsDashboard
+                        tokenAddress={project.token_address!}
+                        tokenSymbol={project.project_type || 'TOKEN'}
+                        creatorAddress={project.wallet_address || user?.wallet?.address || ''}
+                      />
+                    </div>
+                  ))
+                }
+                {projects.filter(project => project.token_address).length === 0 && (
+                  <div className="text-center py-12">
+                    <h3 className="text-xl font-semibold text-headline mb-4">No Analytics Available</h3>
+                    <p className="text-body-text mb-6">Deploy a token to start tracking analytics!</p>
+                    <Link
+                      to="/"
+                      className="inline-flex px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
+                    >
+                      Launch Your First Drop
+                    </Link>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <h3 className="text-xl font-semibold text-headline mb-4">No Projects Yet</h3>
+                <p className="text-body-text mb-6">Create your first project to start tracking analytics!</p>
+                <Link
+                  to="/"
+                  className="inline-flex px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
+                >
+                  Launch Your First Drop
+                </Link>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="positions">
