@@ -1,12 +1,6 @@
+
 import React from "react";
-import { X } from "lucide-react";
-import WizardStep1Describe from "./WizardStep1Describe";
-import WizardStep2Roles from "./WizardStep2Roles";
-import { WizardBudgetStep } from "./WizardBudgetStep";
-import { WizardStep4Success } from "./WizardStep4Success";
 import { useWizardState } from "@/hooks/useWizardState";
-import { WizardStepTokenConfirm } from "./WizardStepTokenConfirm";
-import { AdvancedTokenCustomizationWrapper } from "./AdvancedTokenCustomizationWrapper";
 import { WizardHeader } from "./WizardHeader";
 import { WizardProgressBar } from "./WizardProgressBar";
 import { WizardStepContent } from "./WizardStepContent";
