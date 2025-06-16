@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProjectById } from "@/hooks/useProjectById";
 import { useToast } from "@/hooks/use-toast";
-import { useMintingWorkflow } from "./useMintingWorkflow";
+import { useMintingWorkflow } from "@/hooks/useMintingWorkflow";
 
 export function useWizardStep4State({
   coverBase64,
@@ -37,7 +37,7 @@ export function useWizardStep4State({
   const pledgeNum = Number(pledgeUSDC) || 0;
   const fundingTarget = expenseSum + pledgeNum;
 
-  // Minting workflow
+  // Use the consolidated minting workflow hook
   const mintingWorkflow = useMintingWorkflow({
     coverBase64,
     projectIdea,

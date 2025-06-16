@@ -1,11 +1,14 @@
 
+import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { deployCoinWithRoyalties } from "@/lib/zoraCoin";
 import { useMintingProcess } from "@/hooks/useMintingProcess";
+import { useUSDCxBalance } from "@/hooks/useUSDCxBalance";
 import { useProjectSave } from "@/hooks/useProjectSave";
 import { useUniversalSwap } from "@/hooks/useUniversalSwap";
+import { deployCoinWithRoyalties } from "@/lib/zoraCoin";
+import { getCoinHelperText } from "@/lib/zoraCoin";
 
-interface MintingActionParams {
+interface MintingWorkflowParams {
   coverBase64?: string | null;
   projectIdea: string;
   projectType: any;
@@ -16,21 +19,33 @@ interface MintingActionParams {
   expenseSum: number;
   fundingTarget: number;
   onSaveComplete: (projectRow: any) => void;
-  setCoverIpfs: (value: string | null) => void;
-  setProjectId: (value: string | null) => void;
-  setLoadingMint: (value: boolean) => void;
-  setPoolAddress: (value: string | null) => void;
-  setLastError: (error: any) => void;
 }
 
-export function useMintingActions(params: MintingActionParams) {
+export function useMintingWorkflow(params: MintingWorkflowParams) {
   const { toast } = useToast();
-  const { simulateMinting, completeMinting } = useMintingProcess();
+  const { isMinting, currentStep, mintingStatus, progress, mintingSteps, simulateMinting, completeMinting } = useMintingProcess();
+  const { usdcxBalanceConfirmed, isPollingBalance, pollUSDCxBalance } = useUSDCxBalance();
   const { createPoolAndAddLiquidity } = useUniversalSwap();
   const saveProjectMutation = useProjectSave();
 
-  const handleMintFlow = async ({ gasSpeed }: { gasSpeed: "slow"|"standard"|"fast" }) => {
-    params.setLoadingMint(true);
+  // Consolidated state
+  const [coverIpfs, setCoverIpfs] = useState<string | null>(null);
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [loadingMint, setLoadingMint] = useState(false);
+  const [poolAddress, setPoolAddress] = useState<string | null>(null);
+  const [mintModalOpen, setMintModalOpen] = useState(false);
+  const [lastError, setLastError] = useState<{
+    message: string;
+    code?: string;
+    txHash?: string;
+  } | null>(null);
+
+  const handleMintAndFund = useCallback(async () => {
+    setMintModalOpen(true);
+  }, []);
+
+  const handleMintFlow = useCallback(async ({ gasSpeed }: { gasSpeed: "slow"|"standard"|"fast" }) => {
+    setLoadingMint(true);
     
     try {
       const tokenSymbol = "NPLUS";
@@ -59,7 +74,7 @@ export function useMintingActions(params: MintingActionParams) {
         userWallet: params.walletAddress,
       });
       
-      params.setCoverIpfs(mintData.ipfsHash);
+      setCoverIpfs(mintData.ipfsHash);
       
       // Step 3: Create Uniswap V4 pool with initial liquidity
       console.log('Creating Uniswap V4 pool...');
@@ -71,7 +86,7 @@ export function useMintingActions(params: MintingActionParams) {
         liquidityAmount: params.pledgeUSDC.toString()
       });
 
-      params.setPoolAddress(poolResult?.poolAddress || null);
+      setPoolAddress(poolResult?.poolAddress || null);
       console.log('Pool created:', poolResult);
 
       // Step 4: Save project with pool information
@@ -89,7 +104,7 @@ export function useMintingActions(params: MintingActionParams) {
         poolAddress: poolResult?.poolAddress,
       });
       
-      params.setProjectId(project.id);
+      setProjectId(project.id);
       params.onSaveComplete(project);
       completeMinting();
 
@@ -99,7 +114,7 @@ export function useMintingActions(params: MintingActionParams) {
         variant: "default",
       });
 
-      params.setLoadingMint(false);
+      setLoadingMint(false);
       return { 
         txHash: mintData.txHash, 
         poolAddress: poolResult?.poolAddress,
@@ -107,7 +122,7 @@ export function useMintingActions(params: MintingActionParams) {
       };
       
     } catch (error: any) {
-      params.setLoadingMint(false);
+      setLoadingMint(false);
 
       let code: string | undefined;
       let isUserRejection: boolean | undefined = false;
@@ -134,7 +149,7 @@ export function useMintingActions(params: MintingActionParams) {
       
       if (error?.txHash) txHash = error.txHash;
 
-      params.setLastError({
+      setLastError({
         message: errMsg,
         code,
         txHash,
@@ -155,9 +170,35 @@ export function useMintingActions(params: MintingActionParams) {
 
       return { error: errMsg, code, txHash, step: "error" as const, isUserRejection };
     }
-  };
+  }, [params, simulateMinting, createPoolAndAddLiquidity, saveProjectMutation, completeMinting, toast]);
 
   return {
+    // State
+    coverIpfs,
+    projectId,
+    loadingMint,
+    poolAddress,
+    mintModalOpen,
+    lastError,
+    
+    // Process state
+    isMinting,
+    currentStep,
+    mintingStatus,
+    progress,
+    mintingSteps,
+    
+    // Balance state
+    usdcxBalanceConfirmed,
+    isPollingBalance,
+    
+    // Actions
+    handleMintAndFund,
     handleMintFlow,
+    setMintModalOpen,
+    setProjectId,
+    
+    // Helper text
+    helperText: getCoinHelperText(),
   };
 }

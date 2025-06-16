@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sparkles, Wand2 } from "lucide-react";
@@ -130,7 +129,7 @@ export const WizardStep4Success: React.FC<WizardStep4SuccessProps> = ({
             Content Suite
           </TabsTrigger>
         </TabsList>
-
+        
         <TabsContent value="summary" className="space-y-6">
           <Wizard4SummarySection
             coverBase64={coverBase64}
