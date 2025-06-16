@@ -33,66 +33,74 @@ export default function FarcasterIntegration() {
       <ModernNavigation />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
+        {/* Centered Header Section */}
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2">Farcaster Social Trading</h1>
           <p className="text-text/70 text-lg">
             Trade in-feed, share viral price cards, and earn with referrals
           </p>
         </div>
 
-        {/* Token Selector */}
-        <div className="mb-6">
-          <label className="text-sm font-medium mb-2 block">Select Token</label>
-          <div className="flex gap-2">
-            {DEMO_TOKENS.map((token) => (
-              <Button
-                key={token.address}
-                variant={selectedToken.address === token.address ? "default" : "outline"}
-                onClick={() => setSelectedToken(token)}
-              >
-                {token.symbol}
-              </Button>
-            ))}
+        {/* Centered Token Selector */}
+        <div className="flex justify-center mb-6">
+          <div className="text-center">
+            <label className="text-sm font-medium mb-2 block">Select Token</label>
+            <div className="flex gap-2 justify-center">
+              {DEMO_TOKENS.map((token) => (
+                <Button
+                  key={token.address}
+                  variant={selectedToken.address === token.address ? "default" : "outline"}
+                  onClick={() => setSelectedToken(token)}
+                >
+                  {token.symbol}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 
         <Tabs defaultValue="mini-app" className="space-y-6">
-          <TabsList className="bg-card border border-border">
-            <TabsTrigger value="mini-app" className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Mini App
-            </TabsTrigger>
-            <TabsTrigger value="share" className="flex items-center gap-2">
-              <Share className="w-4 h-4" />
-              Share Cards
-            </TabsTrigger>
-            <TabsTrigger value="referrals" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Referrals
-            </TabsTrigger>
-            <TabsTrigger value="frames" className="flex items-center gap-2">
-              <Frame className="w-4 h-4" />
-              Frames
-            </TabsTrigger>
-          </TabsList>
+          {/* Centered Tab Navigation */}
+          <div className="flex justify-center">
+            <TabsList className="bg-card border border-border">
+              <TabsTrigger value="mini-app" className="flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Mini App
+              </TabsTrigger>
+              <TabsTrigger value="share" className="flex items-center gap-2">
+                <Share className="w-4 h-4" />
+                Share Cards
+              </TabsTrigger>
+              <TabsTrigger value="referrals" className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                Referrals
+              </TabsTrigger>
+              <TabsTrigger value="frames" className="flex items-center gap-2">
+                <Frame className="w-4 h-4" />
+                Frames
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="mini-app">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
+              <div className="text-center lg:text-left">
                 <h2 className="text-2xl font-bold mb-4">In-Feed Trading Mini App</h2>
                 <p className="text-text/70 mb-6">
                   A compact trading interface designed for Farcaster frames and social feeds.
                 </p>
-                <FarcasterMiniApp
-                  tokenAddress={selectedToken.address}
-                  tokenSymbol={selectedToken.symbol}
-                  tokenName={selectedToken.name}
-                  frameData={{
-                    castHash: '0xabcd1234',
-                    fid: '12345',
-                    messageBytes: '0x...'
-                  }}
-                />
+                <div className="flex justify-center lg:justify-start">
+                  <FarcasterMiniApp
+                    tokenAddress={selectedToken.address}
+                    tokenSymbol={selectedToken.symbol}
+                    tokenName={selectedToken.name}
+                    frameData={{
+                      castHash: '0xabcd1234',
+                      fid: '12345',
+                      messageBytes: '0x...'
+                    }}
+                  />
+                </div>
               </div>
               
               <div className="space-y-6">
@@ -125,17 +133,19 @@ export default function FarcasterIntegration() {
 
           <TabsContent value="share">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
+              <div className="text-center lg:text-left">
                 <h2 className="text-2xl font-bold mb-4">Shareable Price Cards</h2>
                 <p className="text-text/70 mb-6">
                   Create viral-ready price cards with custom messages and multiple styles.
                 </p>
-                <ShareablePriceCard
-                  tokenAddress={selectedToken.address}
-                  tokenSymbol={selectedToken.symbol}
-                  tokenName={selectedToken.name}
-                  price={price}
-                />
+                <div className="flex justify-center lg:justify-start">
+                  <ShareablePriceCard
+                    tokenAddress={selectedToken.address}
+                    tokenSymbol={selectedToken.symbol}
+                    tokenName={selectedToken.name}
+                    price={price}
+                  />
+                </div>
               </div>
               
               <div className="space-y-6">
@@ -168,19 +178,21 @@ export default function FarcasterIntegration() {
 
           <TabsContent value="referrals">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
+              <div className="text-center lg:text-left">
                 <h2 className="text-2xl font-bold mb-4">Viral Referral System</h2>
                 <p className="text-text/70 mb-6">
                   Earn rewards by referring friends and building your network.
                 </p>
-                <ReferralSystem
-                  tokenAddress={selectedToken.address}
-                  tokenSymbol={selectedToken.symbol}
-                  frameData={{
-                    castHash: '0xabcd1234',
-                    fid: '12345'
-                  }}
-                />
+                <div className="flex justify-center lg:justify-start">
+                  <ReferralSystem
+                    tokenAddress={selectedToken.address}
+                    tokenSymbol={selectedToken.symbol}
+                    frameData={{
+                      castHash: '0xabcd1234',
+                      fid: '12345'
+                    }}
+                  />
+                </div>
               </div>
               
               <div className="space-y-6">
@@ -213,18 +225,20 @@ export default function FarcasterIntegration() {
 
           <TabsContent value="frames">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
+              <div className="text-center lg:text-left">
                 <h2 className="text-2xl font-bold mb-4">Farcaster Frames</h2>
                 <p className="text-text/70 mb-6">
                   Interactive frames that work seamlessly in Farcaster feeds.
                 </p>
-                <div className="bg-gray-100 p-4 rounded-lg">
-                  <FarcasterFrame
-                    tokenAddress={selectedToken.address}
-                    tokenSymbol={selectedToken.symbol}
-                    tokenName={selectedToken.name}
-                    referralCode="NEPLUS-DEMO123"
-                  />
+                <div className="flex justify-center lg:justify-start">
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <FarcasterFrame
+                      tokenAddress={selectedToken.address}
+                      tokenSymbol={selectedToken.symbol}
+                      tokenName={selectedToken.name}
+                      referralCode="NEPLUS-DEMO123"
+                    />
+                  </div>
                 </div>
               </div>
               
