@@ -1,95 +1,53 @@
 
 import { useMutation } from "@tanstack/react-query";
-import { usePrivy } from "@privy-io/react-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import type { Role, Expense, ProjectType } from "@/hooks/useWizardState";
 
-interface SaveProjectParams {
+interface ProjectSaveData {
   projectIdea: string;
-  projectType: ProjectType;
-  roles: Role[];
-  expenses: Expense[];
+  projectType: any;
+  roles: any[];
+  expenses: any[];
   pledgeUSDC: string;
   walletAddress: string | null;
   fundingTarget: number;
   expenseSum: number;
-  tokenAddress: string;
-  txHash: string;
+  tokenAddress?: string;
+  txHash?: string;
+  poolAddress?: string;
 }
 
 export const useProjectSave = () => {
-  const { user } = usePrivy();
-  const { toast } = useToast();
-
   return useMutation({
-    mutationFn: async (params: SaveProjectParams) => {
-      if (!user?.id) throw new Error("User not authenticated");
-
-      const pledgeNum = Number(params.pledgeUSDC) || 0;
-
-      // Create project with status: 'minted'
-      const { data: project, error: projectError } = await supabase
-        .from("projects")
+    mutationFn: async (data: ProjectSaveData) => {
+      console.log('Saving project with data:', data);
+      
+      const { data: project, error } = await supabase
+        .from('projects')
         .insert({
-          owner_id: user.id,
-          project_idea: params.projectIdea,
-          project_type: params.projectType,
-          pledge_usdc: pledgeNum,
-          wallet_address: params.walletAddress,
-          funding_target: params.fundingTarget,
-          expense_sum: params.expenseSum,
-          token_address: params.tokenAddress,
-          tx_hash: params.txHash,
-          escrow_funded_amount: pledgeNum,
-          streams_active: false,
-          status: "minted",
+          title: data.projectIdea,
+          description: data.projectIdea,
+          project_type: data.projectType?.value || data.projectType,
+          funding_target: data.fundingTarget,
+          expense_sum: data.expenseSum,
+          pledge_usdc: data.pledgeUSDC,
+          wallet_address: data.walletAddress,
+          token_address: data.tokenAddress,
+          tx_hash: data.txHash,
+          pool_address: data.poolAddress,
+          status: data.tokenAddress ? 'minted' : 'draft',
+          roles: data.roles,
+          expenses: data.expenses
         })
         .select()
         .single();
 
-      if (projectError) throw projectError;
+      if (error) {
+        console.error('Project save error:', error);
+        throw new Error(`Failed to save project: ${error.message}`);
+      }
 
-      // Create project roles
-      const rolesData = params.roles.map(role => ({
-        project_id: project.id,
-        name: role.roleName,
-        percent: role.percent,
-        wallet_address: role.walletAddress,
-        stream_flow_rate: 0,
-        stream_active: false,
-      }));
-
-      const { error: rolesError } = await supabase
-        .from("project_roles")
-        .insert(rolesData);
-
-      if (rolesError) throw rolesError;
-
-      // Create project expenses
-      const expensesData = params.expenses.map(expense => ({
-        project_id: project.id,
-        name: expense.expenseName,
-        amount_usdc: expense.amountUSDC,
-        payout_type: expense.payoutType,
-        vendor_wallet: expense.vendorWallet,
-      }));
-
-      const { error: expensesError } = await supabase
-        .from("project_expenses")
-        .insert(expensesData);
-
-      if (expensesError) throw expensesError;
-
+      console.log('Project saved successfully:', project);
       return project;
-    },
-    onError: (error) => {
-      console.error("Error saving project:", error);
-      toast({
-        title: "Database Error",
-        description: "Failed to save project to database",
-        variant: "destructive",
-      });
     },
   });
 };
