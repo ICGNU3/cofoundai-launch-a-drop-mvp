@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/car
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TradingInterface } from './TradingInterface';
 import { useRealTimePrices } from '@/hooks/useTokenPrice';
 import { formatCurrency, formatNumber, formatPercentage } from '@/hooks/usePoolStats';
