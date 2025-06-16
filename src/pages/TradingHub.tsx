@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { LiveTradingDashboard } from '@/components/LiveTradingDashboard';
+import { EnhancedTradingDashboard } from '@/components/EnhancedTradingDashboard';
 import ModernNavigation from '@/components/ModernNavigation';
 
 // Mock token data - in production this would come from your database
@@ -41,13 +42,13 @@ export default function TradingHub() {
       
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Live Trading Hub</h1>
+          <h1 className="text-4xl font-bold mb-2">Enhanced Trading Hub</h1>
           <p className="text-text/70 text-lg">
-            Trade NEPLUS project tokens with real-time price updates and live liquidity
+            Trade NEPLUS project tokens with real-time price updates, live liquidity, and comprehensive analytics
           </p>
         </div>
 
-        <LiveTradingDashboard 
+        <EnhancedTradingDashboard 
           tokens={DEMO_TOKENS}
           featuredToken={DEMO_TOKENS[0]}
         />
