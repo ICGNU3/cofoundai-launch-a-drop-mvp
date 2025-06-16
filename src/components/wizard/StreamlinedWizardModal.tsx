@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 import { StreamlinedProgressBar } from "./StreamlinedProgressBar";
 import { DemoProjectsInspiration } from "./DemoProjectsInspiration";
@@ -8,6 +8,8 @@ import { useStreamlinedWizard } from "@/hooks/wizard/useStreamlinedWizard";
 import { WizardStep1Describe } from "./steps/WizardStep1Describe";
 import { WizardStep2TeamBudget } from "./steps/WizardStep2TeamBudget";
 import { WizardStep3Launch } from "./steps/WizardStep3Launch";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface StreamlinedWizardModalProps {
   isOpen: boolean;
@@ -21,6 +23,8 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
   walletAddress,
 }) => {
   const wizard = useStreamlinedWizard();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [showInspiration, setShowInspiration] = React.useState(false);
 
   const handleDemoSelect = (demo: any) => {
@@ -50,6 +54,22 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
     
     setShowInspiration(false);
     wizard.nextStep();
+  };
+
+  const handleWizardComplete = () => {
+    // Reset wizard state
+    wizard.closeWizard();
+    
+    // Close modal
+    onClose();
+    
+    // Navigate to dashboard to see the new project
+    navigate("/dashboard");
+    
+    toast({
+      title: "Welcome to your new project! 🎉",
+      description: "Your project is now live and ready for supporters. Check it out in your dashboard.",
+    });
   };
 
   const renderStepContent = () => {
@@ -95,7 +115,7 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
             state={wizard.state}
             updateField={wizard.updateField}
             prevStep={wizard.prevStep}
-            onComplete={onClose}
+            onComplete={handleWizardComplete}
             walletAddress={walletAddress}
           />
         );
@@ -109,6 +129,7 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-4xl h-[90vh] max-h-[800px] p-0 bg-card">
+        <DialogTitle className="sr-only">Create Your Drop</DialogTitle>
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border">
