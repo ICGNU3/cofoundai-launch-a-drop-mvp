@@ -6,7 +6,7 @@ const HowItWorksSection: React.FC = () => {
     <section id="how-it-works" className="w-full max-w-6xl mx-auto px-6 py-20">
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-5xl font-light tracking-tight mb-6 text-white">
-          See How It Works
+          How it Works
         </h2>
       </div>
       
