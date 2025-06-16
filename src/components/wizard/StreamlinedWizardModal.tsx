@@ -1,0 +1,142 @@
+
+import React from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { X } from "lucide-react";
+import { StreamlinedProgressBar } from "./StreamlinedProgressBar";
+import { DemoProjectsInspiration } from "./DemoProjectsInspiration";
+import { useStreamlinedWizard } from "@/hooks/wizard/useStreamlinedWizard";
+import { WizardStep1Describe } from "./steps/WizardStep1Describe";
+import { WizardStep2TeamBudget } from "./steps/WizardStep2TeamBudget";
+import { WizardStep3Launch } from "./steps/WizardStep3Launch";
+
+interface StreamlinedWizardModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  walletAddress: string | null;
+}
+
+export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
+  isOpen,
+  onClose,
+  walletAddress,
+}) => {
+  const wizard = useStreamlinedWizard();
+  const [showInspiration, setShowInspiration] = React.useState(false);
+
+  const handleDemoSelect = (demo: any) => {
+    wizard.updateField("projectIdea", demo.example.projectIdea);
+    wizard.updateField("projectType", demo.type);
+    
+    // Convert demo roles to wizard format
+    const roles = demo.example.roles.map((role: any, index: number) => ({
+      name: role.name,
+      percent: role.percent,
+      percentNum: role.percent,
+      percentStr: role.percent.toString(),
+      address: index === 0 ? walletAddress || "" : "",
+      isFixed: false,
+    }));
+    
+    // Convert demo expenses to wizard format
+    const expenses = demo.example.expenses.map((expense: any) => ({
+      name: expense.name,
+      amountUSDC: expense.amount,
+      description: `Budget allocation for ${expense.name.toLowerCase()}`,
+    }));
+    
+    wizard.updateField("roles", roles);
+    wizard.updateField("expenses", expenses);
+    wizard.updateField("mode", "team");
+    
+    setShowInspiration(false);
+    wizard.nextStep();
+  };
+
+  const renderStepContent = () => {
+    if (showInspiration) {
+      return (
+        <div className="p-6">
+          <DemoProjectsInspiration onSelectDemo={handleDemoSelect} />
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setShowInspiration(false)}
+              className="text-sm text-accent hover:underline"
+            >
+              ← Back to project setup
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    switch (wizard.state.step) {
+      case 1:
+        return (
+          <WizardStep1Describe
+            state={wizard.state}
+            updateField={wizard.updateField}
+            nextStep={wizard.nextStep}
+            onShowInspiration={() => setShowInspiration(true)}
+            walletAddress={walletAddress}
+          />
+        );
+      case 2:
+        return (
+          <WizardStep2TeamBudget
+            state={wizard.state}
+            updateField={wizard.updateField}
+            nextStep={wizard.nextStep}
+            prevStep={wizard.prevStep}
+          />
+        );
+      case 3:
+        return (
+          <WizardStep3Launch
+            state={wizard.state}
+            updateField={wizard.updateField}
+            prevStep={wizard.prevStep}
+            onComplete={onClose}
+            walletAddress={walletAddress}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-4xl h-[90vh] max-h-[800px] p-0 bg-card">
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-border">
+            <div>
+              <h2 className="text-xl font-bold text-text">Create Your Drop</h2>
+              <p className="text-sm text-text/70 mt-1">
+                Launch your creative project in just 3 simple steps
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-background rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Progress Bar */}
+          {!showInspiration && (
+            <StreamlinedProgressBar currentStep={wizard.state.step} />
+          )}
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto">
+            {renderStepContent()}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
