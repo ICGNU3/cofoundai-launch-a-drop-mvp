@@ -51,7 +51,7 @@ export interface ZoraCoinParams {
 }
 
 export function useZoraMinting() {
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -60,6 +60,7 @@ export function useZoraMinting() {
 
   const mintCoin = async (params: ZoraCoinParams) => {
     if (!address) throw new Error("Wallet not connected");
+    if (!chain) throw new Error("No chain selected");
 
     return writeContract({
       address: ZORA_CONTRACTS.FACTORY,
@@ -72,6 +73,8 @@ export function useZoraMinting() {
         params.creator,
         params.uri
       ],
+      chain,
+      account: address,
     });
   };
 
