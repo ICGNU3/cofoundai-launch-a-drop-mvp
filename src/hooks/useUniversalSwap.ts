@@ -63,31 +63,8 @@ export function useUniversalSwap() {
       // Calculate initial liquidity parameters
       const liquidityAmount = parseEther(params.liquidityAmount);
       
-      // Encode the initialization call
-      const initializeData = encodeFunctionData({
-        abi: [
-          {
-            name: 'initialize',
-            type: 'function',
-            inputs: [
-              { name: 'key', type: 'tuple', components: [
-                { name: 'currency0', type: 'address' },
-                { name: 'currency1', type: 'address' },
-                { name: 'fee', type: 'uint24' },
-                { name: 'tickSpacing', type: 'int24' },
-                { name: 'hooks', type: 'address' }
-              ]},
-              { name: 'sqrtPriceX96', type: 'uint160' }
-            ],
-            outputs: [{ name: 'tick', type: 'int24' }]
-          }
-        ],
-        functionName: 'initialize',
-        args: [poolKey, parseUnits(params.initialPrice, 18)]
-      });
-
       // Execute the pool creation transaction
-      const result = await writeContract({
+      const hash = await writeContract({
         address: POOL_MANAGER_ADDRESS as `0x${string}`,
         abi: [
           {
@@ -105,12 +82,12 @@ export function useUniversalSwap() {
             ],
             outputs: [{ name: 'tick', type: 'int24' }]
           }
-        ],
+        ] as const,
         functionName: 'initialize',
         args: [poolKey, parseUnits(params.initialPrice, 18)]
       });
 
-      setTxHash(result);
+      setTxHash(hash);
       
       toast({
         title: "Pool Creation Initiated",
@@ -119,7 +96,7 @@ export function useUniversalSwap() {
 
       return {
         success: true,
-        txHash: result,
+        txHash: hash,
         poolAddress: `${poolKey.currency0}-${poolKey.currency1}-${poolKey.fee}`
       };
       
@@ -185,7 +162,7 @@ export function useUniversalSwap() {
         ]
       });
 
-      const result = await writeContract({
+      const hash = await writeContract({
         address: UNIVERSAL_ROUTER_ADDRESS as `0x${string}`,
         abi: [
           {
@@ -196,12 +173,12 @@ export function useUniversalSwap() {
               { name: 'inputs', type: 'bytes[]' }
             ]
           }
-        ],
+        ] as const,
         functionName: 'execute',
         args: [commands, [inputs]]
       });
 
-      setTxHash(result);
+      setTxHash(hash);
       
       toast({
         title: "Swap Initiated",
@@ -210,7 +187,7 @@ export function useUniversalSwap() {
 
       return {
         success: true,
-        txHash: result
+        txHash: hash
       };
       
     } catch (err) {
