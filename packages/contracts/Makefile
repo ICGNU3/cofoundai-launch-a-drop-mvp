@@ -12,6 +12,12 @@ build:
 test:
 	forge test -vv
 
+test-extended:
+	forge test -vv --match-contract CreatorRoyaltyHookExtendedTest
+
+test-all:
+	forge test -vvv
+
 fmt:
 	forge fmt
 
@@ -21,4 +27,10 @@ deploy-zora-testnet:
 clean:
 	forge clean
 
-.PHONY: install build test fmt deploy-zora-testnet clean
+coverage:
+	forge coverage
+
+gas-report:
+	forge test --gas-report
+
+.PHONY: install build test test-extended test-all fmt deploy-zora-testnet clean coverage gas-report
