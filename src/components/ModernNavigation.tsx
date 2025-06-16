@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu } from 'lucide-react';
+import { AuthButton } from './auth/AuthButton';
 
 const ModernNavigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -58,9 +60,9 @@ const ModernNavigation = () => {
             <Menu className="w-6 h-6" />
           </button>
 
-          {/* User Menu (Placeholder) */}
+          {/* Auth Button */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Add user authentication and menu here */}
+            <AuthButton />
           </div>
         </div>
 
@@ -96,6 +98,9 @@ const ModernNavigation = () => {
               >
                 How It Works
               </Link>
+              <div className="pt-2">
+                <AuthButton />
+              </div>
             </div>
           </div>
         )}
