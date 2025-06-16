@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { WizardModal } from "@/components/WizardModal";
 import { useWizardState } from "@/hooks/useWizardState";
@@ -8,6 +9,7 @@ import HeroSection from "@/components/landing/HeroSection";
 import LandingFooter from "@/components/landing/LandingFooter";
 import AdvancedTokenCustomizationModal from "@/components/landing/AdvancedTokenCustomizationModal";
 import ModernNavigation from "@/components/ModernNavigation";
+import SplineBackground from "@/components/SplineBackground";
 
 const Index: React.FC = () => {
   const wizard = useWizardState();
@@ -100,38 +102,42 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-x-hidden overflow-y-auto">
-      <ModernNavigation />
+    <div className="min-h-screen bg-background text-body-text flex flex-col items-center relative overflow-hidden">
+      <SplineBackground />
       
-      <main className="relative w-full z-10 flex flex-col items-center">
-        <HeroSection
-          counter={counter}
-          onCtaClick={wizard.openWizard}
-          countUpDollarRef={countUpDollarRef}
-          countUpDropRef={countUpDropRef}
-          onAIFinish={handleAIKickoffFinish}
-        />
+      <div className="content-container w-full">
+        <ModernNavigation />
         
-        <section id="features" className="w-full max-w-7xl mx-auto px-4 mt-20">
-          <LandingFeaturesSection />
-        </section>
-        
-        <div className="w-full flex items-center justify-center mt-16 mb-8">
-          <LogoRow />
-        </div>
-        
-        <div className="w-full max-w-5xl mx-auto px-4">
-          <CreatorCarousel carousel={carousel} />
-        </div>
-      </main>
+        <main className="relative w-full z-10 flex flex-col items-center">
+          <HeroSection
+            counter={counter}
+            onCtaClick={wizard.openWizard}
+            countUpDollarRef={countUpDollarRef}
+            countUpDropRef={countUpDropRef}
+            onAIFinish={handleAIKickoffFinish}
+          />
+          
+          <section id="features" className="w-full max-w-7xl mx-auto px-4 mt-20">
+            <LandingFeaturesSection />
+          </section>
+          
+          <div className="w-full flex items-center justify-center mt-16 mb-8">
+            <LogoRow />
+          </div>
+          
+          <div className="w-full max-w-5xl mx-auto px-4">
+            <CreatorCarousel carousel={carousel} />
+          </div>
+        </main>
 
-      <AdvancedTokenCustomizationModal isOpen={tokenModalOpen} onClose={() => setTokenModalOpen(false)} />
-      <WizardModal
-        isOpen={wizard.state.isWizardOpen}
-        onClose={wizard.closeWizard}
-        walletAddress={null}
-      />
-      <LandingFooter />
+        <AdvancedTokenCustomizationModal isOpen={tokenModalOpen} onClose={() => setTokenModalOpen(false)} />
+        <WizardModal
+          isOpen={wizard.state.isWizardOpen}
+          onClose={wizard.closeWizard}
+          walletAddress={null}
+        />
+        <LandingFooter />
+      </div>
     </div>
   );
 };
