@@ -14,7 +14,7 @@ const queryClient = new QueryClient();
 function App() {
   const privyAppId = import.meta.env.VITE_PRIVY_APP_ID || 'clpispdcl00lu356f5oh7yl54';
   const privyConfig = {
-    loginMethods: ['wallet', 'email'] as const,
+    loginMethods: ['wallet', 'email'], // mutable string array; no readonly tuple
     appearance: {
       theme: 'dark' as const,
       accentColor: '#36DF8C' as const,
