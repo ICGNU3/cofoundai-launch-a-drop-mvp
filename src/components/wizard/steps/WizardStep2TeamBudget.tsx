@@ -70,151 +70,156 @@ export const WizardStep2TeamBudget: React.FC<WizardStep2TeamBudgetProps> = ({
   };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Team Roles Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Team Roles & Revenue Split</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {state.roles.map((role, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 border border-border rounded-lg">
-              <Input
-                placeholder="Role name"
-                value={role.name}
-                onChange={(e) => updateRole(index, { name: e.target.value })}
-                className="flex-1"
-              />
-              <div className="flex items-center gap-2">
+    <div className="flex flex-col h-full">
+      {/* Scrollable Content */}
+      <div className="flex-1 p-6 space-y-6">
+        {/* Team Roles Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Team Roles & Revenue Split</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {state.roles.map((role, index) => (
+              <div key={index} className="flex items-center gap-3 p-3 border border-border rounded-lg">
                 <Input
-                  type="number"
-                  placeholder="0"
-                  value={role.percentStr}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    const num = parseInt(value) || 0;
-                    updateRole(index, { 
-                      percentStr: value,
-                      percentNum: num,
-                      percent: num 
-                    });
-                  }}
-                  className="w-20"
+                  placeholder="Role name"
+                  value={role.name}
+                  onChange={(e) => updateRole(index, { name: e.target.value })}
+                  className="flex-1"
                 />
-                <span className="text-sm text-text/60">%</span>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={role.percentStr}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const num = parseInt(value) || 0;
+                      updateRole(index, { 
+                        percentStr: value,
+                        percentNum: num,
+                        percent: num 
+                      });
+                    }}
+                    className="w-20"
+                  />
+                  <span className="text-sm text-text/60">%</span>
+                </div>
+                {!role.isFixed && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeRole(index)}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
-              {!role.isFixed && (
+            ))}
+            
+            <Button variant="outline" onClick={addRole} className="w-full">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Team Member
+            </Button>
+            
+            <div className="text-sm text-center">
+              Total: {totalRolePercent}% 
+              {totalRolePercent !== 100 && (
+                <span className="text-red-500 ml-2">
+                  (Must equal 100%)
+                </span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Budget & Expenses Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Project Budget</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {state.expenses.map((expense, index) => (
+              <div key={index} className="flex items-center gap-3 p-3 border border-border rounded-lg">
+                <Input
+                  placeholder="Expense name"
+                  value={expense.name}
+                  onChange={(e) => updateExpense(index, { name: e.target.value })}
+                  className="flex-1"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-text/60">$</span>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={expense.amountUSDC}
+                    onChange={(e) => updateExpense(index, { amountUSDC: parseInt(e.target.value) || 0 })}
+                    className="w-24"
+                  />
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => removeRole(index)}
+                  onClick={() => removeExpense(index)}
                   className="text-red-500 hover:text-red-600"
                 >
                   <X className="w-4 h-4" />
                 </Button>
-              )}
+              </div>
+            ))}
+            
+            <Button variant="outline" onClick={addExpense} className="w-full">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Expense
+            </Button>
+            
+            <div className="text-sm text-center">
+              Total Budget: ${totalExpenses.toLocaleString()}
             </div>
-          ))}
-          
-          <Button variant="outline" onClick={addRole} className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Team Member
-          </Button>
-          
-          <div className="text-sm text-center">
-            Total: {totalRolePercent}% 
-            {totalRolePercent !== 100 && (
-              <span className="text-red-500 ml-2">
-                (Must equal 100%)
-              </span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Budget & Expenses Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Project Budget</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {state.expenses.map((expense, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 border border-border rounded-lg">
+        {/* USDC Pledge */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Your Initial Pledge</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-text/60">$</span>
               <Input
-                placeholder="Expense name"
-                value={expense.name}
-                onChange={(e) => updateExpense(index, { name: e.target.value })}
+                type="number"
+                placeholder="0"
+                value={state.pledgeUSDC}
+                onChange={(e) => updateField("pledgeUSDC", e.target.value)}
                 className="flex-1"
               />
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-text/60">$</span>
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={expense.amountUSDC}
-                  onChange={(e) => updateExpense(index, { amountUSDC: parseInt(e.target.value) || 0 })}
-                  className="w-24"
-                />
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeExpense(index)}
-                className="text-red-500 hover:text-red-600"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+              <span className="text-sm text-text/60">USDC</span>
             </div>
-          ))}
-          
-          <Button variant="outline" onClick={addExpense} className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Expense
+            <p className="text-xs text-text/60 mt-2">
+              This is your initial contribution to get the project started
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Fixed Navigation */}
+      <div className="flex-shrink-0 border-t border-border p-6">
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={prevStep} className="gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Back
           </Button>
-          
-          <div className="text-sm text-center">
-            Total Budget: ${totalExpenses.toLocaleString()}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* USDC Pledge */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Your Initial Pledge</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-text/60">$</span>
-            <Input
-              type="number"
-              placeholder="0"
-              value={state.pledgeUSDC}
-              onChange={(e) => updateField("pledgeUSDC", e.target.value)}
-              className="flex-1"
-            />
-            <span className="text-sm text-text/60">USDC</span>
-          </div>
-          <p className="text-xs text-text/60 mt-2">
-            This is your initial contribution to get the project started
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Navigation */}
-      <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={prevStep} className="gap-2">
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </Button>
-        <Button
-          onClick={nextStep}
-          disabled={!canProceed}
-          className="bg-accent text-black hover:bg-accent/90 gap-2"
-        >
-          Continue to Launch
-          <ArrowRight className="w-4 h-4" />
-        </Button>
+          <Button
+            onClick={nextStep}
+            disabled={!canProceed}
+            className="bg-accent text-black hover:bg-accent/90 gap-2"
+          >
+            Continue to Launch
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
