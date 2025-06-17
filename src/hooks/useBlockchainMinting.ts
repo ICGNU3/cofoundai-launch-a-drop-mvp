@@ -22,21 +22,17 @@ export function useBlockchainMinting() {
   const uploadToIPFS = async (dataURL: string, filename: string): Promise<string> => {
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      const blob = await fetch(dataURL).then(r => r.blob());
-      formData.append("file", blob, filename);
-
-      const response = await fetch("/api/pinata/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to upload to IPFS");
-      }
-
-      const result = await response.json();
-      return result.IpfsHash;
+      // For development, create a mock IPFS hash
+      const mockHash = `Qm${Math.random().toString(36).substring(2, 15)}`;
+      console.log(`Mock IPFS upload for ${filename}:`, mockHash);
+      
+      // Simulate upload delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      return mockHash;
+    } catch (error) {
+      console.error("IPFS upload error:", error);
+      throw new Error("Failed to upload to IPFS");
     } finally {
       setIsUploading(false);
     }
@@ -51,6 +47,8 @@ export function useBlockchainMinting() {
     creatorAddress: string;
   }) => {
     try {
+      console.log("Attempting Zora API mint with params:", params);
+      
       const { data, error } = await supabase.functions.invoke('mint-zora-token', {
         body: params
       });
@@ -73,12 +71,12 @@ export function useBlockchainMinting() {
         throw new Error("Invalid wallet address format");
       }
 
-      // Step 1: Upload cover art to IPFS
+      // Step 1: Upload cover art to IPFS (mock for development)
       toast({ title: "Uploading cover art...", description: "Storing your image on IPFS" });
       const coverHash = await uploadToIPFS(params.coverBase64, `${params.tokenSymbol}-cover.png`);
       setIpfsHash(coverHash);
 
-      // Step 2: Create metadata and upload to IPFS
+      // Step 2: Create metadata and upload to IPFS (mock for development)
       const metadata = {
         name: params.tokenName,
         description: `${params.tokenName} - A NEPLUS creation token`,
@@ -91,29 +89,16 @@ export function useBlockchainMinting() {
         ]
       };
 
-      const metadataBlob = new Blob([JSON.stringify(metadata)], { type: "application/json" });
-      const metadataFile = new File([metadataBlob], `${params.tokenSymbol}-metadata.json`);
-      const metadataFormData = new FormData();
-      metadataFormData.append("file", metadataFile);
-
-      const metadataResponse = await fetch("/api/pinata/upload", {
-        method: "POST",
-        body: metadataFormData,
-      });
-
-      if (!metadataResponse.ok) {
-        throw new Error("Failed to upload metadata to IPFS");
-      }
-
-      const metadataResult = await metadataResponse.json();
-      const metadataUri = `ipfs://${metadataResult.IpfsHash}`;
+      const metadataHash = `Qm${Math.random().toString(36).substring(2, 15)}`;
+      const metadataUri = `ipfs://${metadataHash}`;
+      console.log("Mock metadata upload:", metadataUri);
 
       // Step 3: Try Zora API first, then fallback to direct blockchain interaction
       toast({ title: "Minting token...", description: "Creating your token via Zora API" });
       
       try {
         const zoraResult = await mintWithZoraAPI({
-          chainId: 999999999, // Zora testnet
+          chainId: 999999999, // Zora Sepolia
           name: params.tokenName,
           symbol: params.tokenSymbol,
           totalSupply: params.tokenSupply,
