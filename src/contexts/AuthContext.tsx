@@ -53,6 +53,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleAuthState = async () => {
       if (authenticated && user) {
         try {
+          console.log('Fetching profile for user:', user.id);
+          
           // Check if profile exists
           const { data: existingProfile, error } = await supabase
             .from('profiles')
@@ -60,15 +62,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .eq('id', user.id)
             .maybeSingle();
 
-          if (error && error.code !== 'PGRST116') {
+          if (error) {
             console.error('Error fetching profile:', error);
-            setIsLoading(false);
-            return;
+            // If table doesn't exist or other error, continue without profile
+            if (error.code === '42P01') {
+              console.warn('Profiles table does not exist, continuing without profile');
+              setProfile(null);
+              setIsLoading(false);
+              return;
+            }
           }
 
           if (existingProfile) {
+            console.log('Profile found:', existingProfile);
             setProfile(existingProfile);
           } else {
+            console.log('Creating new profile for user:', user.id);
             // Create new profile
             const newProfile = {
               id: user.id,
@@ -88,12 +97,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (createError) {
               console.error('Error creating profile:', createError);
+              // Continue without profile if creation fails
+              setProfile(null);
             } else {
+              console.log('Profile created:', createdProfile);
               setProfile(createdProfile);
             }
           }
         } catch (error) {
           console.error('Auth state error:', error);
+          setProfile(null);
         }
       } else {
         setProfile(null);
@@ -104,6 +117,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Only run if privyAuth is available
     if (privyAuth) {
       handleAuthState();
+    } else {
+      setIsLoading(false);
     }
   }, [authenticated, user, privyAuth]);
 
