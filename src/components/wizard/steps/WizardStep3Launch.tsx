@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, Zap, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Zap, CheckCircle, Loader2, AlertCircle, XCircle } from "lucide-react";
 import { useMintingWorkflow } from "@/hooks/useMintingWorkflow";
 import { useToast } from "@/hooks/use-toast";
 import type { StreamlinedWizardState } from "@/hooks/wizard/useStreamlinedWizard";
@@ -25,11 +25,42 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
 }) => {
   const { toast } = useToast();
   const [isLaunching, setIsLaunching] = useState(false);
+  const [launchError, setLaunchError] = useState<string | null>(null);
 
   // Calculate values for minting
   const expenseSum = state.expenses.reduce((sum, exp) => sum + exp.amountUSDC, 0);
   const pledgeNum = Number(state.pledgeUSDC) || 0;
   const fundingTarget = expenseSum + pledgeNum;
+
+  // Validation checks
+  const validationChecks = [
+    {
+      id: 'wallet',
+      label: 'Wallet Connected',
+      isValid: !!walletAddress,
+      detail: walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : 'No wallet connected'
+    },
+    {
+      id: 'project',
+      label: 'Project Configuration Complete',
+      isValid: state.projectIdea.trim().length >= 10 && !!state.projectType,
+      detail: state.projectIdea.trim().length >= 10 ? 'Project details validated' : 'Project details incomplete'
+    },
+    {
+      id: 'team',
+      label: 'Team Setup Valid',
+      isValid: state.roles.length > 0 && state.roles.reduce((sum, role) => sum + role.percent, 0) === 100,
+      detail: `${state.roles.length} member(s), ${state.roles.reduce((sum, role) => sum + role.percent, 0)}% allocated`
+    },
+    {
+      id: 'budget',
+      label: 'Budget Configuration',
+      isValid: state.expenses.length > 0 && expenseSum > 0,
+      detail: `${state.expenses.length} item(s), $${expenseSum.toLocaleString()} total`
+    }
+  ];
+
+  const allValidationsPassed = validationChecks.every(check => check.isValid);
 
   // Use the minting workflow
   const mintingWorkflow = useMintingWorkflow({
@@ -44,6 +75,7 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
     fundingTarget,
     onSaveComplete: (projectRow: any) => {
       console.log('Project created successfully:', projectRow);
+      setLaunchError(null);
       toast({
         title: "Project Launched! 🚀",
         description: "Your project has been successfully created and is ready for supporters.",
@@ -54,6 +86,7 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
 
   const handleLaunch = async () => {
     if (!walletAddress) {
+      setLaunchError("Please connect your wallet before launching.");
       toast({
         title: "Wallet Required",
         description: "Please connect your wallet before launching.",
@@ -62,7 +95,18 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
       return;
     }
 
+    if (!allValidationsPassed) {
+      setLaunchError("Please complete all required fields before launching.");
+      toast({
+        title: "Validation Failed",
+        description: "Please review and complete all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLaunching(true);
+    setLaunchError(null);
     
     try {
       console.log("Starting project launch with state:", state);
@@ -75,6 +119,7 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
         // The onSaveComplete callback will handle the success flow
       } else if (result.error) {
         console.error("Launch failed:", result.error);
+        setLaunchError(result.error);
         toast({
           title: "Launch Failed",
           description: result.error,
@@ -83,9 +128,11 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
       }
     } catch (error: any) {
       console.error("Launch error:", error);
+      const errorMessage = error?.message || "An unexpected error occurred during launch.";
+      setLaunchError(errorMessage);
       toast({
         title: "Launch Error",
-        description: error?.message || "An unexpected error occurred during launch.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -93,8 +140,37 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
     }
   };
 
+  const getValidationIcon = (isValid: boolean, isLoading: boolean = false) => {
+    if (isLoading) return <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />;
+    if (isValid) return <CheckCircle className="w-5 h-5 text-green-500" />;
+    return <XCircle className="w-5 h-5 text-red-500" />;
+  };
+
   return (
     <div className="p-6 space-y-6">
+      {/* Launch Error Display */}
+      {launchError && (
+        <Card className="bg-red-50 border-red-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm text-red-700 font-medium">Launch Failed</p>
+                <p className="text-xs text-red-600 mt-1">{launchError}</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLaunchError(null)}
+                className="text-red-500 hover:text-red-600"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Project Summary */}
       <Card>
         <CardHeader>
@@ -128,6 +204,45 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
         </CardContent>
       </Card>
 
+      {/* Launch Readiness Validation */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            Launch Readiness
+            {allValidationsPassed ? (
+              <CheckCircle className="w-5 h-5 text-green-500" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-red-500" />
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {validationChecks.map((check) => (
+              <div key={check.id} className="flex items-center gap-3">
+                {getValidationIcon(check.isValid, isLaunching && check.id === 'wallet')}
+                <div className="flex-1">
+                  <span className={`text-sm ${check.isValid ? 'text-text' : 'text-red-600'}`}>
+                    {check.label}
+                  </span>
+                  <span className={`text-xs ml-2 ${check.isValid ? 'text-text/60' : 'text-red-500'}`}>
+                    {check.detail}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {!allValidationsPassed && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-700">
+                Please resolve the validation issues above before launching your project.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Token Configuration */}
       <Card>
         <CardHeader>
@@ -144,7 +259,7 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
             <Switch
               checked={state.doAdvancedToken}
               onCheckedChange={(checked) => updateField("doAdvancedToken", checked)}
-              disabled={isLaunching}
+              disabled={isLaunching || mintingWorkflow.isMinting}
             />
           </div>
           
@@ -162,32 +277,6 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
               </ul>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Launch Readiness */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Launch Readiness</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-accent" />
-              <span className="text-sm">Wallet Connected</span>
-              <span className="text-xs text-text/60 font-mono">
-                {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "No wallet"}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-accent" />
-              <span className="text-sm">Project Configuration Complete</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-accent" />
-              <span className="text-sm">Ready to Deploy</span>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
@@ -225,7 +314,7 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
         <Button
           onClick={handleLaunch}
           className="bg-accent text-black hover:bg-accent/90 gap-2"
-          disabled={!walletAddress || isLaunching || mintingWorkflow.isMinting}
+          disabled={!allValidationsPassed || isLaunching || mintingWorkflow.isMinting}
         >
           {isLaunching || mintingWorkflow.isMinting ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -241,7 +330,9 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
         <p>
           {isLaunching || mintingWorkflow.isMinting 
             ? "Please wait while we deploy your project to the blockchain..."
-            : "Your project will be deployed to the blockchain and made available for supporters"
+            : allValidationsPassed 
+            ? "Your project will be deployed to the blockchain and made available for supporters"
+            : "Complete all validation requirements above to proceed with launch"
           }
         </p>
       </div>
