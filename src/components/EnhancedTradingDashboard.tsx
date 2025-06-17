@@ -2,9 +2,10 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WalletConnection } from './WalletConnection';
-import { PriceChart } from './PriceChart';
+import { AdvancedChart } from './trading/AdvancedChart';
 import { TradingAnalytics } from './TradingAnalytics';
 import { TradingInterface } from './TradingInterface';
+import { TradingHistory } from './trading/TradingHistory';
 import { TokenSelector } from './trading/TokenSelector';
 import { OnboardingTooltip } from './onboarding/OnboardingTooltip';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
@@ -83,25 +84,27 @@ export function EnhancedTradingDashboard({ tokens, featuredToken }: EnhancedTrad
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
           <TradingInterface
             tokenAddress={selectedToken.address}
             tokenSymbol={selectedToken.symbol}
             tokenName={selectedToken.name}
             poolAddress={selectedToken.poolAddress}
           />
+          
+          <TradingHistory />
         </div>
 
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="chart" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="chart" className="font-inter font-light">Price Chart</TabsTrigger>
+              <TabsTrigger value="chart" className="font-inter font-light">Advanced Chart</TabsTrigger>
               <TabsTrigger value="analytics" className="font-inter font-light">Analytics</TabsTrigger>
             </TabsList>
             
             <TabsContent value="chart" className="space-y-4">
               <div data-onboarding="price-chart">
-                <PriceChart
+                <AdvancedChart
                   tokenSymbol={selectedToken.symbol}
                   currentPrice={price?.price || 0.45}
                   priceChange24h={price?.priceChange24h || 5.67}

@@ -7,6 +7,7 @@ import { RefreshCw, HelpCircle } from 'lucide-react';
 import { SwapForm } from '@/components/trading/SwapForm';
 import { SlippageSettings } from '@/components/trading/SlippageSettings';
 import { PriceInfo } from '@/components/trading/PriceInfo';
+import { LimitOrderForm, LimitOrder } from '@/components/trading/LimitOrderForm';
 import { DemoModeToggle } from '@/components/onboarding/DemoModeToggle';
 import { WalletEducationModal } from '@/components/onboarding/WalletEducationModal';
 import { useTradingLogic } from '@/hooks/trading/useTradingLogic';
@@ -28,6 +29,7 @@ export function TradingInterface({
 }: TradingInterfaceProps) {
   const { isDemoMode } = useOnboarding();
   const [showWalletEducation, setShowWalletEducation] = useState(false);
+  const [pendingOrders, setPendingOrders] = useState<LimitOrder[]>([]);
   
   const {
     amountIn,
@@ -50,11 +52,19 @@ export function TradingInterface({
 
   const handleDemoSwap = () => {
     if (isDemoMode) {
-      // Simulate successful demo trade
       console.log('Demo trade executed:', { amountIn, currentSymbolIn, currentSymbolOut });
-      // You could add toast notification here
     } else {
       handleSwap();
+    }
+  };
+
+  const handlePlaceLimitOrder = (order: LimitOrder) => {
+    if (isDemoMode) {
+      console.log('Demo limit order placed:', order);
+      setPendingOrders(prev => [...prev, { ...order, id: Date.now().toString() }]);
+    } else {
+      // In real implementation, this would call the actual order placement API
+      console.log('Placing limit order:', order);
     }
   };
 
@@ -97,7 +107,7 @@ export function TradingInterface({
           <Tabs defaultValue="swap" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="swap" className="font-inter font-light">Swap</TabsTrigger>
-              <TabsTrigger value="limit" className="font-inter font-light">Limit Order</TabsTrigger>
+              <TabsTrigger value="limit" className="font-inter font-light">Advanced Orders</TabsTrigger>
             </TabsList>
             
             <TabsContent value="swap" className="space-y-4">
@@ -157,9 +167,26 @@ export function TradingInterface({
             </TabsContent>
 
             <TabsContent value="limit" className="space-y-4">
-              <div className="text-center text-text/70 py-8 font-inter font-light tracking-wide">
-                <span>Limit orders coming soon!</span>
-              </div>
+              <LimitOrderForm
+                tokenSymbol={tokenSymbol}
+                currentPrice={price?.price || 0.45}
+                onPlaceOrder={handlePlaceLimitOrder}
+              />
+              
+              {pendingOrders.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium font-inter">Pending Orders</h4>
+                  {pendingOrders.map((order, index) => (
+                    <div key={index} className="p-2 bg-surface/50 rounded text-xs font-inter">
+                      <div className="flex justify-between">
+                        <span>{order.type} {order.direction}</span>
+                        <span>{order.amount} {tokenSymbol}</span>
+                      </div>
+                      <div className="text-text/70">@ ${order.triggerPrice}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
