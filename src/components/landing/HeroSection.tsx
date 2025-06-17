@@ -43,27 +43,23 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           </Link>
         </div>
         
-        {/* Stats Grid */}
+        {/* Stats Grid - Year 1 Projections */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 max-w-4xl mx-auto">
           <div>
-            <p className="text-4xl font-light mb-1 tracking-tight">
-              <span ref={countUpDollarRef}>${counter.total.toLocaleString()}</span>
-            </p>
-            <p className="text-gray-400 font-extralight">Economies created</p>
+            <p className="text-4xl font-light mb-1 tracking-tight">$2.5M</p>
+            <p className="text-gray-400 font-extralight">Year 1 volume target</p>
           </div>
           <div>
-            <p className="text-4xl font-light mb-1 tracking-tight">
-              <span ref={countUpDropRef}>{counter.drops}</span>+
-            </p>
-            <p className="text-gray-400 font-extralight">Active projects</p>
+            <p className="text-4xl font-light mb-1 tracking-tight">500+</p>
+            <p className="text-gray-400 font-extralight">Projected economies</p>
           </div>
           <div>
-            <p className="text-4xl font-light mb-1 tracking-tight">24/7</p>
-            <p className="text-gray-400 font-extralight">Community driven</p>
+            <p className="text-4xl font-light mb-1 tracking-tight">$100K</p>
+            <p className="text-gray-400 font-extralight">Creator earnings goal</p>
           </div>
           <div>
-            <p className="text-4xl font-light mb-1 tracking-tight">100%</p>
-            <p className="text-gray-400 font-extralight">Decentralized</p>
+            <p className="text-4xl font-light mb-1 tracking-tight">50+</p>
+            <p className="text-gray-400 font-extralight">Launch partners</p>
           </div>
         </div>
       </div>
