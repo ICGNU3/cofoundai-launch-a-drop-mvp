@@ -1,8 +1,8 @@
 
 import React from "react";
 import { ModernNavigation } from "@/components/ModernNavigation";
-import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
-import { LandingFooter } from "@/components/landing/LandingFooter";
+import HowItWorksSection from "@/components/landing/HowItWorksSection";
+import LandingFooter from "@/components/landing/LandingFooter";
 import SplineBackground from "@/components/SplineBackground";
 
 const HowItWorks: React.FC = () => {
