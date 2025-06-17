@@ -15,6 +15,13 @@ const queryClient = new QueryClient();
 function App() {
   const privyAppId = import.meta.env.VITE_PRIVY_APP_ID;
   
+  // Debug logging
+  console.log('Environment check:', {
+    privyAppId,
+    allEnvVars: import.meta.env,
+    nodeEnv: import.meta.env.MODE
+  });
+  
   const privyConfig: PrivyClientConfig = {
     loginMethods: ["wallet", "email"] as ("wallet" | "email")[],
     appearance: {
@@ -25,6 +32,7 @@ function App() {
   };
 
   if (!privyAppId) {
+    console.error('VITE_PRIVY_APP_ID is missing or undefined');
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6 bg-card border border-border rounded-lg">
@@ -35,10 +43,15 @@ function App() {
           <div className="text-sm text-body-text/70 bg-surface p-3 rounded border">
             <p className="font-mono">VITE_PRIVY_APP_ID=your_app_id</p>
           </div>
+          <div className="mt-4 text-xs text-body-text/50">
+            Current value: {privyAppId || 'undefined'}
+          </div>
         </div>
       </div>
     );
   }
+
+  console.log('Privy configuration successful with app ID:', privyAppId);
 
   return (
     <QueryClientProvider client={queryClient}>
