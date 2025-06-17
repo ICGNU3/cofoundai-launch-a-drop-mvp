@@ -19,9 +19,9 @@ const HowItWorksSection: React.FC = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-3">Mint a Coin in seconds</h3>
+            <h3 className="text-xl font-semibold text-white mb-3">Create your coin in seconds</h3>
             <p className="text-gray-300 leading-relaxed">
-              Pick a name, set a royalty percentage, hit <strong>Deploy</strong>. NEPLUS's factory mints your ERC-20 on Zora and spins up a Uniswap V4 pool in the same transaction. Gas fee only; no extra set-up cost or code required.
+              Pick a name for your coin, choose how much you want to earn from trades, and hit <strong>Deploy</strong>. NEPLUS creates your digital coin and sets up a trading pool automatically. You only pay the network fee - no hidden costs or complicated setup required.
             </p>
           </div>
         </div>
@@ -34,9 +34,9 @@ const HowItWorksSection: React.FC = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-3">Seed liquidity with one click</h3>
+            <h3 className="text-xl font-semibold text-white mb-3">Add money to get trading started</h3>
             <p className="text-gray-300 leading-relaxed">
-              Choose how much ETH or USDC to pair. The app routes the add-liquidity call through Uniswap's Universal Router, deposits both tokens, and returns a single NFT that records your precise price range, fee tier, and liquidity size. This NFT proves ownership of the position and lets advanced hooks target it later for perks or boosts.
+              Choose how much money you want to put in to kickstart trading. The app handles all the technical stuff behind the scenes and gives you a digital certificate that proves you own this investment. This certificate can unlock special perks and bonuses later.
             </p>
           </div>
         </div>
@@ -49,9 +49,9 @@ const HowItWorksSection: React.FC = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-3">Share straight to Farcaster</h3>
+            <h3 className="text-xl font-semibold text-white mb-3">Share with your community</h3>
             <p className="text-gray-300 leading-relaxed">
-              Tap <strong>Cast to Feed</strong>. Your post renders an interactive card powered by the neplus-miniapp. Followers swap directly inside the thread, track live price and depth, and never leave their timeline. Every trade settles through the pool you just funded.
+              Tap <strong>Share to Feed</strong> and your post becomes an interactive trading card. Your followers can buy and sell your coin right from their social feed, check live prices, and see trading activity - all without leaving the app. Every trade happens through the pool you just funded.
             </p>
           </div>
         </div>
@@ -64,9 +64,9 @@ const HowItWorksSection: React.FC = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-3">Earn on every trade</h3>
+            <h3 className="text-xl font-semibold text-white mb-3">Earn money automatically</h3>
             <p className="text-gray-300 leading-relaxed">
-              A Creator Royalty Hook skims your chosen royalty slice from each swap and streams it to your wallet in real time. Liquidity providers collect the remaining fee flow. Open <strong>Royalties</strong> any time to claim earnings or watch the counter climb as volume builds.
+              Every time someone trades your coin, you automatically earn a percentage that goes straight to your wallet. The more people trade, the more you earn. Check your <strong>Earnings</strong> section anytime to see how much you've made or watch your earnings grow in real-time.
             </p>
           </div>
         </div>
@@ -74,7 +74,7 @@ const HowItWorksSection: React.FC = () => {
 
       <div className="text-center mt-16">
         <p className="text-xl text-gray-300 font-light">
-          Four steps—mint, seed, share, earn. The market runs on autopilot while you focus on building, creating, and growing your community.
+          Four simple steps—create, fund, share, earn. Your coin trades automatically while you focus on building your community and growing your brand.
         </p>
       </div>
     </section>
