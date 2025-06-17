@@ -88,14 +88,14 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       {/* Wallet Connection Warning */}
       {!walletAddress && (
         <Card className="bg-red-50 border-red-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <div className="flex-1">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
                 <p className="text-sm text-red-700 font-medium">
                   Wallet connection required
                 </p>
@@ -110,15 +110,22 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
 
       {/* Inspiration CTA */}
       <Card className="bg-accent/5 border-accent/20">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <Lightbulb className="w-5 h-5 text-accent flex-shrink-0" />
-            <div className="flex-1">
-              <p className="text-sm text-text">
-                <strong>New to project launches?</strong> Browse our template gallery for inspiration and quick setup.
-              </p>
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <Lightbulb className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-text">
+                  <strong>New to project launches?</strong> Browse our template gallery for inspiration and quick setup.
+                </p>
+              </div>
             </div>
-            <Button variant="outline" size="sm" onClick={onShowInspiration}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onShowInspiration}
+              className="w-full sm:w-auto min-h-[44px] whitespace-nowrap"
+            >
               Browse Templates
             </Button>
           </div>
@@ -127,10 +134,10 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
 
       {/* Project Mode */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-3 sm:pb-6">
           <CardTitle className="text-base">Project Mode</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <ModeSelector 
             mode={state.mode}
             onModeChange={handleModeChange}
@@ -140,12 +147,12 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
 
       {/* Project Description */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-3 sm:pb-6">
           <CardTitle className="text-base">Describe Your Project</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-0">
           <div>
-            <label className="text-sm font-medium">
+            <label className="text-sm font-medium block mb-2">
               What's your creative vision? <span className="text-red-500">*</span>
             </label>
             <Textarea
@@ -153,21 +160,21 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
               onChange={(e) => handleProjectIdeaChange(e.target.value)}
               placeholder="Tell us about your project - what you're creating, your goals, and what makes it special..."
               rows={4}
-              className={`mt-2 ${errors.projectIdea ? 'border-red-500 focus:border-red-500' : ''}`}
+              className={`resize-none ${errors.projectIdea ? 'border-red-500 focus:border-red-500' : ''}`}
             />
-            <div className="flex justify-between items-center mt-2">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-2 gap-2">
               <div className="flex flex-col">
                 <p className="text-xs text-text/60">
                   Minimum 10 characters required
                 </p>
                 {errors.projectIdea && (
                   <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.projectIdea}
+                    <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                    <span className="break-words">{errors.projectIdea}</span>
                   </p>
                 )}
               </div>
-              <span className={`text-xs ${
+              <span className={`text-xs flex-shrink-0 ${
                 state.projectIdea.length >= 10 ? "text-accent" : 
                 state.projectIdea.length > 2000 ? "text-red-500" : "text-text/50"
               }`}>
@@ -177,8 +184,8 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
           </div>
 
           <div>
-            <label className="text-sm font-medium">Project Category</label>
-            <div className="mt-2">
+            <label className="text-sm font-medium block mb-2">Project Category</label>
+            <div>
               <ProjectTypeSelector 
                 projectType={state.projectType}
                 onProjectTypeChange={(type) => updateField("projectType", type)}
@@ -194,10 +201,11 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
         <Button
           onClick={handleNext}
           disabled={!canProceed}
-          className="bg-accent text-black hover:bg-accent/90 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto bg-accent text-black hover:bg-accent/90 gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
         >
-          Continue to Team & Budget
-          <ArrowRight className="w-4 h-4" />
+          <span className="hidden sm:inline">Continue to Team & Budget</span>
+          <span className="sm:hidden">Continue</span>
+          <ArrowRight className="w-4 h-4 flex-shrink-0" />
         </Button>
       </div>
 

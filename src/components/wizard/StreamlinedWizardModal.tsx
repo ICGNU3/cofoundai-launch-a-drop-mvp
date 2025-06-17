@@ -75,12 +75,12 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
   const renderStepContent = () => {
     if (showInspiration) {
       return (
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <DemoProjectsInspiration onSelectDemo={handleDemoSelect} />
           <div className="mt-6 text-center">
             <button
               onClick={() => setShowInspiration(false)}
-              className="text-sm text-accent hover:underline"
+              className="text-sm text-accent hover:underline p-2"
             >
               ← Back to project setup
             </button>
@@ -128,20 +128,23 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl h-[90vh] max-h-[800px] p-0 bg-card">
+      <DialogContent className="w-[95vw] max-w-none sm:max-w-4xl h-[100dvh] sm:h-[90vh] max-h-none sm:max-h-[800px] p-0 bg-card m-0 sm:m-auto rounded-none sm:rounded-lg border-0 sm:border">
         <DialogTitle className="sr-only">Create Your Drop</DialogTitle>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-border">
-            <div>
-              <h2 className="text-xl font-bold text-text">Create Your Drop</h2>
-              <p className="text-sm text-text/70 mt-1">
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border bg-card/95 backdrop-blur-sm sticky top-0 z-10">
+            <div className="min-w-0 flex-1 pr-2">
+              <h2 className="text-lg sm:text-xl font-bold text-text truncate">Create Your Drop</h2>
+              <p className="text-xs sm:text-sm text-text/70 mt-1 hidden sm:block">
                 Launch your creative project in just 3 simple steps
+              </p>
+              <p className="text-xs text-text/70 mt-1 sm:hidden">
+                Launch in 3 steps
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-background rounded-lg transition-colors"
+              className="p-2 sm:p-2 hover:bg-background rounded-lg transition-colors flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               <X className="w-5 h-5" />
             </button>

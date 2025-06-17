@@ -157,26 +157,26 @@ export const WizardStep2TeamBudget: React.FC<WizardStep2TeamBudgetProps> = ({
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       {/* Team Roles Section */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            Team Roles & Revenue Split
-            {errors.roles && <AlertCircle className="w-4 h-4 text-red-500" />}
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-base flex items-center gap-2 flex-wrap">
+            <span>Team Roles & Revenue Split</span>
+            {errors.roles && <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />}
             {!errors.roles && totalRolePercent === 100 && state.roles.length > 0 && (
-              <CheckCircle className="w-4 h-4 text-green-500" />
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4 pt-0">
           {state.roles.map((role, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 border border-border rounded-lg">
+            <div key={index} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-3 border border-border rounded-lg">
               <Input
                 placeholder="Role name"
                 value={role.name}
                 onChange={(e) => updateRole(index, { name: e.target.value })}
-                className={`flex-1 ${!role.name.trim() && errors.roles ? 'border-red-500' : ''}`}
+                className={`flex-1 min-h-[44px] ${!role.name.trim() && errors.roles ? 'border-red-500' : ''}`}
               />
               <div className="flex items-center gap-2">
                 <Input
@@ -192,18 +192,18 @@ export const WizardStep2TeamBudget: React.FC<WizardStep2TeamBudgetProps> = ({
                       percent: num 
                     });
                   }}
-                  className={`w-20 ${role.percent <= 0 && errors.roles ? 'border-red-500' : ''}`}
+                  className={`w-20 sm:w-20 min-h-[44px] ${role.percent <= 0 && errors.roles ? 'border-red-500' : ''}`}
                   min="0"
                   max="100"
                 />
-                <span className="text-sm text-text/60">%</span>
+                <span className="text-sm text-text/60 flex-shrink-0">%</span>
               </div>
               {!role.isFixed && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => removeRole(index)}
-                  className="text-red-500 hover:text-red-600"
+                  className="text-red-500 hover:text-red-600 min-h-[44px] min-w-[44px] flex-shrink-0"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -211,7 +211,7 @@ export const WizardStep2TeamBudget: React.FC<WizardStep2TeamBudgetProps> = ({
             </div>
           ))}
           
-          <Button variant="outline" onClick={addRole} className="w-full">
+          <Button variant="outline" onClick={addRole} className="w-full min-h-[44px]">
             <Plus className="w-4 h-4 mr-2" />
             Add Team Member
           </Button>
@@ -228,9 +228,9 @@ export const WizardStep2TeamBudget: React.FC<WizardStep2TeamBudgetProps> = ({
           </div>
           
           {errors.roles && (
-            <div className="flex items-center gap-2 text-sm text-red-500 bg-red-50 p-2 rounded">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {errors.roles}
+            <div className="flex items-start gap-2 text-sm text-red-500 bg-red-50 p-3 rounded">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <span className="break-words">{errors.roles}</span>
             </div>
           )}
         </CardContent>
@@ -238,32 +238,32 @@ export const WizardStep2TeamBudget: React.FC<WizardStep2TeamBudgetProps> = ({
 
       {/* Budget & Expenses Section */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            Project Budget
-            {errors.expenses && <AlertCircle className="w-4 h-4 text-red-500" />}
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-base flex items-center gap-2 flex-wrap">
+            <span>Project Budget</span>
+            {errors.expenses && <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />}
             {!errors.expenses && state.expenses.length > 0 && (
-              <CheckCircle className="w-4 h-4 text-green-500" />
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4 pt-0">
           {state.expenses.map((expense, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 border border-border rounded-lg">
+            <div key={index} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-3 border border-border rounded-lg">
               <Input
                 placeholder="Expense name"
                 value={expense.name}
                 onChange={(e) => updateExpense(index, { name: e.target.value })}
-                className={`flex-1 ${!expense.name.trim() && errors.expenses ? 'border-red-500' : ''}`}
+                className={`flex-1 min-h-[44px] ${!expense.name.trim() && errors.expenses ? 'border-red-500' : ''}`}
               />
               <div className="flex items-center gap-2">
-                <span className="text-sm text-text/60">$</span>
+                <span className="text-sm text-text/60 flex-shrink-0">$</span>
                 <Input
                   type="number"
                   placeholder="0"
                   value={expense.amountUSDC}
                   onChange={(e) => updateExpense(index, { amountUSDC: parseInt(e.target.value) || 0 })}
-                  className={`w-24 ${expense.amountUSDC <= 0 && errors.expenses ? 'border-red-500' : ''}`}
+                  className={`w-24 sm:w-24 min-h-[44px] ${expense.amountUSDC <= 0 && errors.expenses ? 'border-red-500' : ''}`}
                   min="1"
                 />
               </div>
@@ -271,14 +271,14 @@ export const WizardStep2TeamBudget: React.FC<WizardStep2TeamBudgetProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => removeExpense(index)}
-                className="text-red-500 hover:text-red-600"
+                className="text-red-500 hover:text-red-600 min-h-[44px] min-w-[44px] flex-shrink-0"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
           ))}
           
-          <Button variant="outline" onClick={addExpense} className="w-full">
+          <Button variant="outline" onClick={addExpense} className="w-full min-h-[44px]">
             <Plus className="w-4 h-4 mr-2" />
             Add Expense
           </Button>
@@ -288,9 +288,9 @@ export const WizardStep2TeamBudget: React.FC<WizardStep2TeamBudgetProps> = ({
           </div>
           
           {errors.expenses && (
-            <div className="flex items-center gap-2 text-sm text-red-500 bg-red-50 p-2 rounded">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {errors.expenses}
+            <div className="flex items-start gap-2 text-sm text-red-500 bg-red-50 p-3 rounded">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <span className="break-words">{errors.expenses}</span>
             </div>
           )}
         </CardContent>
@@ -298,47 +298,52 @@ export const WizardStep2TeamBudget: React.FC<WizardStep2TeamBudgetProps> = ({
 
       {/* USDC Pledge */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-3 sm:pb-6">
           <CardTitle className="text-base">Your Initial Pledge</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-text/60">$</span>
+            <span className="text-sm text-text/60 flex-shrink-0">$</span>
             <Input
               type="number"
               placeholder="0"
               value={state.pledgeUSDC}
               onChange={(e) => handlePledgeChange(e.target.value)}
-              className={`flex-1 ${errors.pledge ? 'border-red-500' : ''}`}
+              className={`flex-1 min-h-[44px] ${errors.pledge ? 'border-red-500' : ''}`}
               min="0"
               max="100000"
             />
-            <span className="text-sm text-text/60">USDC</span>
+            <span className="text-sm text-text/60 flex-shrink-0">USDC</span>
           </div>
           <p className="text-xs text-text/60 mt-2">
             This is your initial contribution to get the project started
           </p>
           {errors.pledge && (
-            <div className="flex items-center gap-2 text-sm text-red-500 bg-red-50 p-2 rounded mt-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {errors.pledge}
+            <div className="flex items-start gap-2 text-sm text-red-500 bg-red-50 p-3 rounded mt-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <span className="break-words">{errors.pledge}</span>
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* Navigation */}
-      <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={prevStep} className="gap-2">
+      <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
+        <Button 
+          variant="outline" 
+          onClick={prevStep} 
+          className="gap-2 min-h-[44px] order-2 sm:order-1"
+        >
           <ArrowLeft className="w-4 h-4" />
           Back
         </Button>
         <Button
           onClick={handleNext}
           disabled={!canProceed}
-          className="bg-accent text-black hover:bg-accent/90 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-accent text-black hover:bg-accent/90 gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] order-1 sm:order-2"
         >
-          Continue to Launch
+          <span className="hidden sm:inline">Continue to Launch</span>
+          <span className="sm:hidden">Continue</span>
           <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
