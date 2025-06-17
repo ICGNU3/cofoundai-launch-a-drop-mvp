@@ -1,11 +1,12 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ModernNavigation } from "@/components/ModernNavigation";
-import { FullWaveBackground } from "@/components/FullWaveBackground";
+import FullWaveBackground from "@/components/FullWaveBackground";
 import { HeroSection } from "@/components/HeroSection";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
-import { LandingFeaturesSection } from "@/components/LandingFeaturesSection";
+import LandingFeaturesSection from "@/components/LandingFeaturesSection";
 import { LandingFooter } from "@/components/LandingFooter";
 import { StreamlinedWizardButton } from "@/components/StreamlinedWizardButton";
 import { usePrivy } from '@privy-io/react-auth';

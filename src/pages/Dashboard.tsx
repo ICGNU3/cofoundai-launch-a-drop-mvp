@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../integrations/supabase/client";
@@ -11,7 +10,7 @@ import { AnalyticsTab } from "@/components/dashboard/AnalyticsTab";
 import { PositionsTab } from "@/components/dashboard/PositionsTab";
 import { ProjectsTab } from "@/components/dashboard/ProjectsTab";
 import { StreamlinedWizardButton } from "@/components/StreamlinedWizardButton";
-import ModernNavigation from "@/components/ModernNavigation";
+import { ModernNavigation } from "@/components/ModernNavigation";
 
 const Dashboard: React.FC = () => {
   const { user } = usePrivy();

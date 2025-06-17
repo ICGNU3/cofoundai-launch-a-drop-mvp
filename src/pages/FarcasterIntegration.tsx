@@ -7,7 +7,7 @@ import { FarcasterMiniApp } from '@/components/farcaster/FarcasterMiniApp';
 import { ShareablePriceCard } from '@/components/farcaster/ShareablePriceCard';
 import { ReferralSystem } from '@/components/farcaster/ReferralSystem';
 import { FarcasterFrame } from '@/components/farcaster/FarcasterFrame';
-import ModernNavigation from '@/components/ModernNavigation';
+import { ModernNavigation } from '@/components/ModernNavigation';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { Zap, Share, Users, Frame } from 'lucide-react';
 

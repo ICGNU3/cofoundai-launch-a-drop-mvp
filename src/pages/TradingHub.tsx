@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { EnhancedTradingDashboard } from '@/components/EnhancedTradingDashboard';
-import ModernNavigation from '@/components/ModernNavigation';
+import { ModernNavigation } from '@/components/ModernNavigation';
 
 // Mock token data - in production this would come from your database
 const DEMO_TOKENS = [
