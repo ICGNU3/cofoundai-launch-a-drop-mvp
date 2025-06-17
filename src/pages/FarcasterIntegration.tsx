@@ -29,28 +29,33 @@ export default function FarcasterIntegration() {
   const { price } = useTokenPrice(selectedToken.address);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background font-inter">
       <ModernNavigation />
       
-      <main className="container mx-auto px-4 py-8">
-        {/* Centered Header Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Farcaster Social Trading</h1>
-          <p className="text-text/70 text-lg">
-            Trade in-feed, share viral price cards, and earn with referrals
+      <main className="container mx-auto px-4 py-12">
+        {/* Hero Header Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl lg:text-6xl font-light tracking-tighter text-text mb-4">
+            Farcaster Social Trading
+          </h1>
+          <p className="text-lg text-text/70 font-light tracking-wide max-w-2xl mx-auto">
+            Trade in-feed, share viral price cards, and earn with referrals across the Farcaster ecosystem
           </p>
         </div>
 
-        {/* Centered Token Selector */}
-        <div className="flex justify-center mb-6">
+        {/* Token Selector */}
+        <div className="flex justify-center mb-8">
           <div className="text-center">
-            <label className="text-sm font-medium mb-2 block">Select Token</label>
-            <div className="flex gap-2 justify-center">
+            <label className="text-sm font-medium text-text/80 mb-3 block font-light tracking-wide">
+              Select Demo Token
+            </label>
+            <div className="flex gap-3 justify-center">
               {DEMO_TOKENS.map((token) => (
                 <Button
                   key={token.address}
                   variant={selectedToken.address === token.address ? "default" : "outline"}
                   onClick={() => setSelectedToken(token)}
+                  className="font-light tracking-wide"
                 >
                   {token.symbol}
                 </Button>
@@ -59,23 +64,35 @@ export default function FarcasterIntegration() {
           </div>
         </div>
 
-        <Tabs defaultValue="mini-app" className="space-y-6">
-          {/* Centered Tab Navigation */}
+        <Tabs defaultValue="mini-app" className="space-y-8">
+          {/* Tab Navigation */}
           <div className="flex justify-center">
-            <TabsList className="bg-card border border-border">
-              <TabsTrigger value="mini-app" className="flex items-center gap-2">
+            <TabsList className="bg-card border border-border h-14 p-1 font-inter">
+              <TabsTrigger 
+                value="mini-app" 
+                className="flex items-center gap-2 text-text data-[state=active]:bg-accent data-[state=active]:text-black font-light tracking-wide px-6 py-3"
+              >
                 <Zap className="w-4 h-4" />
                 Mini App
               </TabsTrigger>
-              <TabsTrigger value="share" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="share" 
+                className="flex items-center gap-2 text-text data-[state=active]:bg-accent data-[state=active]:text-black font-light tracking-wide px-6 py-3"
+              >
                 <Share className="w-4 h-4" />
                 Share Cards
               </TabsTrigger>
-              <TabsTrigger value="referrals" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="referrals" 
+                className="flex items-center gap-2 text-text data-[state=active]:bg-accent data-[state=active]:text-black font-light tracking-wide px-6 py-3"
+              >
                 <Users className="w-4 h-4" />
                 Referrals
               </TabsTrigger>
-              <TabsTrigger value="frames" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="frames" 
+                className="flex items-center gap-2 text-text data-[state=active]:bg-accent data-[state=active]:text-black font-light tracking-wide px-6 py-3"
+              >
                 <Frame className="w-4 h-4" />
                 Frames
               </TabsTrigger>
@@ -83,12 +100,16 @@ export default function FarcasterIntegration() {
           </div>
 
           <TabsContent value="mini-app">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="text-center lg:text-left">
-                <h2 className="text-2xl font-bold mb-4">In-Feed Trading Mini App</h2>
-                <p className="text-text/70 mb-6">
-                  A compact trading interface designed for Farcaster frames and social feeds.
-                </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="space-y-6">
+                <div className="text-center lg:text-left">
+                  <h2 className="text-3xl font-light tracking-tighter text-text mb-3">
+                    In-Feed Trading Mini App
+                  </h2>
+                  <p className="text-lg text-text/70 font-light tracking-wide">
+                    A compact trading interface designed for Farcaster frames and social feeds.
+                  </p>
+                </div>
                 <div className="flex justify-center lg:justify-start">
                   <FarcasterMiniApp
                     tokenAddress={selectedToken.address}
@@ -104,27 +125,22 @@ export default function FarcasterIntegration() {
               </div>
               
               <div className="space-y-6">
-                <Card>
+                <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle>Features</CardTitle>
+                    <CardTitle className="text-xl font-light tracking-tighter text-text">Features</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      <span>Real-time price updates</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      <span>One-click trading</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      <span>Social sharing integration</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      <span>Referral tracking</span>
-                    </div>
+                  <CardContent className="space-y-4">
+                    {[
+                      'Real-time price updates',
+                      'One-click trading',
+                      'Social sharing integration',
+                      'Referral tracking'
+                    ].map((feature, index) => (
+                      <div key={index} className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-accent rounded-full flex-shrink-0" />
+                        <span className="text-text font-light tracking-wide">{feature}</span>
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
               </div>
@@ -132,12 +148,16 @@ export default function FarcasterIntegration() {
           </TabsContent>
 
           <TabsContent value="share">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="text-center lg:text-left">
-                <h2 className="text-2xl font-bold mb-4">Shareable Price Cards</h2>
-                <p className="text-text/70 mb-6">
-                  Create viral-ready price cards with custom messages and multiple styles.
-                </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="space-y-6">
+                <div className="text-center lg:text-left">
+                  <h2 className="text-3xl font-light tracking-tighter text-text mb-3">
+                    Shareable Price Cards
+                  </h2>
+                  <p className="text-lg text-text/70 font-light tracking-wide">
+                    Create viral-ready price cards with custom messages and multiple styles.
+                  </p>
+                </div>
                 <div className="flex justify-center lg:justify-start">
                   <ShareablePriceCard
                     tokenAddress={selectedToken.address}
@@ -149,27 +169,22 @@ export default function FarcasterIntegration() {
               </div>
               
               <div className="space-y-6">
-                <Card>
+                <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle>Viral Features</CardTitle>
+                    <CardTitle className="text-xl font-light tracking-tighter text-text">Viral Features</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                      <span>Multiple card styles</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                      <span>Custom messaging</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                      <span>Direct Farcaster sharing</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                      <span>Embedded trading frames</span>
-                    </div>
+                  <CardContent className="space-y-4">
+                    {[
+                      'Multiple card styles',
+                      'Custom messaging',
+                      'Direct Farcaster sharing',
+                      'Embedded trading frames'
+                    ].map((feature, index) => (
+                      <div key={index} className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0" />
+                        <span className="text-text font-light tracking-wide">{feature}</span>
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
               </div>
@@ -177,12 +192,16 @@ export default function FarcasterIntegration() {
           </TabsContent>
 
           <TabsContent value="referrals">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="text-center lg:text-left">
-                <h2 className="text-2xl font-bold mb-4">Viral Referral System</h2>
-                <p className="text-text/70 mb-6">
-                  Earn rewards by referring friends and building your network.
-                </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="space-y-6">
+                <div className="text-center lg:text-left">
+                  <h2 className="text-3xl font-light tracking-tighter text-text mb-3">
+                    Viral Referral System
+                  </h2>
+                  <p className="text-lg text-text/70 font-light tracking-wide">
+                    Earn rewards by referring friends and building your network.
+                  </p>
+                </div>
                 <div className="flex justify-center lg:justify-start">
                   <ReferralSystem
                     tokenAddress={selectedToken.address}
@@ -196,27 +215,22 @@ export default function FarcasterIntegration() {
               </div>
               
               <div className="space-y-6">
-                <Card>
+                <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle>Referral Benefits</CardTitle>
+                    <CardTitle className="text-xl font-light tracking-tighter text-text">Referral Benefits</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-accent rounded-full" />
-                      <span>Up to 10% commission</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-accent rounded-full" />
-                      <span>Tiered reward system</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-accent rounded-full" />
-                      <span>Custom referral codes</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-accent rounded-full" />
-                      <span>Viral boost periods</span>
-                    </div>
+                  <CardContent className="space-y-4">
+                    {[
+                      'Up to 10% commission',
+                      'Tiered reward system',
+                      'Custom referral codes',
+                      'Viral boost periods'
+                    ].map((feature, index) => (
+                      <div key={index} className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-accent rounded-full flex-shrink-0" />
+                        <span className="text-text font-light tracking-wide">{feature}</span>
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
               </div>
@@ -224,14 +238,18 @@ export default function FarcasterIntegration() {
           </TabsContent>
 
           <TabsContent value="frames">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="text-center lg:text-left">
-                <h2 className="text-2xl font-bold mb-4">Farcaster Frames</h2>
-                <p className="text-text/70 mb-6">
-                  Interactive frames that work seamlessly in Farcaster feeds.
-                </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="space-y-6">
+                <div className="text-center lg:text-left">
+                  <h2 className="text-3xl font-light tracking-tighter text-text mb-3">
+                    Farcaster Frames
+                  </h2>
+                  <p className="text-lg text-text/70 font-light tracking-wide">
+                    Interactive frames that work seamlessly in Farcaster feeds.
+                  </p>
+                </div>
                 <div className="flex justify-center lg:justify-start">
-                  <div className="bg-gray-100 p-4 rounded-lg">
+                  <div className="bg-surface/30 p-6 rounded-lg border border-border">
                     <FarcasterFrame
                       tokenAddress={selectedToken.address}
                       tokenSymbol={selectedToken.symbol}
@@ -243,39 +261,34 @@ export default function FarcasterIntegration() {
               </div>
               
               <div className="space-y-6">
-                <Card>
+                <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle>Frame Capabilities</CardTitle>
+                    <CardTitle className="text-xl font-light tracking-tighter text-text">Frame Capabilities</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                      <span>Interactive trading buttons</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                      <span>Real-time price display</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                      <span>Referral code integration</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                      <span>Cross-platform compatibility</span>
-                    </div>
+                  <CardContent className="space-y-4">
+                    {[
+                      'Interactive trading buttons',
+                      'Real-time price display',
+                      'Referral code integration',
+                      'Cross-platform compatibility'
+                    ].map((feature, index) => (
+                      <div key={index} className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                        <span className="text-text font-light tracking-wide">{feature}</span>
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle>Frame URL</CardTitle>
+                    <CardTitle className="text-lg font-light tracking-tighter text-text">Frame URL</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-xs text-text/50 bg-surface/50 p-3 rounded break-all">
+                  <CardContent className="space-y-4">
+                    <div className="text-xs text-text/50 bg-surface/50 p-3 rounded break-all font-mono">
                       {window.location.origin}/frame/{selectedToken.address}?ref=NEPLUS-DEMO123
                     </div>
-                    <Button className="w-full mt-3" variant="outline">
+                    <Button className="w-full font-light tracking-wide" variant="outline">
                       <Share className="w-4 h-4 mr-2" />
                       Share Frame
                     </Button>
