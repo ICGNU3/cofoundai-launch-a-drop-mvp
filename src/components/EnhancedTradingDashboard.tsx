@@ -6,6 +6,7 @@ import { PriceChart } from './PriceChart';
 import { TradingAnalytics } from './TradingAnalytics';
 import { TradingInterface } from './TradingInterface';
 import { TokenSelector } from './trading/TokenSelector';
+import { OnboardingTooltip } from './onboarding/OnboardingTooltip';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 
 interface Token {
@@ -73,11 +74,13 @@ export function EnhancedTradingDashboard({ tokens, featuredToken }: EnhancedTrad
     <div className="space-y-8 font-inter">
       <WalletConnection />
       
-      <TokenSelector
-        tokens={tokens}
-        selectedToken={selectedToken}
-        onTokenSelect={setSelectedToken}
-      />
+      <div data-onboarding="token-selector">
+        <TokenSelector
+          tokens={tokens}
+          selectedToken={selectedToken}
+          onTokenSelect={setSelectedToken}
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
@@ -97,12 +100,14 @@ export function EnhancedTradingDashboard({ tokens, featuredToken }: EnhancedTrad
             </TabsList>
             
             <TabsContent value="chart" className="space-y-4">
-              <PriceChart
-                tokenSymbol={selectedToken.symbol}
-                currentPrice={price?.price || 0.45}
-                priceChange24h={price?.priceChange24h || 5.67}
-                data={priceData}
-              />
+              <div data-onboarding="price-chart">
+                <PriceChart
+                  tokenSymbol={selectedToken.symbol}
+                  currentPrice={price?.price || 0.45}
+                  priceChange24h={price?.priceChange24h || 5.67}
+                  data={priceData}
+                />
+              </div>
             </TabsContent>
             
             <TabsContent value="analytics" className="space-y-4">
@@ -114,6 +119,8 @@ export function EnhancedTradingDashboard({ tokens, featuredToken }: EnhancedTrad
           </Tabs>
         </div>
       </div>
+
+      <OnboardingTooltip />
     </div>
   );
 }
