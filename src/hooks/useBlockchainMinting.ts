@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useZoraMinting, type ZoraCoinParams } from "@/lib/zoraContracts";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface BlockchainMintParams {
   coverBase64: string;
@@ -38,6 +39,30 @@ export function useBlockchainMinting() {
       return result.IpfsHash;
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const mintWithZoraAPI = async (params: {
+    chainId: number;
+    name: string;
+    symbol: string;
+    totalSupply: number;
+    uri: string;
+    creatorAddress: string;
+  }) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('mint-zora-token', {
+        body: params
+      });
+
+      if (error) {
+        throw new Error(`Zora API mint failed: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Zora API mint error:", error);
+      throw error;
     }
   };
 
@@ -83,24 +108,50 @@ export function useBlockchainMinting() {
       const metadataResult = await metadataResponse.json();
       const metadataUri = `ipfs://${metadataResult.IpfsHash}`;
 
-      // Step 3: Mint on Zora using blockchain transaction
-      toast({ title: "Minting on blockchain...", description: "Creating your token on Zora" });
+      // Step 3: Try Zora API first, then fallback to direct blockchain interaction
+      toast({ title: "Minting token...", description: "Creating your token via Zora API" });
       
-      const zoraCoinParams: ZoraCoinParams = {
-        name: params.tokenName,
-        symbol: params.tokenSymbol,
-        initialSupply: ethers.parseUnits(params.tokenSupply.toString(), 18),
-        creator: params.userWallet as `0x${string}`,
-        uri: metadataUri,
-      };
+      try {
+        const zoraResult = await mintWithZoraAPI({
+          chainId: 999999999, // Zora testnet
+          name: params.tokenName,
+          symbol: params.tokenSymbol,
+          totalSupply: params.tokenSupply,
+          uri: metadataUri,
+          creatorAddress: params.userWallet,
+        });
 
-      await mintCoin(zoraCoinParams);
+        console.log("Zora API mint successful:", zoraResult);
+        
+        return {
+          coverHash,
+          metadataUri,
+          ipfsHash: coverHash,
+          tokenAddress: zoraResult.tokenAddress,
+          txHash: zoraResult.txHash || "zora-api-mint",
+        };
+      } catch (zoraError) {
+        console.warn("Zora API failed, falling back to direct blockchain mint:", zoraError);
+        
+        // Fallback to direct blockchain minting
+        toast({ title: "Minting on blockchain...", description: "Creating your token directly on chain" });
+        
+        const zoraCoinParams: ZoraCoinParams = {
+          name: params.tokenName,
+          symbol: params.tokenSymbol,
+          initialSupply: ethers.parseUnits(params.tokenSupply.toString(), 18),
+          creator: params.userWallet as `0x${string}`,
+          uri: metadataUri,
+        };
 
-      return {
-        coverHash,
-        metadataUri,
-        ipfsHash: coverHash,
-      };
+        await mintCoin(zoraCoinParams);
+
+        return {
+          coverHash,
+          metadataUri,
+          ipfsHash: coverHash,
+        };
+      }
     } catch (error) {
       console.error("Minting error:", error);
       toast({
