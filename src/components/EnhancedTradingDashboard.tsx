@@ -70,7 +70,7 @@ export function EnhancedTradingDashboard({ tokens, featuredToken }: EnhancedTrad
   const analyticsData = generateMockAnalytics();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 font-inter">
       <WalletConnection />
       
       <TokenSelector
@@ -92,8 +92,8 @@ export function EnhancedTradingDashboard({ tokens, featuredToken }: EnhancedTrad
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="chart" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="chart">Price Chart</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="chart" className="font-inter font-light">Price Chart</TabsTrigger>
+              <TabsTrigger value="analytics" className="font-inter font-light">Analytics</TabsTrigger>
             </TabsList>
             
             <TabsContent value="chart" className="space-y-4">

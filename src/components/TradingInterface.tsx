@@ -45,8 +45,8 @@ export function TradingInterface({
   return (
     <Card className="w-full max-w-md mx-auto bg-surface border-border">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center justify-between">
-          <span>Trade {tokenSymbol}</span>
+        <CardTitle className="flex items-center justify-between font-inter">
+          <span className="font-light tracking-tighter">Trade {tokenSymbol}</span>
           <div className="flex items-center gap-2">
             <PriceInfo 
               price={price}
@@ -56,7 +56,7 @@ export function TradingInterface({
               isConnected={isConnected}
             />
             {price && (
-              <div className="text-sm font-mono">
+              <div className="text-sm font-mono font-light">
                 {formatCurrency(price.price.toString())}
               </div>
             )}
@@ -66,8 +66,8 @@ export function TradingInterface({
       <CardContent className="space-y-4">
         <Tabs defaultValue="swap" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="swap">Swap</TabsTrigger>
-            <TabsTrigger value="limit">Limit Order</TabsTrigger>
+            <TabsTrigger value="swap" className="font-inter font-light">Swap</TabsTrigger>
+            <TabsTrigger value="limit" className="font-inter font-light">Limit Order</TabsTrigger>
           </TabsList>
           
           <TabsContent value="swap" className="space-y-4">
@@ -90,7 +90,7 @@ export function TradingInterface({
             <Button 
               onClick={handleSwap}
               disabled={!amountIn || isLoading}
-              className="w-full bg-accent text-black hover:bg-accent/90"
+              className="w-full bg-accent text-black hover:bg-accent/90 font-inter font-light"
             >
               {isLoading ? (
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -99,7 +99,7 @@ export function TradingInterface({
             </Button>
 
             {error && (
-              <div className="text-red-400 text-sm p-2 bg-red-400/10 rounded">
+              <div className="text-red-400 text-sm p-2 bg-red-400/10 rounded font-inter font-light tracking-wide">
                 {error}
               </div>
             )}
@@ -114,7 +114,7 @@ export function TradingInterface({
           </TabsContent>
 
           <TabsContent value="limit" className="space-y-4">
-            <div className="text-center text-text/70 py-8">
+            <div className="text-center text-text/70 py-8 font-inter font-light tracking-wide">
               <span>Limit orders coming soon!</span>
             </div>
           </TabsContent>

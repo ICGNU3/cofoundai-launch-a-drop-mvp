@@ -27,12 +27,12 @@ export function LiveTradingDashboard({ tokens, featuredToken }: LiveTradingDashb
   const { data: prices, isLoading } = useRealTimePrices(tokenAddresses);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-inter">
       {/* Featured Trading Interface */}
       {featuredToken && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <h2 className="text-2xl font-bold mb-4">Trade {featuredToken.symbol}</h2>
+            <h2 className="text-2xl font-light tracking-tighter mb-4">Trade {featuredToken.symbol}</h2>
             <TradingInterface
               tokenAddress={featuredToken.address}
               tokenSymbol={featuredToken.symbol}
@@ -43,22 +43,22 @@ export function LiveTradingDashboard({ tokens, featuredToken }: LiveTradingDashb
           
           {/* Live Statistics */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Live Statistics</h3>
+            <h3 className="text-lg font-light tracking-tighter">Live Statistics</h3>
             <div className="grid grid-cols-2 gap-4">
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-accent" />
-                    <span className="text-sm text-text/70">Price</span>
+                    <span className="text-sm text-text/70 font-light tracking-wide">Price</span>
                   </div>
-                  <div className="text-xl font-bold">
+                  <div className="text-xl font-light">
                     {prices?.[featuredToken.address] ? 
                       formatCurrency(prices[featuredToken.address].price.toString()) : 
                       'Loading...'
                     }
                   </div>
                   {prices?.[featuredToken.address] && (
-                    <div className={`text-sm flex items-center gap-1 ${
+                    <div className={`text-sm flex items-center gap-1 font-light ${
                       prices[featuredToken.address].priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'
                     }`}>
                       {prices[featuredToken.address].priceChange24h >= 0 ? 
@@ -75,9 +75,9 @@ export function LiveTradingDashboard({ tokens, featuredToken }: LiveTradingDashb
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2">
                     <Activity className="w-4 h-4 text-accent" />
-                    <span className="text-sm text-text/70">24h Volume</span>
+                    <span className="text-sm text-text/70 font-light tracking-wide">24h Volume</span>
                   </div>
-                  <div className="text-xl font-bold">
+                  <div className="text-xl font-light">
                     {prices?.[featuredToken.address] ? 
                       formatNumber(prices[featuredToken.address].volume24h.toString()) : 
                       'Loading...'
@@ -92,7 +92,7 @@ export function LiveTradingDashboard({ tokens, featuredToken }: LiveTradingDashb
 
       {/* All Tokens Price Grid */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">All NEPLUS Tokens</h3>
+        <h3 className="text-lg font-light tracking-tighter mb-4">All NEPLUS Tokens</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {tokens.map((token) => {
             const tokenPrice = prices?.[token.address];
@@ -100,34 +100,34 @@ export function LiveTradingDashboard({ tokens, featuredToken }: LiveTradingDashb
             return (
               <Card key={token.address} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-3">
+                  <CardTitle className="flex items-center gap-3 font-light tracking-tighter">
                     {token.logoUrl ? (
                       <img src={token.logoUrl} alt={token.symbol} className="w-8 h-8 rounded-full" />
                     ) : (
-                      <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-sm font-bold">
+                      <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-sm font-bold font-inter">
                         {token.symbol.charAt(0)}
                       </div>
                     )}
                     <div>
-                      <div className="font-semibold">{token.symbol}</div>
-                      <div className="text-sm text-text/70">{token.name}</div>
+                      <div className="font-light">{token.symbol}</div>
+                      <div className="text-sm text-text/70 font-light tracking-wide">{token.name}</div>
                     </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {isLoading ? (
-                    <div className="text-center text-text/70">Loading...</div>
+                    <div className="text-center text-text/70 font-light tracking-wide">Loading...</div>
                   ) : tokenPrice ? (
                     <>
                       <div className="flex justify-between items-center">
-                        <span className="text-text/70">Price</span>
-                        <span className="font-mono font-semibold">
+                        <span className="text-text/70 font-light tracking-wide">Price</span>
+                        <span className="font-mono font-light">
                           {formatCurrency(tokenPrice.price.toString())}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-text/70">24h Change</span>
-                        <span className={`font-mono ${
+                        <span className="text-text/70 font-light tracking-wide">24h Change</span>
+                        <span className={`font-mono font-light ${
                           tokenPrice.priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'
                         }`}>
                           {tokenPrice.priceChange24h >= 0 ? '+' : ''}
@@ -135,14 +135,14 @@ export function LiveTradingDashboard({ tokens, featuredToken }: LiveTradingDashb
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-text/70">Volume</span>
-                        <span className="font-mono">
+                        <span className="text-text/70 font-light tracking-wide">Volume</span>
+                        <span className="font-mono font-light">
                           {formatNumber(tokenPrice.volume24h.toString())}
                         </span>
                       </div>
                     </>
                   ) : (
-                    <div className="text-center text-text/70">No data</div>
+                    <div className="text-center text-text/70 font-light tracking-wide">No data</div>
                   )}
                 </CardContent>
               </Card>

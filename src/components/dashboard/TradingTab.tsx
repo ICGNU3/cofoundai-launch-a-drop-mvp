@@ -5,7 +5,7 @@ import { mockTrendingCoins } from '@/data/mockPortfolioData';
 
 export function TradingTab() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-inter">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {mockTrendingCoins.map((coin) => {
           // Mock pool stats for each coin

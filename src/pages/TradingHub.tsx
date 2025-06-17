@@ -40,10 +40,10 @@ export default function TradingHub() {
     <div className="min-h-screen bg-background">
       <ModernNavigation />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 font-inter">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Enhanced Trading Hub</h1>
-          <p className="text-text/70 text-lg">
+          <h1 className="text-4xl font-light tracking-tighter mb-2">Enhanced Trading Hub</h1>
+          <p className="text-text/70 text-lg font-light tracking-wide">
             Trade NEPLUS project tokens with real-time price updates, live liquidity, and comprehensive analytics
           </p>
         </div>
