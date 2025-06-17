@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 import { StreamlinedProgressBar } from "./StreamlinedProgressBar";
 import { DemoProjectsInspiration } from "./DemoProjectsInspiration";
@@ -55,7 +55,7 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
   const renderStepContent = () => {
     if (showInspiration) {
       return (
-        <div className="p-6">
+        <div className="p-6 h-full overflow-y-auto">
           <DemoProjectsInspiration onSelectDemo={handleDemoSelect} />
           <div className="mt-6 text-center">
             <button
@@ -72,32 +72,38 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
     switch (wizard.state.step) {
       case 1:
         return (
-          <WizardStep1Describe
-            state={wizard.state}
-            updateField={wizard.updateField}
-            nextStep={wizard.nextStep}
-            onShowInspiration={() => setShowInspiration(true)}
-            walletAddress={walletAddress}
-          />
+          <div className="h-full overflow-y-auto">
+            <WizardStep1Describe
+              state={wizard.state}
+              updateField={wizard.updateField}
+              nextStep={wizard.nextStep}
+              onShowInspiration={() => setShowInspiration(true)}
+              walletAddress={walletAddress}
+            />
+          </div>
         );
       case 2:
         return (
-          <WizardStep2TeamBudget
-            state={wizard.state}
-            updateField={wizard.updateField}
-            nextStep={wizard.nextStep}
-            prevStep={wizard.prevStep}
-          />
+          <div className="h-full overflow-y-auto">
+            <WizardStep2TeamBudget
+              state={wizard.state}
+              updateField={wizard.updateField}
+              nextStep={wizard.nextStep}
+              prevStep={wizard.prevStep}
+            />
+          </div>
         );
       case 3:
         return (
-          <WizardStep3Launch
-            state={wizard.state}
-            updateField={wizard.updateField}
-            prevStep={wizard.prevStep}
-            onComplete={onClose}
-            walletAddress={walletAddress}
-          />
+          <div className="h-full overflow-y-auto">
+            <WizardStep3Launch
+              state={wizard.state}
+              updateField={wizard.updateField}
+              prevStep={wizard.prevStep}
+              onComplete={onClose}
+              walletAddress={walletAddress}
+            />
+          </div>
         );
       default:
         return null;
@@ -109,6 +115,11 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-4xl h-[90vh] max-h-[800px] p-0 bg-card overflow-hidden">
+        <DialogTitle className="sr-only">Create Your Drop</DialogTitle>
+        <DialogDescription className="sr-only">
+          Launch your creative project in just 3 simple steps
+        </DialogDescription>
+        
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
@@ -133,8 +144,8 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
             </div>
           )}
 
-          {/* Content - Now properly scrollable */}
-          <div className="flex-1 overflow-y-auto">
+          {/* Content - Now properly scrollable with individual step containers */}
+          <div className="flex-1 min-h-0">
             {renderStepContent()}
           </div>
         </div>
