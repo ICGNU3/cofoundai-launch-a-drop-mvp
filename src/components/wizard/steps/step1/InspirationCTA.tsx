@@ -17,7 +17,7 @@ export const InspirationCTA: React.FC<InspirationCTAProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Lightbulb className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-medium text-blue-800 font-inter">
+            <span className="text-sm font-light text-blue-800 font-inter tracking-wide">
               Need inspiration?
             </span>
           </div>
@@ -25,12 +25,12 @@ export const InspirationCTA: React.FC<InspirationCTAProps> = ({
             variant="outline"
             size="sm"
             onClick={onShowInspiration}
-            className="text-blue-700 border-blue-300 hover:bg-blue-100 font-inter"
+            className="text-blue-700 border-blue-300 hover:bg-blue-100 font-light font-inter"
           >
             View Examples
           </Button>
         </div>
-        <p className="text-xs text-blue-700 mt-1 font-inter">
+        <p className="text-xs text-blue-700 mt-1 font-light font-inter tracking-wide">
           Check out successful projects to spark your creativity
         </p>
       </CardContent>

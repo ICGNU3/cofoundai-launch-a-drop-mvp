@@ -25,26 +25,26 @@ export const ProjectDescriptionForm: React.FC<ProjectDescriptionFormProps> = ({
   return (
     <Card>
       <CardHeader className="pb-3 sm:pb-6">
-        <CardTitle className="text-lg flex items-center gap-2 font-inter text-headline">
+        <CardTitle className="text-lg flex items-center gap-2 font-light tracking-tighter font-inter text-headline">
           ✨ Describe Your Project
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 pt-0">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-headline font-inter">
+          <label className="text-sm font-light text-headline font-inter tracking-wide">
             Project Type
           </label>
           <Select value={projectType} onValueChange={onProjectTypeChange}>
-            <SelectTrigger className="w-full font-inter">
+            <SelectTrigger className="w-full font-light font-inter">
               <SelectValue placeholder="Select project type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="creative" className="font-inter">Creative Project</SelectItem>
-              <SelectItem value="business" className="font-inter">Business Venture</SelectItem>
-              <SelectItem value="community" className="font-inter">Community Initiative</SelectItem>
-              <SelectItem value="product" className="font-inter">Product Development</SelectItem>
-              <SelectItem value="research" className="font-inter">Research Project</SelectItem>
-              <SelectItem value="other" className="font-inter">Other</SelectItem>
+              <SelectItem value="creative" className="font-light font-inter">Creative Project</SelectItem>
+              <SelectItem value="business" className="font-light font-inter">Business Venture</SelectItem>
+              <SelectItem value="community" className="font-light font-inter">Community Initiative</SelectItem>
+              <SelectItem value="product" className="font-light font-inter">Product Development</SelectItem>
+              <SelectItem value="research" className="font-light font-inter">Research Project</SelectItem>
+              <SelectItem value="other" className="font-light font-inter">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -60,9 +60,9 @@ export const ProjectDescriptionForm: React.FC<ProjectDescriptionFormProps> = ({
             required
             maxLength={2000}
             rows={6}
-            className="font-inter"
+            className="font-light font-inter"
           />
-          <div className="text-xs text-tagline font-inter">
+          <div className="text-xs text-tagline font-light font-inter tracking-wide">
             {projectIdea.length}/2000 characters
           </div>
         </div>

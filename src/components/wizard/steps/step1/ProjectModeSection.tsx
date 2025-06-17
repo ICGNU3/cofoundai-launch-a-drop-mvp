@@ -16,7 +16,7 @@ export const ProjectModeSection: React.FC<ProjectModeSectionProps> = ({
   return (
     <Card>
       <CardHeader className="pb-3 sm:pb-6">
-        <CardTitle className="text-lg font-inter text-headline">
+        <CardTitle className="text-lg font-light tracking-tighter font-inter text-headline">
           Choose Your Project Mode
         </CardTitle>
       </CardHeader>
@@ -25,13 +25,13 @@ export const ProjectModeSection: React.FC<ProjectModeSectionProps> = ({
           <Button
             variant={mode === "solo" ? "default" : "outline"}
             onClick={() => onModeChange("solo")}
-            className="h-auto p-4 flex flex-col items-start gap-2 font-inter"
+            className="h-auto p-4 flex flex-col items-start gap-2 font-light font-inter"
           >
             <div className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              <span className="font-medium">Solo Creator</span>
+              <span className="font-light">Solo Creator</span>
             </div>
-            <span className="text-xs text-left opacity-80">
+            <span className="text-xs text-left opacity-80 font-light tracking-wide">
               You own 100% of the project
             </span>
           </Button>
@@ -39,13 +39,13 @@ export const ProjectModeSection: React.FC<ProjectModeSectionProps> = ({
           <Button
             variant={mode === "team" ? "default" : "outline"}
             onClick={() => onModeChange("team")}
-            className="h-auto p-4 flex flex-col items-start gap-2 font-inter"
+            className="h-auto p-4 flex flex-col items-start gap-2 font-light font-inter"
           >
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              <span className="font-medium">Team Project</span>
+              <span className="font-light">Team Project</span>
             </div>
-            <span className="text-xs text-left opacity-80">
+            <span className="text-xs text-left opacity-80 font-light tracking-wide">
               Share ownership with collaborators
             </span>
           </Button>

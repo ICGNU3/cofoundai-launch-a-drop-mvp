@@ -21,7 +21,7 @@ export const Step2Navigation: React.FC<Step2NavigationProps> = ({
         <Button
           variant="outline"
           onClick={onBack}
-          className="w-full sm:w-auto gap-2 min-h-[44px] font-inter"
+          className="w-full sm:w-auto gap-2 min-h-[44px] font-light font-inter"
         >
           <ArrowLeft className="w-4 h-4 flex-shrink-0" />
           <span className="hidden sm:inline">Back to Description</span>
@@ -31,7 +31,7 @@ export const Step2Navigation: React.FC<Step2NavigationProps> = ({
         <Button
           onClick={onNext}
           disabled={!canProceed}
-          className="w-full sm:w-auto bg-accent text-black hover:bg-accent/90 gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] sm:ml-auto font-inter"
+          className="w-full sm:w-auto bg-accent text-black hover:bg-accent/90 gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] sm:ml-auto font-light font-inter"
         >
           <span className="hidden sm:inline">Continue to Launch</span>
           <span className="sm:hidden">Continue</span>
@@ -40,7 +40,7 @@ export const Step2Navigation: React.FC<Step2NavigationProps> = ({
       </div>
 
       {/* Help Text */}
-      <div className="text-center text-xs text-tagline border-t border-border pt-4 font-inter">
+      <div className="text-center text-xs text-tagline border-t border-border pt-4 font-light font-inter tracking-wide">
         <p>You can adjust team and budget details after launching</p>
       </div>
     </>

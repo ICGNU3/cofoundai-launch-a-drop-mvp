@@ -19,7 +19,7 @@ export const Step1Navigation: React.FC<Step1NavigationProps> = ({
         <Button
           onClick={onNext}
           disabled={!canProceed}
-          className="bg-accent text-black hover:bg-accent/90 gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] font-inter"
+          className="bg-accent text-black hover:bg-accent/90 gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] font-light font-inter"
         >
           Continue to Team & Budget
           <ArrowRight className="w-4 h-4 flex-shrink-0" />
@@ -27,7 +27,7 @@ export const Step1Navigation: React.FC<Step1NavigationProps> = ({
       </div>
 
       {/* Help Text */}
-      <div className="text-center text-xs text-tagline border-t border-border pt-4 font-inter">
+      <div className="text-center text-xs text-tagline border-t border-border pt-4 font-light font-inter tracking-wide">
         <p>You can refine your project details in the next steps</p>
       </div>
     </>
