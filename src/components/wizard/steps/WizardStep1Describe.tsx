@@ -101,7 +101,7 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
         projectIdea={state.projectIdea}
         onProjectIdeaChange={handleProjectIdeaChange}
         projectType={state.projectType}
-        onProjectTypeChange={(type) => updateField("projectType", type)}
+        onProjectTypeChange={(type) => updateField("projectType", type as any)}
         errors={errors}
       />
 

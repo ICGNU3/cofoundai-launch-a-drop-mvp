@@ -50,11 +50,9 @@ export const ProjectDescriptionForm: React.FC<ProjectDescriptionFormProps> = ({
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-headline font-inter">
-            Project Description *
-          </label>
           <SecureTextarea
             id="project-idea"
+            label="Project Description *"
             value={projectIdea}
             onChange={onProjectIdeaChange}
             error={errors.projectIdea}
