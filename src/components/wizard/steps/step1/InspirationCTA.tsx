@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Lightbulb } from "lucide-react";
 
 interface InspirationCTAProps {
@@ -12,26 +12,27 @@ export const InspirationCTA: React.FC<InspirationCTAProps> = ({
   onShowInspiration,
 }) => {
   return (
-    <Card className="bg-accent/5 border-accent/20">
-      <CardContent className="p-3 sm:p-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            <Lightbulb className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-text">
-                <strong>New to project launches?</strong> Browse our template gallery for inspiration and quick setup.
-              </p>
-            </div>
+    <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Lightbulb className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-800 font-inter">
+              Need inspiration?
+            </span>
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onShowInspiration}
-            className="w-full sm:w-auto min-h-[44px] whitespace-nowrap"
+            className="text-blue-700 border-blue-300 hover:bg-blue-100 font-inter"
           >
-            Browse Templates
+            View Examples
           </Button>
         </div>
+        <p className="text-xs text-blue-700 mt-1 font-inter">
+          Check out successful projects to spark your creativity
+        </p>
       </CardContent>
     </Card>
   );

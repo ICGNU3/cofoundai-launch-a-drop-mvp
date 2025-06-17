@@ -1,7 +1,6 @@
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 interface WalletConnectionWarningProps {
   walletAddress: string | null;
@@ -13,20 +12,14 @@ export const WalletConnectionWarning: React.FC<WalletConnectionWarningProps> = (
   if (walletAddress) return null;
 
   return (
-    <Card className="bg-red-50 border-red-200">
-      <CardContent className="p-3 sm:p-4">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm text-red-700 font-medium">
-              Wallet connection required
-            </p>
-            <p className="text-xs text-red-600 mt-1">
-              Please connect your wallet in the top navigation to proceed with project creation.
-            </p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+      <div className="flex items-center gap-2 text-orange-800">
+        <AlertTriangle className="w-4 h-4" />
+        <span className="text-sm font-medium font-inter">Wallet Connection Required</span>
+      </div>
+      <p className="text-sm text-orange-700 mt-1 font-inter">
+        Please connect your wallet to continue with project creation.
+      </p>
+    </div>
   );
 };

@@ -32,13 +32,13 @@ export const RolesSection: React.FC<RolesSectionProps> = ({
     return (
       <Card>
         <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-base flex items-center gap-2">
+          <CardTitle className="text-base flex items-center gap-2 font-inter">
             <Users className="w-4 h-4" />
             Solo Creator Mode
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <p className="text-sm text-text/70">
+          <p className="text-sm text-tagline font-inter">
             You're creating this project as a solo creator. You'll receive 100% of the revenue.
           </p>
         </CardContent>
@@ -51,7 +51,7 @@ export const RolesSection: React.FC<RolesSectionProps> = ({
   return (
     <Card>
       <CardHeader className="pb-3 sm:pb-6">
-        <CardTitle className="text-base flex items-center gap-2">
+        <CardTitle className="text-base flex items-center gap-2 font-inter">
           <Users className="w-4 h-4" />
           Team Roles
         </CardTitle>
@@ -64,18 +64,18 @@ export const RolesSection: React.FC<RolesSectionProps> = ({
               className="flex items-center justify-between p-3 bg-background border border-border rounded-lg"
             >
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm">{role.name}</div>
-                <div className="text-xs text-text/60 truncate">
+                <div className="font-medium text-sm font-inter text-headline">{role.name}</div>
+                <div className="text-xs text-tagline truncate font-inter">
                   {role.address || "No address set"}
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{role.percentNum}%</span>
+                <span className="text-sm font-medium font-inter text-headline">{role.percentNum}%</span>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => onEditRole(index)}
-                  className="h-8 px-2"
+                  className="h-8 px-2 font-inter"
                 >
                   Edit
                 </Button>
@@ -83,7 +83,7 @@ export const RolesSection: React.FC<RolesSectionProps> = ({
                   variant="outline"
                   size="sm"
                   onClick={() => onRemoveRole(index)}
-                  className="h-8 px-2 text-red-600 hover:text-red-700"
+                  className="h-8 px-2 text-red-600 hover:text-red-700 font-inter"
                 >
                   Remove
                 </Button>
@@ -93,7 +93,7 @@ export const RolesSection: React.FC<RolesSectionProps> = ({
         </div>
 
         {totalPercent !== 100 && (
-          <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
+          <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded font-inter">
             Total allocation: {totalPercent}% (should be 100%)
           </div>
         )}
@@ -101,7 +101,7 @@ export const RolesSection: React.FC<RolesSectionProps> = ({
         <Button
           variant="outline"
           onClick={onAddRole}
-          className="w-full gap-2"
+          className="w-full gap-2 font-inter"
         >
           <Plus className="w-4 h-4" />
           Add Team Member
