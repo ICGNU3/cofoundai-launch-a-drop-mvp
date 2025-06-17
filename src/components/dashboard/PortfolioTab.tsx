@@ -7,12 +7,23 @@ import { mockTokenHoldings, mockTradingActivity, mockPortfolioData } from '@/dat
 
 export function PortfolioTab() {
   const portfolioTotalValue = mockTokenHoldings.reduce((sum, holding) => sum + holding.valueUSD, 0);
-  const portfolioDayChange = -0.9; // Mock day change
-  const portfolioWeekChange = 9.1; // Mock week change
+  const portfolioDayChange = -0.9;
+  const portfolioWeekChange = 9.1;
   const totalTrades = mockTradingActivity.length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 font-inter">
+      {/* Portfolio Overview Header */}
+      <div className="mb-8">
+        <h2 className="text-3xl font-light tracking-tighter text-text mb-2">
+          Portfolio Overview
+        </h2>
+        <p className="text-lg text-text/70 font-light tracking-wide">
+          Track your holdings and performance across all NEPLUS tokens
+        </p>
+      </div>
+
+      {/* Metrics Section */}
       <PortfolioMetrics
         totalValue={portfolioTotalValue}
         dayChange={portfolioDayChange}
@@ -21,7 +32,8 @@ export function PortfolioTab() {
         historicalData={mockPortfolioData}
       />
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Holdings and Activity Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         <TokenHoldings
           holdings={mockTokenHoldings}
           totalValue={portfolioTotalValue}
