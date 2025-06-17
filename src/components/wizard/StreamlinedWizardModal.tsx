@@ -108,10 +108,10 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl h-[90vh] max-h-[800px] p-0 bg-card">
+      <DialogContent className="sm:max-w-4xl h-[90vh] max-h-[800px] p-0 bg-card overflow-hidden">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-border">
+          <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
             <div>
               <h2 className="text-xl font-bold text-text">Create Your Drop</h2>
               <p className="text-sm text-text/70 mt-1">
@@ -128,10 +128,12 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
 
           {/* Progress Bar */}
           {!showInspiration && (
-            <StreamlinedProgressBar currentStep={wizard.state.step} />
+            <div className="flex-shrink-0">
+              <StreamlinedProgressBar currentStep={wizard.state.step} />
+            </div>
           )}
 
-          {/* Content */}
+          {/* Content - Now properly scrollable */}
           <div className="flex-1 overflow-y-auto">
             {renderStepContent()}
           </div>
