@@ -70,7 +70,7 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
   };
 
   const canProceed = !errors.projectIdea && !errors.walletConnection && 
-                    state.projectIdea.trim().length >= 10 && walletAddress;
+                    state.projectIdea.trim().length >= 10 && !!walletAddress;
 
   const handleModeChange = (mode: any) => {
     updateField("mode", mode);
@@ -87,7 +87,7 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <div className="p-3 sm:p-6 space-y-3 sm:space-y-6">
       <WalletConnectionWarning walletAddress={walletAddress} />
       
       <InspirationCTA onShowInspiration={onShowInspiration} />
