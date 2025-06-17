@@ -41,9 +41,12 @@ export default function TradingHub() {
       <ModernNavigation />
       
       <main className="container mx-auto px-4 py-8 font-inter">
-        <div className="mb-8">
-          <h1 className="text-4xl font-light tracking-tighter mb-2">Enhanced Trading Hub</h1>
-          <p className="text-text/70 text-lg font-light tracking-wide">
+        {/* Centered Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl lg:text-5xl font-light tracking-tighter mb-4 text-text">
+            Enhanced Trading Hub
+          </h1>
+          <p className="text-text/70 text-lg font-light tracking-wide max-w-2xl mx-auto">
             Trade NEPLUS project tokens with real-time price updates, live liquidity, and comprehensive analytics
           </p>
         </div>

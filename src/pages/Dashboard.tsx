@@ -63,10 +63,10 @@ const Dashboard: React.FC = () => {
       <ModernNavigation />
       <div className="px-4 py-12">
         <div className="max-w-7xl mx-auto">
-          {/* Header Section */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-12 gap-6">
-            <div>
-              <h1 className="text-5xl lg:text-6xl font-light tracking-tighter text-text mb-2">
+          {/* Header Section - Centered */}
+          <div className="flex flex-col items-center text-center mb-12">
+            <div className="mb-8">
+              <h1 className="text-5xl lg:text-6xl font-light tracking-tighter text-text mb-4">
                 Dashboard
               </h1>
               <p className="text-lg text-text/70 font-light tracking-wide">
