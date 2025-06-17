@@ -42,9 +42,8 @@ export const StreamlinedProgressBar: React.FC<StreamlinedProgressBarProps> = ({
   ];
 
   return (
-    <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border bg-card/50">
-      {/* Desktop Progress Bar */}
-      <div className="hidden sm:flex items-center justify-between max-w-2xl mx-auto">
+    <div className="px-6 py-4 border-b border-border bg-card/50">
+      <div className="flex items-center justify-between max-w-2xl mx-auto">
         {steps.map((step, index) => (
           <React.Fragment key={step.number}>
             <div className="flex flex-col items-center min-w-0 flex-1">
@@ -66,7 +65,7 @@ export const StreamlinedProgressBar: React.FC<StreamlinedProgressBarProps> = ({
                 }`}>
                   {step.title}
                 </div>
-                <div className="text-xs text-text/60 mt-1">
+                <div className="text-xs text-text/60 mt-1 hidden sm:block">
                   {step.description}
                 </div>
               </div>
@@ -79,38 +78,10 @@ export const StreamlinedProgressBar: React.FC<StreamlinedProgressBarProps> = ({
         ))}
       </div>
       
-      {/* Mobile Progress Bar */}
-      <div className="sm:hidden">
-        {/* Simple step indicator */}
-        <div className="flex items-center justify-center gap-2 mb-3">
-          {steps.map((step) => (
-            <div
-              key={step.number}
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                step.isComplete
-                  ? "bg-accent text-black"
-                  : step.isCurrent
-                  ? "bg-accent text-black"
-                  : "bg-border text-text/50"
-              }`}
-            >
-              {step.isComplete ? (
-                <CheckCircle className="w-4 h-4" />
-              ) : (
-                step.number
-              )}
-            </div>
-          ))}
-        </div>
-        
-        {/* Current step info */}
-        <div className="text-center">
-          <div className="text-sm font-medium text-accent">
-            {steps[currentStep - 1].title}
-          </div>
-          <div className="text-xs text-text/60 mt-1">
-            Step {currentStep} of 3: {steps[currentStep - 1].description}
-          </div>
+      {/* Mobile-friendly current step indicator */}
+      <div className="mt-3 text-center sm:hidden">
+        <div className="text-sm text-text/80">
+          Step {currentStep} of 3: {steps[currentStep - 1].description}
         </div>
       </div>
     </div>

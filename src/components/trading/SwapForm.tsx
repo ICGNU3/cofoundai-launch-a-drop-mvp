@@ -32,9 +32,9 @@ export function SwapForm({
     <>
       {/* Token Input */}
       <div className="space-y-2">
-        <div className="flex justify-between text-sm text-text/70 font-inter">
-          <span className="font-light tracking-wide">From</span>
-          <span className="font-light tracking-wide">Balance: 0.0</span>
+        <div className="flex justify-between text-sm text-text/70">
+          <span>From</span>
+          <span>Balance: 0.0</span>
         </div>
         <div className="flex gap-2">
           <select 
@@ -46,7 +46,7 @@ export function SwapForm({
               onTokenInChange(e.target.value);
             }}
             disabled={isReversed}
-            className="px-3 py-2 bg-card border border-border rounded text-text min-w-[80px] font-inter font-light"
+            className="px-3 py-2 bg-card border border-border rounded text-text min-w-[80px]"
           >
             <option value="ETH">ETH</option>
             <option value="USDC">USDC</option>
@@ -57,7 +57,7 @@ export function SwapForm({
             placeholder="0.0"
             value={amountIn}
             onChange={(e) => onAmountInChange(e.target.value)}
-            className="flex-1 bg-card border-border text-text font-inter font-light"
+            className="flex-1 bg-card border-border text-text"
           />
         </div>
       </div>
@@ -68,7 +68,7 @@ export function SwapForm({
           variant="outline"
           size="sm"
           onClick={onReverse}
-          className="rounded-full p-2 font-inter font-light"
+          className="rounded-full p-2"
         >
           <ArrowUpDown className="w-4 h-4" />
         </Button>
@@ -76,12 +76,12 @@ export function SwapForm({
 
       {/* Token Output */}
       <div className="space-y-2">
-        <div className="flex justify-between text-sm text-text/70 font-inter">
-          <span className="font-light tracking-wide">To</span>
-          <span className="font-light tracking-wide">Balance: 0.0</span>
+        <div className="flex justify-between text-sm text-text/70">
+          <span>To</span>
+          <span>Balance: 0.0</span>
         </div>
         <div className="flex gap-2">
-          <div className="px-3 py-2 bg-card border border-border rounded text-text min-w-[80px] flex items-center font-inter font-light">
+          <div className="px-3 py-2 bg-card border border-border rounded text-text min-w-[80px] flex items-center">
             {currentSymbolOut}
           </div>
           <Input
@@ -89,7 +89,7 @@ export function SwapForm({
             placeholder="0.0"
             value={amountOut}
             readOnly
-            className="flex-1 bg-card border-border text-text font-inter font-light"
+            className="flex-1 bg-card border-border text-text"
           />
         </div>
       </div>

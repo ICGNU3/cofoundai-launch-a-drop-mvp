@@ -16,7 +16,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   countUpDropRef,
 }) => {
   return (
-    <div className="container mx-auto px-6 pt-16 md:pt-24 font-inter">
+    <div className="container mx-auto px-6 pt-16 md:pt-24">
       <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
         {/* Main Headline */}
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tighter mb-6 leading-tight">
@@ -32,12 +32,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-4">
           <button 
-            className="bg-white text-black font-light rounded-md px-8 py-3 hover:bg-opacity-90 transition-all"
+            className="bg-white text-black font-medium rounded-md px-8 py-3 hover:bg-opacity-90 transition-all"
             onClick={onCtaClick}
           >
             Start building
           </button>
-          <Link to="/how-it-works" className="flex items-center justify-center text-gray-300 hover:text-white transition-colors py-3 px-2 group font-light tracking-wide">
+          <Link to="/how-it-works" className="flex items-center justify-center text-gray-300 hover:text-white transition-colors py-3 px-2 group">
             See how it works
             <span className="material-symbols-outlined ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
           </Link>
@@ -49,21 +49,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             <p className="text-4xl font-light mb-1 tracking-tight">
               <span ref={countUpDollarRef}>${counter.total.toLocaleString()}</span>
             </p>
-            <p className="text-gray-400 font-extralight tracking-wide">Economies created</p>
+            <p className="text-gray-400 font-extralight">Economies created</p>
           </div>
           <div>
             <p className="text-4xl font-light mb-1 tracking-tight">
               <span ref={countUpDropRef}>{counter.drops}</span>+
             </p>
-            <p className="text-gray-400 font-extralight tracking-wide">Active projects</p>
+            <p className="text-gray-400 font-extralight">Active projects</p>
           </div>
           <div>
             <p className="text-4xl font-light mb-1 tracking-tight">24/7</p>
-            <p className="text-gray-400 font-extralight tracking-wide">Community driven</p>
+            <p className="text-gray-400 font-extralight">Community driven</p>
           </div>
           <div>
             <p className="text-4xl font-light mb-1 tracking-tight">100%</p>
-            <p className="text-gray-400 font-extralight tracking-wide">Decentralized</p>
+            <p className="text-gray-400 font-extralight">Decentralized</p>
           </div>
         </div>
       </div>

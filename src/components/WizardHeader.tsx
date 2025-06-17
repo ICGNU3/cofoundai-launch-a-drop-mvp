@@ -15,18 +15,18 @@ export const WizardHeader: React.FC<WizardHeaderProps> = ({
   totalSteps,
   onClose,
 }) => (
-  <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border font-inter">
-    <div className="min-w-0 flex-1 pr-2">
-      <h2 className="text-lg sm:text-2xl font-light tracking-tighter text-headline truncate">{title}</h2>
-      <div className="text-xs sm:text-sm text-body-text/70 mt-1 font-light tracking-wide">
+  <div className="flex items-center justify-between p-6 border-b border-border">
+    <div>
+      <h2 className="text-2xl font-bold text-headline">{title}</h2>
+      <div className="text-sm text-body-text/70 mt-1">
         Step {currentStep} of {totalSteps}
       </div>
     </div>
     <button
       onClick={onClose}
-      className="text-body-text/60 hover:text-body-text transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0"
+      className="text-body-text/60 hover:text-body-text transition-colors"
     >
-      <X size={20} className="sm:w-6 sm:h-6" />
+      <X size={24} />
     </button>
   </div>
 );

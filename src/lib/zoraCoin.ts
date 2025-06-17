@@ -16,8 +16,7 @@ export const defaultCoinParams: CoinDeploymentParams = {
   royaltyBps: 500, // 5% default royalty
 };
 
-// Get hook address from environment or use fallback
-export const CREATOR_ROYALTY_HOOK = import.meta.env.VITE_CREATOR_ROYALTY_HOOK || "0x1234567890123456789012345678901234567890";
+export const CREATOR_ROYALTY_HOOK = import.meta.env.VITE_CREATOR_ROYALTY_HOOK || "";
 
 // Hook flags from deployment script - these need to match the hook permissions
 export const ROYALTY_HOOK_FLAGS = "0x4000000000000000000000000000000000000000"; // beforeSwap flag
@@ -36,8 +35,8 @@ export async function deployCoinWithRoyalties(params: CoinDeploymentParams) {
     throw new Error("Creator address is required for royalty deployment");
   }
 
-  if (!CREATOR_ROYALTY_HOOK || CREATOR_ROYALTY_HOOK === "0x1234567890123456789012345678901234567890") {
-    console.warn("VITE_CREATOR_ROYALTY_HOOK not properly configured, using placeholder");
+  if (!CREATOR_ROYALTY_HOOK) {
+    throw new Error("VITE_CREATOR_ROYALTY_HOOK environment variable not set");
   }
 
   if (royaltyBps && (royaltyBps < 0 || royaltyBps > 10000)) {
@@ -80,7 +79,7 @@ export async function deployCoinWithRoyalties(params: CoinDeploymentParams) {
 }
 
 export function getCoinHelperText(): string {
-  return "Deploy your NEPLUS Coin with creator royalties through Zora API.";
+  return "Deploy your NEPLUS Coin with creator royalties.";
 }
 
 // Utility function to calculate royalty amount

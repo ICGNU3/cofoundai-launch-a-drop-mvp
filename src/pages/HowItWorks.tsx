@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ModernNavigation } from "@/components/ModernNavigation";
+import ModernNavigation from "@/components/ModernNavigation";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import LandingFooter from "@/components/landing/LandingFooter";
 import SplineBackground from "@/components/SplineBackground";

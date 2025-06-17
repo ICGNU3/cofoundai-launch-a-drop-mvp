@@ -28,51 +28,36 @@ export function ProjectsTab({ projects }: ProjectsTabProps) {
 
   if (!projects || projects.length === 0) {
     return (
-      <div className="text-center py-20 font-inter">
-        <div className="max-w-md mx-auto">
-          <h3 className="text-3xl font-light tracking-tighter text-text mb-4">
-            No projects yet
-          </h3>
-          <p className="text-lg text-text/70 font-light tracking-wide mb-8">
-            Create your first project to get started building your own economy!
-          </p>
-          <StreamlinedWizardButton 
-            walletAddress={walletAddress}
-            variant="default"
-            size="default"
-            className="bg-accent text-black hover:bg-accent/90 font-light tracking-wide px-8 py-3 text-base"
-          >
-            Launch Your First Drop
-          </StreamlinedWizardButton>
-        </div>
+      <div className="text-center py-12">
+        <h3 className="text-xl font-semibold text-headline mb-4">No projects yet</h3>
+        <p className="text-body-text mb-6">Create your first project to get started!</p>
+        <StreamlinedWizardButton 
+          walletAddress={walletAddress}
+          variant="default"
+          size="default"
+          className="bg-accent text-black hover:bg-accent/90"
+        >
+          Launch Your First Drop
+        </StreamlinedWizardButton>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 font-inter">
-      {/* Projects Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        <div>
-          <h2 className="text-3xl font-light tracking-tighter text-text mb-2">
-            Your Projects
-          </h2>
-          <p className="text-lg text-text/70 font-light tracking-wide">
-            Manage and track all your launched projects
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-headline">Your Projects</h2>
         <StreamlinedWizardButton 
           walletAddress={walletAddress}
           variant="outline"
-          size="default"
-          className="border-accent text-accent hover:bg-accent hover:text-black font-light tracking-wide px-6 py-3"
+          size="sm"
+          className="border-accent text-accent hover:bg-accent hover:text-black"
         >
           Create New Project
         </StreamlinedWizardButton>
       </div>
       
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
           <ProjectPreviewCard key={project.id} project={project} />
         ))}

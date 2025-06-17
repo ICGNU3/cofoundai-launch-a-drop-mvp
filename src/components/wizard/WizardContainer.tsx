@@ -18,8 +18,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   onClose,
   children,
 }) => (
-  <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
-    <div className="bg-card border border-border rounded-none sm:rounded-lg w-full max-w-none sm:max-w-4xl h-[100dvh] sm:h-[90vh] max-h-none sm:max-h-[600px] flex flex-col mx-auto">
+  <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-[90vh] max-h-[600px] flex flex-col mx-auto">
       <WizardHeader 
         title={title} 
         currentStep={currentStep} 

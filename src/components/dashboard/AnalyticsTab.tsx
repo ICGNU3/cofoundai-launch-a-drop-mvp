@@ -21,21 +21,15 @@ export function AnalyticsTab({ projects }: AnalyticsTabProps) {
 
   if (!projects || projects.length === 0) {
     return (
-      <div className="text-center py-20 font-inter">
-        <div className="max-w-md mx-auto">
-          <h3 className="text-3xl font-light tracking-tighter text-text mb-4">
-            No Projects Yet
-          </h3>
-          <p className="text-lg text-text/70 font-light tracking-wide mb-8">
-            Create your first project to start tracking comprehensive analytics and insights!
-          </p>
-          <Link
-            to="/"
-            className="inline-flex px-8 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition font-light tracking-wide text-base"
-          >
-            Launch Your First Drop
-          </Link>
-        </div>
+      <div className="text-center py-12">
+        <h3 className="text-xl font-semibold text-headline mb-4">No Projects Yet</h3>
+        <p className="text-body-text mb-6">Create your first project to start tracking analytics!</p>
+        <Link
+          to="/"
+          className="inline-flex px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
+        >
+          Launch Your First Drop
+        </Link>
       </div>
     );
   }
@@ -44,47 +38,26 @@ export function AnalyticsTab({ projects }: AnalyticsTabProps) {
 
   if (projectsWithTokens.length === 0) {
     return (
-      <div className="text-center py-20 font-inter">
-        <div className="max-w-md mx-auto">
-          <h3 className="text-3xl font-light tracking-tighter text-text mb-4">
-            No Analytics Available
-          </h3>
-          <p className="text-lg text-text/70 font-light tracking-wide mb-8">
-            Deploy a token to start tracking detailed analytics and performance metrics!
-          </p>
-          <Link
-            to="/"
-            className="inline-flex px-8 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition font-light tracking-wide text-base"
-          >
-            Launch Your First Drop
-          </Link>
-        </div>
+      <div className="text-center py-12">
+        <h3 className="text-xl font-semibold text-headline mb-4">No Analytics Available</h3>
+        <p className="text-body-text mb-6">Deploy a token to start tracking analytics!</p>
+        <Link
+          to="/"
+          className="inline-flex px-6 py-3 bg-accent text-black rounded-lg hover:bg-accent/90 transition"
+        >
+          Launch Your First Drop
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-12 font-inter">
-      {/* Analytics Header */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-light tracking-tighter text-text mb-2">
-          Creator Analytics
-        </h2>
-        <p className="text-lg text-text/70 font-light tracking-wide">
-          Deep insights into your project performance and token metrics
-        </p>
-      </div>
-
-      {/* Analytics Dashboard for Each Project */}
+    <div className="space-y-8">
       {projectsWithTokens.map((project) => (
-        <div key={project.id} className="space-y-6">
-          <div className="pb-4 border-b border-border">
-            <h3 className="text-2xl font-light tracking-tighter text-text mb-1">
-              {project.project_idea}
-            </h3>
-            <p className="text-text/70 font-light tracking-wide">
-              Token: {project.token_address}
-            </p>
+        <div key={project.id}>
+          <div className="mb-4">
+            <h3 className="text-xl font-semibold">{project.project_idea}</h3>
+            <p className="text-text/70 text-sm">Token: {project.token_address}</p>
           </div>
           <CreatorAnalyticsDashboard
             tokenAddress={project.token_address!}

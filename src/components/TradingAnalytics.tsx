@@ -51,7 +51,7 @@ export function TradingAnalytics({ tokenSymbol, data }: TradingAnalyticsProps) {
   ];
 
   return (
-    <div className="space-y-6 font-inter">
+    <div className="space-y-6">
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
@@ -59,9 +59,9 @@ export function TradingAnalytics({ tokenSymbol, data }: TradingAnalyticsProps) {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-text/70 font-light tracking-wide">{stat.title}</p>
-                  <p className="text-xl font-light">{stat.value}</p>
-                  <Badge variant="outline" className="text-xs text-green-500 font-light">
+                  <p className="text-sm text-text/70">{stat.title}</p>
+                  <p className="text-xl font-bold">{stat.value}</p>
+                  <Badge variant="outline" className="text-xs text-green-500">
                     {stat.change}
                   </Badge>
                 </div>
@@ -75,7 +75,7 @@ export function TradingAnalytics({ tokenSymbol, data }: TradingAnalyticsProps) {
       {/* Volume Chart */}
       <Card className="bg-surface border-border">
         <CardHeader>
-          <CardTitle className="font-light tracking-tighter">Trading Volume (24h)</CardTitle>
+          <CardTitle>Trading Volume (24h)</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-48">
@@ -86,12 +86,10 @@ export function TradingAnalytics({ tokenSymbol, data }: TradingAnalyticsProps) {
                   dataKey="time" 
                   stroke="#9CA3AF"
                   fontSize={12}
-                  style={{ fontFamily: 'Inter', fontWeight: 300 }}
                 />
                 <YAxis 
                   stroke="#9CA3AF"
                   fontSize={12}
-                  style={{ fontFamily: 'Inter', fontWeight: 300 }}
                   tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
@@ -99,9 +97,7 @@ export function TradingAnalytics({ tokenSymbol, data }: TradingAnalyticsProps) {
                     backgroundColor: '#1F2937',
                     border: '1px solid #374151',
                     borderRadius: '8px',
-                    color: '#F9FAFB',
-                    fontFamily: 'Inter',
-                    fontWeight: 300
+                    color: '#F9FAFB'
                   }}
                   formatter={(value: number) => [formatCurrency(value.toString()), 'Volume']}
                 />

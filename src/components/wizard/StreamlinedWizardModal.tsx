@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 import { StreamlinedProgressBar } from "./StreamlinedProgressBar";
 import { DemoProjectsInspiration } from "./DemoProjectsInspiration";
@@ -8,8 +8,6 @@ import { useStreamlinedWizard } from "@/hooks/wizard/useStreamlinedWizard";
 import { WizardStep1Describe } from "./steps/WizardStep1Describe";
 import { WizardStep2TeamBudget } from "./steps/WizardStep2TeamBudget";
 import { WizardStep3Launch } from "./steps/WizardStep3Launch";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 
 interface StreamlinedWizardModalProps {
   isOpen: boolean;
@@ -23,8 +21,6 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
   walletAddress,
 }) => {
   const wizard = useStreamlinedWizard();
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const [showInspiration, setShowInspiration] = React.useState(false);
 
   const handleDemoSelect = (demo: any) => {
@@ -56,31 +52,15 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
     wizard.nextStep();
   };
 
-  const handleWizardComplete = () => {
-    // Reset wizard state
-    wizard.closeWizard();
-    
-    // Close modal
-    onClose();
-    
-    // Navigate to dashboard to see the new project
-    navigate("/dashboard");
-    
-    toast({
-      title: "Welcome to your new project! 🎉",
-      description: "Your project is now live and ready for supporters. Check it out in your dashboard.",
-    });
-  };
-
   const renderStepContent = () => {
     if (showInspiration) {
       return (
-        <div className="p-4 sm:p-6">
+        <div className="p-6">
           <DemoProjectsInspiration onSelectDemo={handleDemoSelect} />
           <div className="mt-6 text-center">
             <button
               onClick={() => setShowInspiration(false)}
-              className="text-sm text-accent hover:underline p-2"
+              className="text-sm text-accent hover:underline"
             >
               ← Back to project setup
             </button>
@@ -115,7 +95,7 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
             state={wizard.state}
             updateField={wizard.updateField}
             prevStep={wizard.prevStep}
-            onComplete={handleWizardComplete}
+            onComplete={onClose}
             walletAddress={walletAddress}
           />
         );
@@ -128,23 +108,19 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-none sm:max-w-4xl h-[100dvh] sm:h-[90vh] max-h-none sm:max-h-[800px] p-0 bg-card m-0 sm:m-auto rounded-none sm:rounded-lg border-0 sm:border">
-        <DialogTitle className="sr-only">Create Your Drop</DialogTitle>
+      <DialogContent className="sm:max-w-4xl h-[90vh] max-h-[800px] p-0 bg-card">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border bg-card/95 backdrop-blur-sm sticky top-0 z-10">
-            <div className="min-w-0 flex-1 pr-2">
-              <h2 className="text-lg sm:text-xl font-bold text-text truncate">Create Your Drop</h2>
-              <p className="text-xs sm:text-sm text-text/70 mt-1 hidden sm:block">
+          <div className="flex items-center justify-between p-6 border-b border-border">
+            <div>
+              <h2 className="text-xl font-bold text-text">Create Your Drop</h2>
+              <p className="text-sm text-text/70 mt-1">
                 Launch your creative project in just 3 simple steps
-              </p>
-              <p className="text-xs text-text/70 mt-1 sm:hidden">
-                Launch in 3 steps
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 sm:p-2 hover:bg-background rounded-lg transition-colors flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="p-2 hover:bg-background rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
             </button>

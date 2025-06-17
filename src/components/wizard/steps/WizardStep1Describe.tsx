@@ -1,11 +1,12 @@
 
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { ProjectTypeSelector } from "@/components/ui/ProjectTypeSelector";
+import { ModeSelector } from "@/components/ui/ModeSelector";
+import { Lightbulb, ArrowRight } from "lucide-react";
 import type { StreamlinedWizardState } from "@/hooks/wizard/useStreamlinedWizard";
-import { WalletConnectionWarning } from "./step1/WalletConnectionWarning";
-import { InspirationCTA } from "./step1/InspirationCTA";
-import { ProjectModeSection } from "./step1/ProjectModeSection";
-import { ProjectDescriptionForm } from "./step1/ProjectDescriptionForm";
-import { Step1Navigation } from "./step1/Step1Navigation";
 
 interface WizardStep1DescribeProps {
   state: StreamlinedWizardState;
@@ -22,55 +23,7 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
   onShowInspiration,
   walletAddress,
 }) => {
-  const [errors, setErrors] = React.useState<{
-    projectIdea?: string;
-    walletConnection?: string;
-  }>({});
-
-  const validateProjectIdea = (value: string) => {
-    if (!value.trim()) {
-      return "Project description is required";
-    }
-    if (value.trim().length < 10) {
-      return "Project description must be at least 10 characters";
-    }
-    if (value.trim().length > 2000) {
-      return "Project description cannot exceed 2000 characters";
-    }
-    return null;
-  };
-
-  const validateWalletConnection = () => {
-    if (!walletAddress) {
-      return "Please connect your wallet to continue";
-    }
-    return null;
-  };
-
-  const handleProjectIdeaChange = (value: string) => {
-    updateField("projectIdea", value);
-    const error = validateProjectIdea(value);
-    setErrors(prev => ({ ...prev, projectIdea: error || undefined }));
-  };
-
-  const handleNext = () => {
-    const projectIdeaError = validateProjectIdea(state.projectIdea);
-    const walletError = validateWalletConnection();
-    
-    const newErrors = {
-      projectIdea: projectIdeaError || undefined,
-      walletConnection: walletError || undefined,
-    };
-    
-    setErrors(newErrors);
-    
-    if (!projectIdeaError && !walletError) {
-      nextStep();
-    }
-  };
-
-  const canProceed = !errors.projectIdea && !errors.walletConnection && 
-                    state.projectIdea.trim().length >= 10 && !!walletAddress;
+  const canProceed = state.projectIdea.trim().length >= 10;
 
   const handleModeChange = (mode: any) => {
     updateField("mode", mode);
@@ -87,28 +40,95 @@ export const WizardStep1Describe: React.FC<WizardStep1DescribeProps> = ({
   };
 
   return (
-    <div className="p-3 sm:p-6 space-y-3 sm:space-y-6">
-      <WalletConnectionWarning walletAddress={walletAddress} />
-      
-      <InspirationCTA onShowInspiration={onShowInspiration} />
+    <div className="p-6 space-y-6">
+      {/* Inspiration CTA */}
+      <Card className="bg-accent/5 border-accent/20">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <Lightbulb className="w-5 h-5 text-accent flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm text-text">
+                <strong>New to project launches?</strong> Browse our template gallery for inspiration and quick setup.
+              </p>
+            </div>
+            <Button variant="outline" size="sm" onClick={onShowInspiration}>
+              Browse Templates
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      <ProjectModeSection 
-        mode={state.mode}
-        onModeChange={handleModeChange}
-      />
+      {/* Project Mode */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Project Mode</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ModeSelector 
+            mode={state.mode}
+            onModeChange={handleModeChange}
+          />
+        </CardContent>
+      </Card>
 
-      <ProjectDescriptionForm
-        projectIdea={state.projectIdea}
-        onProjectIdeaChange={handleProjectIdeaChange}
-        projectType={state.projectType}
-        onProjectTypeChange={(type) => updateField("projectType", type as any)}
-        errors={errors}
-      />
+      {/* Project Description */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Describe Your Project</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="text-sm font-medium">
+              What's your creative vision? <span className="text-red-500">*</span>
+            </label>
+            <Textarea
+              value={state.projectIdea}
+              onChange={(e) => updateField("projectIdea", e.target.value)}
+              placeholder="Tell us about your project - what you're creating, your goals, and what makes it special..."
+              rows={4}
+              className="mt-2"
+            />
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-xs text-text/60">
+                Minimum 10 characters required
+              </p>
+              <span className={`text-xs ${
+                state.projectIdea.length >= 10 ? "text-accent" : "text-text/50"
+              }`}>
+                {state.projectIdea.length}/2000
+              </span>
+            </div>
+          </div>
 
-      <Step1Navigation
-        onNext={handleNext}
-        canProceed={canProceed}
-      />
+          <div>
+            <label className="text-sm font-medium">Project Category</label>
+            <div className="mt-2">
+              <ProjectTypeSelector 
+                projectType={state.projectType}
+                onProjectTypeChange={(type) => updateField("projectType", type)}
+                onLoadDefaultRoles={() => {}} // Not used in streamlined flow
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Navigation */}
+      <div className="flex justify-end pt-4">
+        <Button
+          onClick={nextStep}
+          disabled={!canProceed}
+          className="bg-accent text-black hover:bg-accent/90 gap-2"
+        >
+          Continue to Team & Budget
+          <ArrowRight className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Help Text */}
+      <div className="text-center text-xs text-text/50 border-t border-border pt-4">
+        <p>Don't worry, you can always edit these details later</p>
+      </div>
     </div>
   );
 };

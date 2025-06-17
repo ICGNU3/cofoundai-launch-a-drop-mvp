@@ -25,6 +25,7 @@ export function FarcasterFrame({
   const { price, isConnected } = useTokenPrice(tokenAddress);
 
   const handleFrameAction = (actionType: string) => {
+    // This would typically post back to the Farcaster frame endpoint
     const frameData = {
       action: actionType,
       tokenAddress,
@@ -32,8 +33,10 @@ export function FarcasterFrame({
       referralCode
     };
     
+    // In a real implementation, this would make a POST request to your frame endpoint
     console.log('Frame action:', frameData);
     
+    // Redirect to the main app
     const baseUrl = window.location.origin;
     const url = referralCode 
       ? `${baseUrl}/trade/${tokenAddress}?ref=${referralCode}`
@@ -43,17 +46,17 @@ export function FarcasterFrame({
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto aspect-[1.91/1] bg-gradient-to-br from-background via-surface to-background border border-border rounded-lg overflow-hidden font-inter">
+    <div className="w-full max-w-sm mx-auto aspect-[1.91/1] bg-gradient-to-br from-background via-surface to-background border border-border rounded-lg overflow-hidden">
       <div className="h-full flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-accent/20 to-accent/10 p-4 border-b border-border">
+        <div className="bg-gradient-to-r from-accent/20 to-accent/10 p-4 border-b">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-light text-lg tracking-tighter text-text">{tokenSymbol}</h3>
-              <p className="text-sm text-text/70 truncate font-light tracking-wide">{tokenName}</p>
+              <h3 className="font-bold text-lg">{tokenSymbol}</h3>
+              <p className="text-sm text-text/70 truncate">{tokenName}</p>
             </div>
             {isConnected && (
-              <Badge variant="outline" className="text-xs font-light">
+              <Badge variant="outline" className="text-xs">
                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1" />
                 Live
               </Badge>
@@ -65,10 +68,10 @@ export function FarcasterFrame({
         <div className="flex-1 p-4 flex flex-col justify-center">
           {price ? (
             <div className="text-center">
-              <div className="text-2xl font-light tracking-tighter text-text mb-1">
+              <div className="text-2xl font-bold mb-1">
                 {formatCurrency(price.price.toString())}
               </div>
-              <div className={`flex items-center justify-center gap-1 text-sm font-light ${
+              <div className={`flex items-center justify-center gap-1 text-sm ${
                 price.priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'
               }`}>
                 {price.priceChange24h >= 0 ? 
@@ -82,13 +85,13 @@ export function FarcasterFrame({
             </div>
           ) : (
             <div className="text-center">
-              <div className="text-xl font-light text-text/50 tracking-wide">Loading...</div>
+              <div className="text-xl font-bold text-text/50">Loading...</div>
             </div>
           )}
 
           {referralCode && (
             <div className="text-center mt-2">
-              <Badge variant="outline" className="text-xs font-light">
+              <Badge variant="outline" className="text-xs">
                 🎁 Referral Bonus Available
               </Badge>
             </div>
@@ -96,11 +99,11 @@ export function FarcasterFrame({
         </div>
 
         {/* Action Buttons */}
-        <div className="p-4 border-t border-border bg-surface/30">
+        <div className="p-4 border-t bg-surface/30">
           <div className="grid grid-cols-2 gap-2">
             <Button 
               size="sm" 
-              className="bg-green-600 hover:bg-green-700 text-white font-light tracking-wide"
+              className="bg-green-600 hover:bg-green-700 text-white"
               onClick={() => handleFrameAction('buy')}
             >
               <Zap className="w-3 h-3 mr-1" />
@@ -109,7 +112,6 @@ export function FarcasterFrame({
             <Button 
               size="sm" 
               variant="outline"
-              className="font-light tracking-wide"
               onClick={() => handleFrameAction('share')}
             >
               <Share className="w-3 h-3 mr-1" />
@@ -120,7 +122,7 @@ export function FarcasterFrame({
           <Button 
             size="sm" 
             variant="ghost" 
-            className="w-full mt-2 text-xs font-light tracking-wide"
+            className="w-full mt-2 text-xs"
             onClick={() => handleFrameAction('open')}
           >
             Open in NEPLUS →

@@ -20,7 +20,7 @@ export function TokenSelector({ tokens, selectedToken, onTokenSelect }: TokenSel
   return (
     <Card className="bg-surface border-border">
       <CardHeader>
-        <CardTitle className="font-inter font-light tracking-tighter">Select Token to Trade</CardTitle>
+        <CardTitle>Select Token to Trade</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -39,17 +39,17 @@ export function TokenSelector({ tokens, selectedToken, onTokenSelect }: TokenSel
                   {token.logoUrl ? (
                     <img src={token.logoUrl} alt={token.symbol} className="w-8 h-8 rounded-full" />
                   ) : (
-                    <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-sm font-bold text-black font-inter">
+                    <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-sm font-bold text-black">
                       {token.symbol.charAt(0)}
                     </div>
                   )}
                   <div>
-                    <div className="font-inter font-light">{token.symbol}</div>
-                    <div className="text-xs text-text/70 truncate font-inter font-light tracking-wide">{token.name}</div>
+                    <div className="font-semibold">{token.symbol}</div>
+                    <div className="text-xs text-text/70 truncate">{token.name}</div>
                   </div>
                 </div>
                 {selectedToken.address === token.address && (
-                  <Badge className="mt-2 bg-accent text-black font-inter font-light">
+                  <Badge className="mt-2 bg-accent text-black">
                     Selected
                   </Badge>
                 )}
