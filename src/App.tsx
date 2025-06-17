@@ -17,7 +17,7 @@ function App() {
     loginMethods: ['wallet', 'email'] as const,
     appearance: {
       theme: 'dark' as const,
-      accentColor: '#36DF8C',
+      accentColor: '#36DF8C' as const,
     },
   };
 
