@@ -22,7 +22,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Main Headline */}
         <div className="space-y-4">
           <h1 className="text-5xl md:text-7xl font-light bg-gradient-to-r from-accent via-accent/80 to-accent/60 bg-clip-text text-transparent leading-tight">
-            Fund Your Creative Projects
+            Create Your Own Economy
           </h1>
           <p className="text-xl md:text-2xl text-body-text/80 max-w-3xl mx-auto leading-relaxed font-light">
             Launch creative projects with transparent team collaboration, fair revenue splits, and community backing
