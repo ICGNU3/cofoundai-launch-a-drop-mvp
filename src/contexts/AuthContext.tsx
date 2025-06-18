@@ -46,6 +46,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ready: privyAuth?.ready
   });
 
+  // Check if Privy is properly configured
+  useEffect(() => {
+    const privyAppId = import.meta.env.VITE_PRIVY_APP_ID;
+    console.log('AuthProvider: Privy App ID check:', {
+      hasAppId: !!privyAppId,
+      appId: privyAppId ? `${privyAppId.slice(0, 8)}...` : 'Missing'
+    });
+  }, []);
+
   // Safely destructure Privy auth with fallbacks
   const { 
     user = null, 
@@ -60,27 +69,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('AuthContext: Starting login process...');
     
     if (!privyAuth) {
-      console.error('AuthContext: Privy not initialized');
-      throw new Error('Privy authentication not available');
+      const error = 'Privy authentication not available';
+      console.error('AuthContext:', error);
+      throw new Error(error);
+    }
+
+    if (!import.meta.env.VITE_PRIVY_APP_ID) {
+      const error = 'Privy App ID not configured';
+      console.error('AuthContext:', error);
+      throw new Error(error);
     }
 
     try {
       console.log('AuthContext: Calling privyLogin...');
       await privyLogin();
-      console.log('AuthContext: privyLogin completed');
+      console.log('AuthContext: privyLogin completed successfully');
     } catch (error) {
       console.error('AuthContext: Login failed:', error);
-      throw error;
+      
+      // Check for specific error types
+      if (error instanceof Error) {
+        if (error.message.includes('User rejected')) {
+          throw new Error('Authentication was cancelled by user');
+        } else if (error.message.includes('network')) {
+          throw new Error('Network error - please check your connection');
+        } else if (error.message.includes('configuration')) {
+          throw new Error('Authentication service configuration error');
+        }
+      }
+      
+      throw new Error(`Authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   // Create or fetch user profile when authenticated
   useEffect(() => {
     const handleAuthState = async () => {
-      console.log('AuthContext: Handling auth state change', { authenticated, user: user?.id });
+      console.log('AuthContext: Handling auth state change', { 
+        authenticated, 
+        user: user?.id,
+        ready 
+      });
       
       if (authenticated && user) {
         try {
+          console.log('AuthContext: Fetching user profile...');
+          
           // Check if profile exists
           const { data: existingProfile, error } = await supabase
             .from('profiles')
@@ -118,8 +152,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (createError) {
               console.error('Error creating profile:', createError);
+              throw createError;
             } else {
-              console.log('AuthContext: Created new profile');
+              console.log('AuthContext: Created new profile successfully');
               setProfile(createdProfile);
             }
           }
@@ -127,6 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.error('Auth state error:', error);
         }
       } else {
+        console.log('AuthContext: User not authenticated, clearing profile');
         setProfile(null);
       }
       setIsLoading(false);
@@ -134,9 +170,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Only run if privyAuth is available and ready
     if (privyAuth && ready) {
+      console.log('AuthContext: Privy is ready, handling auth state');
       handleAuthState();
     } else if (ready) {
+      console.log('AuthContext: Ready but no privyAuth, setting loading to false');
       setIsLoading(false);
+    } else {
+      console.log('AuthContext: Still waiting for Privy to be ready...');
     }
   }, [authenticated, user, privyAuth, ready]);
 
