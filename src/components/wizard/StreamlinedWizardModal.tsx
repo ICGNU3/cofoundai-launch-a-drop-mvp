@@ -128,25 +128,22 @@ export const StreamlinedWizardModal: React.FC<StreamlinedWizardModalProps> = ({
           Launch your creative project in just 3 simple steps
         </DialogDescription>
         
-        {/* Header - Fixed */}
-        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
+        {/* Minimized Header */}
+        <div className="flex items-center justify-between p-3 border-b border-border flex-shrink-0">
           <div>
-            <h2 className="text-xl font-bold text-text">Create Your Drop</h2>
-            <p className="text-sm text-text/70 mt-1">
-              Launch your creative project in just 3 simple steps
-            </p>
+            <h2 className="text-lg font-semibold text-text">Create Your Drop</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-background rounded-lg transition-colors"
+            className="p-1 hover:bg-background rounded-lg transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Progress Bar - Fixed */}
+        {/* Compact Progress Bar */}
         {!showInspiration && (
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 px-3 py-2">
             <StreamlinedProgressBar currentStep={wizard.state.step} />
           </div>
         )}
