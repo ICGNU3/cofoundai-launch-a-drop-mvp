@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { StreamlinedWizardButton } from "@/components/StreamlinedWizardButton";
 import CreatorCarousel from "@/components/CreatorCarousel";
 import LogoRow from "@/components/LogoRow";
 import LandingFeaturesSection from "@/components/LandingFeaturesSection";
-import HeroSection from "@/components/landing/HeroSection";
+import { HeroSection } from "@/components/landing/HeroSection";
 import LandingFooter from "@/components/landing/LandingFooter";
 import AdvancedTokenCustomizationModal from "@/components/landing/AdvancedTokenCustomizationModal";
 import ModernNavigation from "@/components/ModernNavigation";
