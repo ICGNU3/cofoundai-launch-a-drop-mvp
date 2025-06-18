@@ -168,13 +168,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     };
 
-    // Only run if privyAuth is available and ready
-    if (privyAuth && ready) {
-      console.log('AuthContext: Privy is ready, handling auth state');
-      handleAuthState();
-    } else if (ready) {
-      console.log('AuthContext: Ready but no privyAuth, setting loading to false');
-      setIsLoading(false);
+    // Set loading to false when Privy is ready, regardless of auth state
+    if (ready) {
+      if (privyAuth && (authenticated || !authenticated)) {
+        handleAuthState();
+      } else {
+        console.log('AuthContext: Privy ready but no auth state, setting loading to false');
+        setIsLoading(false);
+      }
     } else {
       console.log('AuthContext: Still waiting for Privy to be ready...');
     }
