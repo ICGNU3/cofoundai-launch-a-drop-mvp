@@ -2,10 +2,9 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2, Wallet, Mail } from 'lucide-react';
+import { Loader2, Wallet, AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -14,11 +13,27 @@ interface AuthModalProps {
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const { login, isLoading } = useAuth();
-  const [authMethod, setAuthMethod] = useState<'wallet' | 'email'>('wallet');
+  const [isConnecting, setIsConnecting] = useState(false);
+  const { toast } = useToast();
 
-  const handleLogin = () => {
-    login();
-    onClose();
+  const handleLogin = async () => {
+    console.log('AuthModal: Attempting login...');
+    setIsConnecting(true);
+    
+    try {
+      await login();
+      console.log('AuthModal: Login successful, closing modal');
+      onClose();
+    } catch (error) {
+      console.error('AuthModal: Login error:', error);
+      toast({
+        title: "Authentication Error",
+        description: "Failed to connect with Privy. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsConnecting(false);
+    }
   };
 
   return (
@@ -36,16 +51,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <div className="space-y-4">
             <Button
               onClick={handleLogin}
-              disabled={isLoading}
+              disabled={isLoading || isConnecting}
               className="w-full bg-accent text-black hover:bg-accent/90 h-12"
             >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              {(isLoading || isConnecting) ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Connecting...
+                </>
               ) : (
-                <Wallet className="w-4 h-4 mr-2" />
+                <>
+                  <Wallet className="w-4 h-4 mr-2" />
+                  Connect with Privy
+                </>
               )}
-              Connect with Privy
             </Button>
+            
+            {/* Debug info */}
+            <div className="text-xs text-center text-text/50 space-y-1">
+              <div>Debug: Privy App ID configured</div>
+              <div>Status: {isLoading ? 'Loading...' : 'Ready'}</div>
+            </div>
           </div>
 
           <div className="text-xs text-center text-text/50">

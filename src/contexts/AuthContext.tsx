@@ -19,7 +19,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: () => void;
+  login: () => Promise<void>;
   logout: () => void;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
@@ -40,17 +40,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  console.log('AuthProvider: Privy auth state:', {
+    authenticated: privyAuth?.authenticated,
+    user: privyAuth?.user?.id,
+    ready: privyAuth?.ready
+  });
+
   // Safely destructure Privy auth with fallbacks
   const { 
     user = null, 
     authenticated = false, 
-    login = () => {}, 
-    logout = () => {} 
+    login: privyLogin = () => Promise.resolve(), 
+    logout: privyLogout = () => {},
+    ready = false
   } = privyAuth || {};
+
+  // Enhanced login function with better error handling
+  const login = async () => {
+    console.log('AuthContext: Starting login process...');
+    
+    if (!privyAuth) {
+      console.error('AuthContext: Privy not initialized');
+      throw new Error('Privy authentication not available');
+    }
+
+    try {
+      console.log('AuthContext: Calling privyLogin...');
+      await privyLogin();
+      console.log('AuthContext: privyLogin completed');
+    } catch (error) {
+      console.error('AuthContext: Login failed:', error);
+      throw error;
+    }
+  };
 
   // Create or fetch user profile when authenticated
   useEffect(() => {
     const handleAuthState = async () => {
+      console.log('AuthContext: Handling auth state change', { authenticated, user: user?.id });
+      
       if (authenticated && user) {
         try {
           // Check if profile exists
@@ -67,8 +95,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
 
           if (existingProfile) {
+            console.log('AuthContext: Found existing profile');
             setProfile(existingProfile);
           } else {
+            console.log('AuthContext: Creating new profile');
             // Create new profile
             const newProfile = {
               id: user.id,
@@ -89,6 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (createError) {
               console.error('Error creating profile:', createError);
             } else {
+              console.log('AuthContext: Created new profile');
               setProfile(createdProfile);
             }
           }
@@ -101,11 +132,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     };
 
-    // Only run if privyAuth is available
-    if (privyAuth) {
+    // Only run if privyAuth is available and ready
+    if (privyAuth && ready) {
       handleAuthState();
+    } else if (ready) {
+      setIsLoading(false);
     }
-  }, [authenticated, user, privyAuth]);
+  }, [authenticated, user, privyAuth, ready]);
 
   const updateProfile = async (data: Partial<UserProfile>) => {
     if (!user || !profile) return;
@@ -136,7 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated: authenticated,
     isLoading,
     login,
-    logout,
+    logout: privyLogout,
     updateProfile,
     completeOnboarding
   };
