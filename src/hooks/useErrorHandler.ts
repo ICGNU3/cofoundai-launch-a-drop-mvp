@@ -8,6 +8,7 @@ export interface AppError {
   userMessage: string;
   timestamp: Date;
   context?: Record<string, any>;
+  stack?: string;
 }
 
 export const useErrorHandler = () => {
@@ -17,7 +18,7 @@ export const useErrorHandler = () => {
       message: error.message,
       userMessage: getUserFriendlyMessage(error),
       timestamp: new Date(),
-      context: { ...context, stack: error.stack }
+      context: { ...context, stack: 'stack' in error ? error.stack : undefined }
     };
 
     // Log to console in development

@@ -2,13 +2,11 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Calendar, Download, Filter } from 'lucide-react';
+import { Calendar, Download } from 'lucide-react';
 
-interface PerformanceData {
+interface HistoricalData {
   date: string;
   revenue: number;
   visitors: number;
@@ -17,9 +15,9 @@ interface PerformanceData {
 }
 
 interface HistoricalPerformanceProps {
-  data: PerformanceData[];
-  onDateRangeChange: (startDate: string, endDate: string) => void;
-  onExport: (format: 'csv' | 'pdf') => void;
+  data: HistoricalData[];
+  onDateRangeChange: (start: string, end: string) => void;
+  onExport: (format: 'csv' | 'pdf', options: any) => Promise<void>;
 }
 
 export const HistoricalPerformance: React.FC<HistoricalPerformanceProps> = ({
@@ -27,71 +25,27 @@ export const HistoricalPerformance: React.FC<HistoricalPerformanceProps> = ({
   onDateRangeChange,
   onExport
 }) => {
-  const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'custom'>('30d');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(['revenue', 'visitors']);
-
-  const handleDateRangeChange = (range: string) => {
-    setDateRange(range as any);
-    const end = new Date();
-    let start = new Date();
-    
-    switch (range) {
-      case '7d':
-        start.setDate(end.getDate() - 7);
-        break;
-      case '30d':
-        start.setDate(end.getDate() - 30);
-        break;
-      case '90d':
-        start.setDate(end.getDate() - 90);
-        break;
-      default:
-        return;
-    }
-    
-    onDateRangeChange(start.toISOString().split('T')[0], end.toISOString().split('T')[0]);
-  };
-
-  const handleCustomDateRange = () => {
-    if (startDate && endDate) {
-      onDateRangeChange(startDate, endDate);
-    }
-  };
-
-  const metricColors = {
-    revenue: '#36DF8C',
-    visitors: '#3B82F6',
-    conversions: '#8B5CF6',
-    engagement: '#F59E0B'
-  };
+  const [timeRange, setTimeRange] = useState('30d');
+  const [metric, setMetric] = useState('revenue');
 
   const formatCurrency = (value: number) => `$${value.toLocaleString()}`;
+
+  const handleExportData = async () => {
+    await onExport('csv', {
+      format: 'csv',
+      dateRange: timeRange,
+      metrics: ['historical'],
+      includeCharts: false
+    });
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          Historical Performance
+        <div className="flex items-center justify-between">
+          <CardTitle>Historical Performance</CardTitle>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => onExport('csv')}>
-              <Download className="w-4 h-4 mr-1" />
-              CSV
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => onExport('pdf')}>
-              <Download className="w-4 h-4 mr-1" />
-              PDF
-            </Button>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Filters */}
-        <div className="flex flex-wrap items-end gap-4 mb-6 p-4 border border-border rounded-lg">
-          <div>
-            <Label htmlFor="dateRange">Time Period</Label>
-            <Select value={dateRange} onValueChange={handleDateRangeChange}>
+            <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
@@ -99,117 +53,109 @@ export const HistoricalPerformance: React.FC<HistoricalPerformanceProps> = ({
                 <SelectItem value="7d">Last 7 days</SelectItem>
                 <SelectItem value="30d">Last 30 days</SelectItem>
                 <SelectItem value="90d">Last 90 days</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+                <SelectItem value="all">All time</SelectItem>
               </SelectContent>
             </Select>
+            <Button variant="outline" size="sm" onClick={handleExportData}>
+              <Download className="w-4 h-4 mr-1" />
+              Export
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {/* Metric Selector */}
+          <div className="flex gap-2">
+            <Button
+              variant={metric === 'revenue' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setMetric('revenue')}
+            >
+              Revenue
+            </Button>
+            <Button
+              variant={metric === 'visitors' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setMetric('visitors')}
+            >
+              Visitors
+            </Button>
+            <Button
+              variant={metric === 'conversions' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setMetric('conversions')}
+            >
+              Conversions
+            </Button>
+            <Button
+              variant={metric === 'engagement' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setMetric('engagement')}
+            >
+              Engagement
+            </Button>
           </div>
 
-          {dateRange === 'custom' && (
-            <>
-              <div>
-                <Label htmlFor="startDate">Start Date</Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-40"
+          {/* Chart */}
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data}>
+                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip 
+                  formatter={(value) => 
+                    metric === 'revenue' ? formatCurrency(value as number) : value
+                  }
                 />
-              </div>
-              <div>
-                <Label htmlFor="endDate">End Date</Label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-40"
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey={metric} 
+                  stroke="#36DF8C" 
+                  strokeWidth={2}
+                  dot={{ fill: '#36DF8C' }}
                 />
-              </div>
-              <Button onClick={handleCustomDateRange} size="sm">
-                <Filter className="w-4 h-4 mr-1" />
-                Apply
-              </Button>
-            </>
-          )}
-        </div>
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
 
-        {/* Chart */}
-        <div className="h-80 mb-6">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip 
-                formatter={(value, name) => [
-                  name === 'revenue' ? formatCurrency(value as number) : value,
-                  name
-                ]}
-              />
-              <Legend />
-              {selectedMetrics.includes('revenue') && (
-                <Line 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke={metricColors.revenue}
-                  strokeWidth={2}
-                  name="Revenue"
-                />
-              )}
-              {selectedMetrics.includes('visitors') && (
-                <Line 
-                  type="monotone" 
-                  dataKey="visitors" 
-                  stroke={metricColors.visitors}
-                  strokeWidth={2}
-                  name="Visitors"
-                />
-              )}
-              {selectedMetrics.includes('conversions') && (
-                <Line 
-                  type="monotone" 
-                  dataKey="conversions" 
-                  stroke={metricColors.conversions}
-                  strokeWidth={2}
-                  name="Conversions"
-                />
-              )}
-              {selectedMetrics.includes('engagement') && (
-                <Line 
-                  type="monotone" 
-                  dataKey="engagement" 
-                  stroke={metricColors.engagement}
-                  strokeWidth={2}
-                  name="Engagement"
-                />
-              )}
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Metric Toggle */}
-        <div className="flex flex-wrap gap-2">
-          {Object.entries(metricColors).map(([metric, color]) => (
-            <Button
-              key={metric}
-              variant={selectedMetrics.includes(metric) ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                setSelectedMetrics(prev => 
-                  prev.includes(metric) 
-                    ? prev.filter(m => m !== metric)
-                    : [...prev, metric]
-                );
-              }}
-              className="capitalize"
-            >
-              <div 
-                className="w-3 h-3 rounded-full mr-2" 
-                style={{ backgroundColor: color }}
-              />
-              {metric}
-            </Button>
-          ))}
+          {/* Summary Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
+            <div className="text-center">
+              <div className="text-2xl font-bold">
+                {metric === 'revenue' 
+                  ? formatCurrency(data.reduce((sum, d) => sum + d.revenue, 0))
+                  : data.reduce((sum, d) => sum + (d as any)[metric], 0).toLocaleString()
+                }
+              </div>
+              <div className="text-sm text-text/60">Total {metric}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">
+                {metric === 'revenue' 
+                  ? formatCurrency(data.reduce((sum, d) => sum + d.revenue, 0) / data.length)
+                  : Math.round(data.reduce((sum, d) => sum + (d as any)[metric], 0) / data.length).toLocaleString()
+                }
+              </div>
+              <div className="text-sm text-text/60">Average {metric}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">
+                {metric === 'revenue' 
+                  ? formatCurrency(Math.max(...data.map(d => d.revenue)))
+                  : Math.max(...data.map(d => (d as any)[metric])).toLocaleString()
+                }
+              </div>
+              <div className="text-sm text-text/60">Peak {metric}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">
+                {data.length}
+              </div>
+              <div className="text-sm text-text/60">Data points</div>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
