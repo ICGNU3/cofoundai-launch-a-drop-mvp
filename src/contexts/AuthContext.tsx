@@ -53,6 +53,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       hasAppId: !!privyAppId,
       appId: privyAppId ? `${privyAppId.slice(0, 8)}...` : 'Missing'
     });
+
+    // If no App ID is configured, stop loading immediately
+    if (!privyAppId) {
+      console.log('AuthProvider: No Privy App ID configured, stopping loading state');
+      setIsLoading(false);
+    }
   }, []);
 
   // Safely destructure Privy auth with fallbacks
@@ -167,6 +173,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       setIsLoading(false);
     };
+
+    // Check if Privy App ID is configured first
+    const hasPrivyAppId = !!import.meta.env.VITE_PRIVY_APP_ID;
+    
+    if (!hasPrivyAppId) {
+      // If no App ID, stop loading and don't try to handle auth
+      console.log('AuthContext: No Privy App ID, skipping auth state handling');
+      setIsLoading(false);
+      return;
+    }
 
     // Set loading to false when Privy is ready, regardless of auth state
     if (ready) {
