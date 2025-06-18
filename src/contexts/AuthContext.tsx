@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Check if Privy is properly configured
   useEffect(() => {
-    const privyAppId = import.meta.env.VITE_PRIVY_APP_ID;
+    const privyAppId = 'cmbwrcdqp00sijy0mx4wx4aew';
     console.log('AuthProvider: Privy App ID check:', {
       hasAppId: !!privyAppId,
       appId: privyAppId ? `${privyAppId.slice(0, 8)}...` : 'Missing'
@@ -80,7 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error(error);
     }
 
-    if (!import.meta.env.VITE_PRIVY_APP_ID) {
+    const privyAppId = 'cmbwrcdqp00sijy0mx4wx4aew';
+    if (!privyAppId) {
       const error = 'Privy App ID not configured';
       console.error('AuthContext:', error);
       throw new Error(error);
@@ -175,7 +176,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     // Check if Privy App ID is configured first
-    const hasPrivyAppId = !!import.meta.env.VITE_PRIVY_APP_ID;
+    const privyAppId = 'cmbwrcdqp00sijy0mx4wx4aew';
+    const hasPrivyAppId = !!privyAppId;
     
     if (!hasPrivyAppId) {
       // If no App ID, stop loading and don't try to handle auth
