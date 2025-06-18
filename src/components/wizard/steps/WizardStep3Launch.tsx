@@ -30,11 +30,24 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
   const pledgeAmount = parseInt(state.pledgeUSDC) || 0;
 
   const handleLaunch = async () => {
+    console.log('Launch Project button clicked', { walletAddress, isLaunching });
+    
+    if (!walletAddress) {
+      console.error('No wallet address available');
+      return;
+    }
+    
     setIsLaunching(true);
-    // Simulate launch process
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLaunching(false);
-    onComplete();
+    try {
+      // Simulate launch process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Launch process completed');
+      onComplete();
+    } catch (error) {
+      console.error('Launch failed:', error);
+    } finally {
+      setIsLaunching(false);
+    }
   };
 
   const mockProjectUrl = `https://yourapp.com/project/${state.projectIdea.toLowerCase().replace(/\s+/g, '-').slice(0, 20)}`;
@@ -82,6 +95,8 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
       </CardContent>
     </Card>
   );
+
+  const canLaunch = !!walletAddress && !isLaunching;
 
   return (
     <div className="p-6 space-y-6">
@@ -175,21 +190,33 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
             <CardContent>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-accent" />
+                  {walletAddress ? (
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full border-2 border-red-500"></div>
+                  )}
                   <span className="text-sm">Wallet Connected</span>
                   <span className="text-xs text-text/60 font-mono">
-                    {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "No wallet"}
+                    {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "No wallet connected"}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-accent" />
+                  <CheckCircle className="w-5 h-5 text-green-500" />
                   <span className="text-sm">Project Configuration Complete</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-accent" />
+                  <CheckCircle className="w-5 h-5 text-green-500" />
                   <span className="text-sm">Ready for Blockchain Deployment</span>
                 </div>
               </div>
+              
+              {!walletAddress && (
+                <Alert className="mt-4">
+                  <AlertDescription>
+                    Please connect your wallet to launch your project.
+                  </AlertDescription>
+                </Alert>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -237,8 +264,12 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
         </Button>
         <Button
           onClick={handleLaunch}
-          disabled={!walletAddress || isLaunching}
-          className="bg-accent text-black hover:bg-accent/90 gap-2 min-w-[200px]"
+          disabled={!canLaunch}
+          className={`gap-2 min-w-[200px] transition-all ${
+            canLaunch 
+              ? 'bg-accent hover:bg-accent/90 text-black font-medium' 
+              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+          }`}
         >
           {isLaunching ? (
             <>Launching...</>
@@ -254,6 +285,9 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
       {/* Help Text */}
       <div className="text-center text-xs text-text/50 border-t border-border pt-4">
         <p>Your project will be deployed to the blockchain and made available for supporters</p>
+        {!walletAddress && (
+          <p className="text-red-400 mt-1">⚠️ Wallet connection required to launch</p>
+        )}
       </div>
     </div>
   );
