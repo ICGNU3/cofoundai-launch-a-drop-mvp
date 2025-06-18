@@ -29,7 +29,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </p>
         </div>
 
-        {/* Stats - Using projected numbers */}
+        {/* Projected Outcome Stats */}
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
           <div className="text-center">
             <div className="text-3xl md:text-4xl font-light text-accent">
