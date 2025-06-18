@@ -11,10 +11,11 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Inter', 'Geist', system-ui, sans-serif;
+  font-weight: 300; /* Make all fonts lighter by default */
 }
 
 body {
-  @apply bg-background text-base font-normal m-0 p-0 min-h-screen leading-[1.5];
+  @apply bg-background text-base font-light m-0 p-0 min-h-screen leading-[1.5];
   color: #f9fafb;
   height: 100%;
   overflow-x: hidden;
@@ -36,7 +37,7 @@ body {
 
 .hero-title, h1.headline, h1 {
   font-family: 'Inter', 'Geist', system-ui, sans-serif;
-  font-weight: 300;
+  font-weight: 200; /* Extra light for main headings */
   font-size: 4rem;
   line-height: 1.1;
   color: #f9fafb;
@@ -57,7 +58,7 @@ body {
 
 h2, .section-heading {
   font-family: 'Inter', 'Geist', system-ui, sans-serif;
-  font-weight: 500;
+  font-weight: 300; /* Light for section headings */
   font-size: 1.5rem;
   color: #f9fafb;
   margin-bottom: 1rem;
@@ -69,7 +70,7 @@ h2, .section-heading {
   font-family: 'Inter', 'Geist', system-ui, sans-serif;
   font-size: 1rem;
   line-height: 1.6;
-  font-weight: 400;
+  font-weight: 300; /* Light for body text */
   margin-bottom: 1.5rem;
   margin-top: 0.5rem;
 }
@@ -77,9 +78,11 @@ h2, .section-heading {
 /* Custom utility for Inter/Geist fonts */
 .font-geist {
   font-family: 'Inter', 'Geist', system-ui, sans-serif !important;
+  font-weight: 300 !important;
 }
 .font-inter {
   font-family: 'Inter', system-ui, sans-serif !important;
+  font-weight: 300 !important;
 }
 
 /* Modern Card/Surface Design */
@@ -99,7 +102,7 @@ h2, .section-heading {
 
 /* Modern Gradient Button */
 button.accent-btn, .accent-btn {
-  @apply rounded-lg text-white font-medium h-12 px-6;
+  @apply rounded-lg text-white font-light h-12 px-6;
   background: linear-gradient(92deg, #60a5fa 9%, #3b82f6 52%, #1d4ed8 98%);
   box-shadow: 0 0 16px rgba(96, 165, 250, 0.3);
   border: none;
@@ -133,7 +136,7 @@ button.accent-btn.secondary, .accent-btn.secondary {
 
 /* Modern Inputs */
 input, textarea, select {
-  @apply font-sans text-base font-normal;
+  @apply font-sans text-base font-light;
   border-radius: 8px;
   background: #111111;
   color: #f9fafb;
@@ -151,7 +154,7 @@ input:focus, textarea:focus, select:focus {
 /* Modern Pills */
 .role-pill, .expense-pill {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 300;
   padding: 8px 12px;
   margin: 4px 4px 4px 0;
   border-radius: 20px;
