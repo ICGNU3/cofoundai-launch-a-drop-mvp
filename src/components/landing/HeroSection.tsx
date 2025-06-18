@@ -29,20 +29,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </p>
         </div>
 
-        {/* Projected Outcome Stats */}
+        {/* Projected Goals */}
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
           <div className="text-center">
             <div className="text-3xl md:text-4xl font-light text-accent">
               $2.4M+
             </div>
-            <div className="text-sm text-body-text/60 font-light">Total Raised</div>
+            <div className="text-sm text-body-text/60 font-light">Goal to Raise</div>
           </div>
           <div className="hidden sm:block w-px h-12 bg-border"></div>
           <div className="text-center">
             <div className="text-3xl md:text-4xl font-light text-accent">
               150+
             </div>
-            <div className="text-sm text-body-text/60 font-light">Projects Funded</div>
+            <div className="text-sm text-body-text/60 font-light">Projects Goal</div>
           </div>
         </div>
 
