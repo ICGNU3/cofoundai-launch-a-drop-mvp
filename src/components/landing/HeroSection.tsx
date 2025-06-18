@@ -22,27 +22,27 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Main Headline */}
         <div className="space-y-4">
           <h1 className="text-5xl md:text-7xl font-light bg-gradient-to-r from-accent via-accent/80 to-accent/60 bg-clip-text text-transparent leading-tight">
-            Launch Your Creative Vision
+            Fund Your Creative Projects
           </h1>
           <p className="text-xl md:text-2xl text-body-text/80 max-w-3xl mx-auto leading-relaxed font-light">
-            Transform your ideas into funded projects with community support and transparent revenue sharing
+            Launch creative projects with transparent team collaboration, fair revenue splits, and community backing
           </p>
         </div>
 
-        {/* Stats */}
+        {/* Stats - Using projected numbers */}
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
           <div className="text-center">
             <div className="text-3xl md:text-4xl font-light text-accent">
-              <span ref={countUpDollarRef}>$0</span>
+              $2.4M+
             </div>
             <div className="text-sm text-body-text/60 font-light">Total Raised</div>
           </div>
           <div className="hidden sm:block w-px h-12 bg-border"></div>
           <div className="text-center">
             <div className="text-3xl md:text-4xl font-light text-accent">
-              <span ref={countUpDropRef}>0</span>
+              150+
             </div>
-            <div className="text-sm text-body-text/60 font-light">Successful Drops</div>
+            <div className="text-sm text-body-text/60 font-light">Projects Funded</div>
           </div>
         </div>
 
@@ -65,14 +65,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </div>
         </div>
 
-        {/* Minimal CTA */}
+        {/* CTA */}
         <div className="mt-8">
           <Button
             onClick={onCtaClick}
             size="lg"
             className="bg-accent text-black hover:bg-accent/90 font-light px-8 py-3"
           >
-            Get Started
+            Start Your Project
           </Button>
           <p className="text-xs text-body-text/50 mt-2 font-light">
             Join thousands of creators building their projects
