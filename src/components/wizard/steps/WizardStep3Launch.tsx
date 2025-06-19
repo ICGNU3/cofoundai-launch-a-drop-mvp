@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, Zap, CheckCircle, Eye, ExternalLink, Copy, Share2 } from "lucide-react";
+import { ArrowLeft, Zap, CheckCircle, Eye, ExternalLink, Copy, Share2, Wallet } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAccount, useConnect } from 'wagmi';
 import type { StreamlinedWizardState } from "@/hooks/wizard/useStreamlinedWizard";
 
 interface WizardStep3LaunchProps {
@@ -26,13 +27,20 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
   
+  // Add wagmi hooks for wallet connection
+  const { address, isConnected } = useAccount();
+  const { connect, connectors, isPending } = useConnect();
+
+  // Use wagmi address if available, fallback to prop
+  const effectiveWalletAddress = address || walletAddress;
+  
   const totalExpenses = state.expenses.reduce((sum, expense) => sum + expense.amountUSDC, 0);
   const pledgeAmount = parseInt(state.pledgeUSDC) || 0;
 
   const handleLaunch = async () => {
-    console.log('Launch Project button clicked', { walletAddress, isLaunching });
+    console.log('Launch Project button clicked', { walletAddress: effectiveWalletAddress, isLaunching });
     
-    if (!walletAddress) {
+    if (!effectiveWalletAddress) {
       console.error('No wallet address available');
       return;
     }
@@ -96,7 +104,7 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
     </Card>
   );
 
-  const canLaunch = !!walletAddress && !isLaunching;
+  const canLaunch = !!effectiveWalletAddress && !isLaunching;
 
   return (
     <div className="p-6 space-y-6">
@@ -182,41 +190,58 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
             </CardContent>
           </Card>
 
-          {/* Launch Readiness */}
+          {/* Wallet Connection & Launch Readiness */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Launch Readiness</CardTitle>
+              <CardTitle className="text-base">Wallet Connection & Launch Readiness</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  {walletAddress ? (
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                  ) : (
-                    <div className="w-5 h-5 rounded-full border-2 border-red-500"></div>
-                  )}
-                  <span className="text-sm">Wallet Connected</span>
-                  <span className="text-xs text-text/60 font-mono">
-                    {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "No wallet connected"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-sm">Project Configuration Complete</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-sm">Ready for Blockchain Deployment</span>
-                </div>
+              <div className="space-y-4">
+                {/* Wallet Connection Section */}
+                {!effectiveWalletAddress ? (
+                  <div className="p-4 border border-border rounded-lg bg-surface/50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-5 h-5 rounded-full border-2 border-red-500"></div>
+                      <span className="text-sm font-medium">Wallet Connection Required</span>
+                    </div>
+                    <p className="text-xs text-text/60 mb-4">
+                      Connect your wallet to deploy your project to the blockchain
+                    </p>
+                    <div className="space-y-2">
+                      {connectors.map((connector) => (
+                        <Button
+                          key={connector.uid}
+                          onClick={() => connect({ connector })}
+                          disabled={isPending}
+                          variant="outline"
+                          className="w-full gap-2"
+                        >
+                          <Wallet className="w-4 h-4" />
+                          {isPending ? 'Connecting...' : `Connect ${connector.name}`}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="text-sm">Wallet Connected</span>
+                      <span className="text-xs text-text/60 font-mono">
+                        {effectiveWalletAddress.slice(0, 6)}...{effectiveWalletAddress.slice(-4)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="text-sm">Project Configuration Complete</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="text-sm">Ready for Blockchain Deployment</span>
+                    </div>
+                  </div>
+                )}
               </div>
-              
-              {!walletAddress && (
-                <Alert className="mt-4">
-                  <AlertDescription>
-                    Please connect your wallet to launch your project.
-                  </AlertDescription>
-                </Alert>
-              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -285,8 +310,8 @@ export const WizardStep3Launch: React.FC<WizardStep3LaunchProps> = ({
       {/* Help Text */}
       <div className="text-center text-xs text-text/50 border-t border-border pt-4">
         <p>Your project will be deployed to the blockchain and made available for supporters</p>
-        {!walletAddress && (
-          <p className="text-red-400 mt-1">⚠️ Wallet connection required to launch</p>
+        {!effectiveWalletAddress && (
+          <p className="text-red-400 mt-1">⚠️ Connect your wallet above to launch</p>
         )}
       </div>
     </div>
