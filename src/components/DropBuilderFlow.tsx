@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { CampaignPreviewStep } from './dropBuilder/CampaignPreviewStep';
 import { LaunchStep } from './dropBuilder/LaunchStep';
 import { PricingPlans } from './PricingPlans';
 import { PaymentGate } from './PaymentGate';
-import { useDropBuilder } from '@/hooks/useDropBuilder';
+import { useDropBuilder, DropData } from '@/hooks/useDropBuilder';
 import { usePayment } from '@/hooks/usePayment';
 import { AIAssistantButton } from './ai/AIAssistantButton';
 
