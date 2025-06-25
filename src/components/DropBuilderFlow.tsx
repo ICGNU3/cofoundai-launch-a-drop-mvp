@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { MediaUploadStep } from './dropBuilder/MediaUploadStep';
 import { TokenConfigStep } from './dropBuilder/TokenConfigStep';
 import { RewardsConfigStep } from './dropBuilder/RewardsConfigStep';
