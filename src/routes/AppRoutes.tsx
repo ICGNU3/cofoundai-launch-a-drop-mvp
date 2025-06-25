@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
@@ -13,6 +12,7 @@ import FarcasterFramePage from '@/pages/FarcasterFramePage';
 import HowItWorks from '@/pages/HowItWorks';
 import NotFound from '@/pages/NotFound';
 import { TokenGatedContentPage } from '@/components/TokenGatedContentPage';
+import { DropBuilderFlow } from '@/components/DropBuilderFlow';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -33,6 +33,9 @@ export const AppRoutes: React.FC = () => {
       
       {/* Token-Gated Content Route */}
       <Route path="/token-gated" element={<TokenGatedContentPage />} />
+      
+      {/* Drop Builder Route */}
+      <Route path="/create-drop" element={<DropBuilderFlow />} />
       
       {/* Social/Farcaster Routes */}
       <Route path="/farcaster" element={<FarcasterIntegration />} />
