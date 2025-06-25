@@ -12,6 +12,7 @@ import FarcasterIntegration from '@/pages/FarcasterIntegration';
 import FarcasterFramePage from '@/pages/FarcasterFramePage';
 import HowItWorks from '@/pages/HowItWorks';
 import NotFound from '@/pages/NotFound';
+import { TokenGatedContentPage } from '@/components/TokenGatedContentPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -29,6 +30,9 @@ export const AppRoutes: React.FC = () => {
       
       {/* Trading Routes */}
       <Route path="/trading" element={<TradingHub />} />
+      
+      {/* Token-Gated Content Route */}
+      <Route path="/token-gated" element={<TokenGatedContentPage />} />
       
       {/* Social/Farcaster Routes */}
       <Route path="/farcaster" element={<FarcasterIntegration />} />
