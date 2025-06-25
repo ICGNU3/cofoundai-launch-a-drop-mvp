@@ -4,7 +4,7 @@ import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wallet, LogOut, Copy } from 'lucide-react';
+import { Wallet, LogOut, Copy, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function WalletConnection() {
@@ -33,8 +33,8 @@ export function WalletConnection() {
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
-                <Wallet className="w-5 h-5 text-black" />
+              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-white" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -49,21 +49,18 @@ export function WalletConnection() {
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs border-green-500 text-green-500">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1" />
-                    {chain?.name || 'Connected'}
+                    Connected
                   </Badge>
                 </div>
               </div>
             </div>
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => disconnect()}
-              className="gap-2"
+              className="bg-green-500 text-white hover:bg-green-600 gap-2"
             >
-              <LogOut className="w-4 h-4" />
-              Disconnect
+              <CheckCircle className="w-4 h-4" />
+              Connected
             </Button>
           </div>
         </CardContent>
