@@ -29,20 +29,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </p>
         </div>
 
-        {/* Projected Goals */}
-        <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-light text-accent">
-              $2.4M+
-            </div>
-            <div className="text-sm text-body-text/60 font-light">Goal to Raise</div>
-          </div>
-          <div className="hidden sm:block w-px h-12 bg-border"></div>
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-light text-accent">
-              150+
-            </div>
-            <div className="text-sm text-body-text/60 font-light">Projects Goal</div>
+        {/* Pre-Launch Alpha Badge */}
+        <div className="flex justify-center">
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent/20 to-gradient-end/20 rounded-pill border border-accent/30">
+            <Zap className="w-5 h-5 text-accent" />
+            <span className="text-lg font-medium text-accent">Pre-Launch Alpha</span>
           </div>
         </div>
 
@@ -75,7 +66,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             Start Your Project
           </Button>
           <p className="text-xs text-body-text/50 mt-2 font-light">
-            Join thousands of creators building their projects
+            Be among the first to experience the future of creative collaboration
           </p>
         </div>
       </div>
