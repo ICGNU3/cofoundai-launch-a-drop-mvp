@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Image, Video, Gift } from 'lucide-react';
+import { Edit, Eye, Users, Coins, Gift } from 'lucide-react';
 import { DropData } from '@/hooks/useDropBuilder';
 
 interface CampaignPreviewStepProps {
@@ -18,125 +18,176 @@ export const CampaignPreviewStep: React.FC<CampaignPreviewStepProps> = ({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Campaign Preview</h2>
+        <h2 className="text-2xl font-bold mb-2">Preview Your Campaign</h2>
         <p className="text-gray-600">
-          Review your drop before launching
+          Review all your settings before launching
         </p>
       </div>
 
-      {/* Media Preview */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Image className="w-5 h-5" />
-            Media ({dropData.media.length})
-          </CardTitle>
-          <Button variant="outline" size="sm" onClick={() => onEdit(1)}>
-            <Edit className="w-4 h-4 mr-2" />
-            Edit
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {dropData.media.map((item, index) => (
-              <div key={index} className="relative aspect-square bg-gray-100 rounded-md overflow-hidden">
-                {item.type === 'image' ? (
-                  <img
-                    src={item.preview}
-                    alt={`Media ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Video className="w-8 h-8 text-gray-400" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Media Preview */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5" />
+              Media Content
+            </CardTitle>
+            <Button variant="outline" size="sm" onClick={() => onEdit(1)}>
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {dropData.media.length > 0 ? (
+              <div className="grid grid-cols-2 gap-2">
+                {dropData.media.slice(0, 4).map((item, index) => (
+                  <div key={index} className="relative aspect-square bg-gray-100 rounded-md overflow-hidden">
+                    {item.type === 'image' ? (
+                      <img
+                        src={item.preview}
+                        alt={`Media ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <video
+                        src={item.preview}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                ))}
+                {dropData.media.length > 4 && (
+                  <div className="aspect-square bg-gray-200 rounded-md flex items-center justify-center">
+                    <span className="text-sm text-gray-600">
+                      +{dropData.media.length - 4} more
+                    </span>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            ) : (
+              <p className="text-gray-500 text-center py-8">No media uploaded</p>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Token Configuration */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Token Configuration</CardTitle>
-          <Button variant="outline" size="sm" onClick={() => onEdit(2)}>
-            <Edit className="w-4 h-4 mr-2" />
-            Edit
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-lg mb-2">{dropData.tokenConfig.name}</h3>
-              <p className="text-gray-600 mb-4">{dropData.tokenConfig.description}</p>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Symbol:</span>
-                  <span className="font-mono">{dropData.tokenConfig.symbol}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Total Supply:</span>
-                  <span>{Number(dropData.tokenConfig.totalSupply).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Initial Price:</span>
-                  <span>{dropData.tokenConfig.price} ETH</span>
-                </div>
-              </div>
+        {/* Token Configuration */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Coins className="w-5 h-5" />
+              Token Details
+            </CardTitle>
+            <Button variant="outline" size="sm" onClick={() => onEdit(2)}>
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Name:</span>
+              <span className="font-medium">{dropData.tokenConfig.name || 'Not set'}</span>
             </div>
-            <div className="flex items-center justify-center">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                {dropData.tokenConfig.symbol}
-              </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Symbol:</span>
+              <Badge variant="secondary">{dropData.tokenConfig.symbol || 'N/A'}</Badge>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Supply:</span>
+              <span className="font-medium">
+                {dropData.tokenConfig.totalSupply ? Number(dropData.tokenConfig.totalSupply).toLocaleString() : '0'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Price:</span>
+              <span className="font-medium">{dropData.tokenConfig.price || '0'} ETH</span>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Supporter Rewards */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Gift className="w-5 h-5" />
-            Supporter Rewards ({dropData.rewards.length})
-          </CardTitle>
-          <Button variant="outline" size="sm" onClick={() => onEdit(3)}>
-            <Edit className="w-4 h-4 mr-2" />
-            Edit
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {dropData.rewards.map((reward) => (
-              <div key={reward.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <h4 className="font-medium">{reward.title}</h4>
-                  <p className="text-sm text-gray-600">{reward.description}</p>
-                </div>
-                <Badge variant="secondary">
-                  {reward.tokenThreshold} token{reward.tokenThreshold !== 1 ? 's' : ''}
-                </Badge>
+        {/* Rewards Preview */}
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Gift className="w-5 h-5" />
+              Supporter Rewards ({dropData.rewards.length})
+            </CardTitle>
+            <Button variant="outline" size="sm" onClick={() => onEdit(3)}>
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {dropData.rewards.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {dropData.rewards.map((reward, index) => (
+                  <div key={reward.id} className="border rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold">{reward.title}</h4>
+                      <Badge variant="outline" className="ml-2">
+                        {reward.tokenThreshold} token{reward.tokenThreshold !== 1 ? 's' : ''}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-gray-600">{reward.description}</p>
+                    {reward.customDetails && (
+                      <p className="text-xs text-blue-600 mt-2">{reward.customDetails}</p>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            ) : (
+              <p className="text-gray-500 text-center py-8">No rewards configured</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Project Description */}
+        {dropData.tokenConfig.description && (
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Project Description</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700 leading-relaxed">
+                {dropData.tokenConfig.description}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Launch Summary */}
       <Card className="border-green-200 bg-green-50">
-        <CardHeader>
-          <CardTitle className="text-green-800">Ready to Launch!</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm text-green-700">
-            <p>✅ {dropData.media.length} media file{dropData.media.length !== 1 ? 's' : ''} uploaded</p>
-            <p>✅ Token configured: {dropData.tokenConfig.name} ({dropData.tokenConfig.symbol})</p>
-            <p>✅ {dropData.rewards.length} supporter reward{dropData.rewards.length !== 1 ? 's' : ''} defined</p>
-            <p className="pt-2 font-medium">
-              Your drop will be deployed to Zora and become available for supporters to mint.
-            </p>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <Users className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-green-800">Ready to Launch!</h3>
+              <p className="text-sm text-green-600">
+                Your drop is configured and ready to go live
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-green-700">{dropData.media.length}</div>
+              <div className="text-xs text-green-600">Media Files</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-700">
+                {dropData.tokenConfig.totalSupply ? Number(dropData.tokenConfig.totalSupply).toLocaleString() : '0'}
+              </div>
+              <div className="text-xs text-green-600">Token Supply</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-700">{dropData.rewards.length}</div>
+              <div className="text-xs text-green-600">Rewards</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-700">{dropData.tokenConfig.price || '0'}</div>
+              <div className="text-xs text-green-600">ETH Price</div>
+            </div>
           </div>
         </CardContent>
       </Card>
