@@ -37,7 +37,7 @@ export const WalletConnectionProvider: React.FC<WalletConnectionProviderProps> =
   const { switchChain } = useSwitchChain();
   const [localAddress, setLocalAddress] = useState<string | null>(null);
 
-  const isOnSupportedChain = chain ? SUPPORTED_CHAINS.includes(chain.id) : false;
+  const isOnSupportedChain = chain ? SUPPORTED_CHAINS.includes(chain.id as 8453 | 84532) : false;
 
   // Load saved address from localStorage on mount
   useEffect(() => {
