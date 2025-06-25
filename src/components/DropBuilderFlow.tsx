@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { PricingPlans } from './PricingPlans';
 import { PaymentGate } from './PaymentGate';
 import { useDropBuilder } from '@/hooks/useDropBuilder';
 import { usePayment } from '@/hooks/usePayment';
+import { AIAssistantButton } from './ai/AIAssistantButton';
 
 const STEPS = [
   { id: 1, title: 'Upload Media', description: 'Add your creative content' },
@@ -46,6 +46,18 @@ export const DropBuilderFlow: React.FC = () => {
   React.useEffect(() => {
     verifyPayment();
   }, [verifyPayment]);
+
+  const handleAIRecommendations = (recommendations: Partial<DropData>) => {
+    // Apply AI recommendations to the drop data
+    updateDropData(recommendations);
+    
+    // If we have token config, skip to step 3 (rewards)
+    if (recommendations.tokenConfig && recommendations.rewards) {
+      setCurrentStep(3);
+    } else if (recommendations.tokenConfig) {
+      setCurrentStep(2);
+    }
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -157,9 +169,19 @@ export const DropBuilderFlow: React.FC = () => {
               </Button>
             </div>
           </div>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 mb-4">
             Launch your creative project in 5 simple steps
           </p>
+          
+          {/* AI Assistant Button */}
+          {currentStep === 1 && (
+            <div className="mb-6">
+              <AIAssistantButton onRecommendationsApplied={handleAIRecommendations} />
+              <p className="text-sm text-gray-500 mt-2">
+                Let AI help you create the perfect launch strategy
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Progress Bar */}
