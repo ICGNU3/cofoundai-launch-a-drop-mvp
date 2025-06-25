@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -90,6 +91,7 @@ export const DropBuilderFlow: React.FC = () => {
           <PaymentGate 
             requiredTier="pro" 
             featureName="Drop Launch"
+            showPricing={true}
           >
             <LaunchStep
               dropData={dropData}
