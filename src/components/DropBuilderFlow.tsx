@@ -9,7 +9,10 @@ import { TokenConfigStep } from './dropBuilder/TokenConfigStep';
 import { RewardsConfigStep } from './dropBuilder/RewardsConfigStep';
 import { CampaignPreviewStep } from './dropBuilder/CampaignPreviewStep';
 import { LaunchStep } from './dropBuilder/LaunchStep';
+import { PricingPlans } from './PricingPlans';
+import { PaymentGate } from './PaymentGate';
 import { useDropBuilder } from '@/hooks/useDropBuilder';
+import { usePayment } from '@/hooks/usePayment';
 
 const STEPS = [
   { id: 1, title: 'Upload Media', description: 'Add your creative content' },
@@ -22,6 +25,7 @@ const STEPS = [
 export const DropBuilderFlow: React.FC = () => {
   const {
     currentStep,
+    setCurrentStep,
     dropData,
     updateDropData,
     nextStep,
@@ -29,8 +33,19 @@ export const DropBuilderFlow: React.FC = () => {
     canProceed,
     isLaunching,
     launchDrop,
-    saveDraft
+    saveDraft,
+    getMediaLimit,
+    canUseAdvancedTokens,
+    canUseCustomRewards
   } = useDropBuilder();
+
+  const { currentTier, verifyPayment } = usePayment();
+  const [showPricing, setShowPricing] = useState(false);
+
+  // Verify payment on component mount
+  React.useEffect(() => {
+    verifyPayment();
+  }, [verifyPayment]);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -39,6 +54,7 @@ export const DropBuilderFlow: React.FC = () => {
           <MediaUploadStep
             media={dropData.media}
             onMediaUpdate={(media) => updateDropData({ media })}
+            mediaLimit={getMediaLimit()}
           />
         );
       case 2:
@@ -46,6 +62,7 @@ export const DropBuilderFlow: React.FC = () => {
           <TokenConfigStep
             tokenConfig={dropData.tokenConfig}
             onConfigUpdate={(tokenConfig) => updateDropData({ tokenConfig })}
+            canUseAdvanced={canUseAdvancedTokens()}
           />
         );
       case 3:
@@ -53,6 +70,7 @@ export const DropBuilderFlow: React.FC = () => {
           <RewardsConfigStep
             rewards={dropData.rewards}
             onRewardsUpdate={(rewards) => updateDropData({ rewards })}
+            canUseCustom={canUseCustomRewards()}
           />
         );
       case 4:
@@ -63,7 +81,19 @@ export const DropBuilderFlow: React.FC = () => {
           />
         );
       case 5:
-        return (
+        return currentTier === 'free' ? (
+          <PaymentGate 
+            requiredTier="pro" 
+            featureName="Drop Launch"
+            showPricing={true}
+          >
+            <LaunchStep
+              dropData={dropData}
+              onLaunch={launchDrop}
+              isLaunching={isLaunching}
+            />
+          </PaymentGate>
+        ) : (
           <LaunchStep
             dropData={dropData}
             onLaunch={launchDrop}
@@ -77,14 +107,56 @@ export const DropBuilderFlow: React.FC = () => {
 
   const progressPercentage = (currentStep / STEPS.length) * 100;
 
+  if (showPricing) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Choose Your Plan
+            </h1>
+            <p className="text-lg text-gray-600">
+              Select the plan that best fits your creative needs
+            </p>
+          </div>
+          
+          <PricingPlans />
+          
+          <div className="text-center mt-8">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowPricing(false)}
+            >
+              Back to Drop Builder
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Create Your Drop
-          </h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Create Your Drop
+            </h1>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                Current Plan: <strong className="capitalize">{currentTier}</strong>
+              </span>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowPricing(true)}
+              >
+                View Plans
+              </Button>
+            </div>
+          </div>
           <p className="text-lg text-gray-600">
             Launch your creative project in 5 simple steps
           </p>
@@ -166,7 +238,7 @@ export const DropBuilderFlow: React.FC = () => {
             ) : (
               <Button
                 onClick={launchDrop}
-                disabled={!canProceed || isLaunching}
+                disabled={!canProceed || isLaunching || currentTier === 'free'}
                 className="gap-2"
               >
                 <Rocket className="w-4 h-4" />

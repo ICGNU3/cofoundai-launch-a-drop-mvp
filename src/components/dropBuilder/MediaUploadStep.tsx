@@ -2,24 +2,32 @@
 import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Upload, X, Image, Video } from 'lucide-react';
+import { Upload, X, Image, Video, Lock } from 'lucide-react';
 import { MediaFile } from '@/hooks/useDropBuilder';
+import { PaymentGate } from '../PaymentGate';
+import { usePayment } from '@/hooks/usePayment';
 
 interface MediaUploadStepProps {
   media: MediaFile[];
   onMediaUpdate: (media: MediaFile[]) => void;
+  mediaLimit?: number | null; // null = unlimited
 }
 
 export const MediaUploadStep: React.FC<MediaUploadStepProps> = ({
   media,
-  onMediaUpdate
+  onMediaUpdate,
+  mediaLimit = null
 }) => {
+  const { canAccessTier } = usePayment();
+  const isAtLimit = mediaLimit !== null && media.length >= mediaLimit;
+
   const handleFileUpload = useCallback((files: FileList | null) => {
     if (!files) return;
 
     const newMedia: MediaFile[] = [];
+    const remainingSlots = mediaLimit ? mediaLimit - media.length : files.length;
     
-    Array.from(files).forEach(file => {
+    Array.from(files).slice(0, remainingSlots).forEach(file => {
       if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
         const preview = URL.createObjectURL(file);
         newMedia.push({
@@ -31,7 +39,7 @@ export const MediaUploadStep: React.FC<MediaUploadStepProps> = ({
     });
 
     onMediaUpdate([...media, ...newMedia]);
-  }, [media, onMediaUpdate]);
+  }, [media, onMediaUpdate, mediaLimit]);
 
   const removeMedia = useCallback((index: number) => {
     const newMedia = media.filter((_, i) => i !== index);
@@ -45,30 +53,66 @@ export const MediaUploadStep: React.FC<MediaUploadStepProps> = ({
         <p className="text-gray-600">
           Add images or videos that represent your project
         </p>
+        {mediaLimit && (
+          <p className="text-sm text-orange-600 mt-2">
+            Free tier: {media.length}/{mediaLimit} files used
+            {!canAccessTier('pro') && (
+              <span className="block text-xs">
+                Upgrade to Pro for unlimited uploads
+              </span>
+            )}
+          </p>
+        )}
       </div>
 
       {/* Upload Area */}
-      <Card className="border-dashed border-2 border-gray-300 hover:border-blue-400 transition-colors">
+      <Card className={`border-dashed border-2 ${
+        isAtLimit ? 'border-gray-300 opacity-50' : 'border-gray-300 hover:border-blue-400'
+      } transition-colors`}>
         <CardContent className="p-8">
           <div className="text-center">
-            <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold mb-2">Drop files here</h3>
+            {isAtLimit ? (
+              <Lock className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            ) : (
+              <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            )}
+            <h3 className="text-lg font-semibold mb-2">
+              {isAtLimit ? 'Upload Limit Reached' : 'Drop files here'}
+            </h3>
             <p className="text-gray-500 mb-4">
-              Support for images and videos (JPG, PNG, MP4, MOV)
+              {isAtLimit ? (
+                'Upgrade to Pro for unlimited uploads'
+              ) : (
+                'Support for images and videos (JPG, PNG, MP4, MOV)'
+              )}
             </p>
-            <input
-              type="file"
-              multiple
-              accept="image/*,video/*"
-              onChange={(e) => handleFileUpload(e.target.files)}
-              className="hidden"
-              id="media-upload"
-            />
-            <Button asChild>
-              <label htmlFor="media-upload" className="cursor-pointer">
-                Choose Files
-              </label>
-            </Button>
+            
+            {!isAtLimit && (
+              <>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*,video/*"
+                  onChange={(e) => handleFileUpload(e.target.files)}
+                  className="hidden"
+                  id="media-upload"
+                />
+                <Button asChild>
+                  <label htmlFor="media-upload" className="cursor-pointer">
+                    Choose Files
+                  </label>
+                </Button>
+              </>
+            )}
+
+            {isAtLimit && !canAccessTier('pro') && (
+              <PaymentGate 
+                requiredTier="pro" 
+                featureName="Unlimited Media Uploads"
+              >
+                <></>
+              </PaymentGate>
+            )}
           </div>
         </CardContent>
       </Card>

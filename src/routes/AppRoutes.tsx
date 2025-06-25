@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
@@ -10,6 +11,7 @@ import TradingHub from '@/pages/TradingHub';
 import FarcasterIntegration from '@/pages/FarcasterIntegration';
 import FarcasterFramePage from '@/pages/FarcasterFramePage';
 import HowItWorks from '@/pages/HowItWorks';
+import Pricing from '@/pages/Pricing';
 import NotFound from '@/pages/NotFound';
 import { TokenGatedContentPage } from '@/components/TokenGatedContentPage';
 import { DropBuilderFlow } from '@/components/DropBuilderFlow';
@@ -20,6 +22,7 @@ export const AppRoutes: React.FC = () => {
       {/* Public Routes */}
       <Route path="/" element={<Index />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
+      <Route path="/pricing" element={<Pricing />} />
       
       {/* Dashboard & Project Routes */}
       <Route path="/dashboard" element={<Dashboard />} />

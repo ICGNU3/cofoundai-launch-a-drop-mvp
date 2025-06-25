@@ -1,6 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { usePayment } from './usePayment';
 
 export interface MediaFile {
   file: File;
@@ -51,6 +52,7 @@ export function useDropBuilder() {
   const [dropData, setDropData] = useState<DropData>(initialDropData);
   const [isLaunching, setIsLaunching] = useState(false);
   const { toast } = useToast();
+  const { canAccessTier, hasFeatureAccess } = usePayment();
 
   const updateDropData = useCallback((updates: Partial<DropData>) => {
     setDropData(prev => ({ ...prev, ...updates }));
@@ -59,12 +61,17 @@ export function useDropBuilder() {
   const canProceed = useCallback(() => {
     switch (currentStep) {
       case 1:
+        // Free tier: max 3 media files, Pro/Advisory: unlimited
+        if (!canAccessTier('pro') && dropData.media.length > 3) {
+          return false;
+        }
         return dropData.media.length > 0;
       case 2:
         return dropData.tokenConfig.name && 
                dropData.tokenConfig.symbol && 
                dropData.tokenConfig.totalSupply;
       case 3:
+        // Free tier: basic rewards only, Pro/Advisory: custom rewards
         return dropData.rewards.length > 0;
       case 4:
         return true;
@@ -73,7 +80,19 @@ export function useDropBuilder() {
       default:
         return false;
     }
-  }, [currentStep, dropData]);
+  }, [currentStep, dropData, canAccessTier]);
+
+  const getMediaLimit = useCallback(() => {
+    return canAccessTier('pro') ? null : 3; // null = unlimited, 3 = free tier limit
+  }, [canAccessTier]);
+
+  const canUseAdvancedTokens = useCallback(() => {
+    return hasFeatureAccess('Advanced token customization');
+  }, [hasFeatureAccess]);
+
+  const canUseCustomRewards = useCallback(() => {
+    return hasFeatureAccess('Custom rewards setup');
+  }, [hasFeatureAccess]);
 
   const nextStep = useCallback(() => {
     if (canProceed() && currentStep < 5) {
@@ -106,6 +125,15 @@ export function useDropBuilder() {
   }, [dropData, toast]);
 
   const launchDrop = useCallback(async () => {
+    if (!canAccessTier('pro')) {
+      toast({
+        title: "Upgrade Required",
+        description: "Pro Launch tier required to deploy drops",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLaunching(true);
     try {
       // Here you would integrate with Zora SDK
@@ -138,7 +166,7 @@ export function useDropBuilder() {
     } finally {
       setIsLaunching(false);
     }
-  }, [dropData, toast]);
+  }, [dropData, toast, canAccessTier]);
 
   return {
     currentStep,
@@ -150,6 +178,11 @@ export function useDropBuilder() {
     canProceed: canProceed(),
     isLaunching,
     launchDrop,
-    saveDraft
+    saveDraft,
+    // Payment-related features
+    getMediaLimit,
+    canUseAdvancedTokens,
+    canUseCustomRewards,
+    canAccessTier
   };
 }
