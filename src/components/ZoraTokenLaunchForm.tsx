@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { WalletConnectionCheck } from './WalletConnectionCheck';
+import { EnhancedWalletConnection } from './EnhancedWalletConnection';
+import { useWallet } from './WalletConnectionProvider';
 import { useZoraCoinFactory } from '@/hooks/useZoraCoinFactory';
-import { Loader, Rocket, CheckCircle } from 'lucide-react';
+import { Loader, Rocket, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface TokenFormData {
   name: string;
@@ -25,13 +26,18 @@ export const ZoraTokenLaunchForm: React.FC = () => {
   });
   const [launchResult, setLaunchResult] = useState<{ hash: string; coinAddress?: string } | null>(null);
 
-  const { createCoin, isCreating, isConnected, walletAddress, chainId } = useZoraCoinFactory();
+  const { address, isConnected, chainId } = useWallet();
+  const { createCoin, isCreating } = useZoraCoinFactory();
 
   const handleInputChange = (field: keyof TokenFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleLaunch = async () => {
+    if (!isConnected || !address) {
+      return;
+    }
+
     try {
       const result = await createCoin({
         name: formData.name,
@@ -47,7 +53,42 @@ export const ZoraTokenLaunchForm: React.FC = () => {
   };
 
   const isFormValid = formData.name && formData.symbol && formData.initialSupply && parseInt(formData.initialSupply) > 0;
+  const canLaunch = isConnected && address && isFormValid && !isCreating;
 
+  // Show wallet connection if not connected
+  if (!isConnected || !address) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Rocket className="w-6 h-6" />
+              Launch Token with Zora
+            </CardTitle>
+            <p className="text-sm text-gray-600">
+              Connect your wallet to create tokens using Zora's audited Coin Factory.
+            </p>
+          </CardHeader>
+        </Card>
+        
+        <EnhancedWalletConnection />
+        
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-amber-800">
+              <AlertCircle className="w-5 h-5" />
+              <span className="font-medium">Wallet Required</span>
+            </div>
+            <p className="text-sm text-amber-700 mt-1">
+              You need to connect your wallet to create tokens. Your wallet address will be set as the token creator and royalty recipient.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show success screen after launch
   if (launchResult) {
     return (
       <Card className="max-w-2xl mx-auto">
@@ -69,6 +110,10 @@ export const ZoraTokenLaunchForm: React.FC = () => {
               </div>
               <div>
                 <span className="font-medium">Initial Supply:</span> {parseInt(formData.initialSupply).toLocaleString()}
+              </div>
+              <div>
+                <span className="font-medium">Creator:</span>
+                <code className="ml-2 text-xs bg-gray-100 px-2 py-1 rounded">{address}</code>
               </div>
               <div>
                 <span className="font-medium">Transaction Hash:</span>
@@ -95,9 +140,10 @@ export const ZoraTokenLaunchForm: React.FC = () => {
     );
   }
 
+  // Show token creation form
   return (
-    <WalletConnectionCheck requiredChainId={chainId}>
-      <Card className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Rocket className="w-6 h-6" />
@@ -108,16 +154,14 @@ export const ZoraTokenLaunchForm: React.FC = () => {
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {isConnected && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm">
-                <span className="font-medium">Connected Wallet:</span> {walletAddress}
-              </p>
-              <p className="text-xs text-gray-600 mt-1">
-                This wallet will be set as the token creator and royalty recipient.
-              </p>
-            </div>
-          )}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-sm">
+              <span className="font-medium">Connected Wallet:</span> {address}
+            </p>
+            <p className="text-xs text-gray-600 mt-1">
+              This wallet will be set as the token creator and royalty recipient.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -179,7 +223,7 @@ export const ZoraTokenLaunchForm: React.FC = () => {
 
           <Button
             onClick={handleLaunch}
-            disabled={!isFormValid || isCreating}
+            disabled={!canLaunch}
             className="w-full"
           >
             {isCreating ? (
@@ -196,6 +240,6 @@ export const ZoraTokenLaunchForm: React.FC = () => {
           </Button>
         </CardContent>
       </Card>
-    </WalletConnectionCheck>
+    </div>
   );
 };

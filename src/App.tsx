@@ -6,6 +6,7 @@ import { PrivyProvider } from '@privy-io/react-auth';
 import { config } from './lib/wagmi';
 import { AppRoutes } from './routes/AppRoutes';
 import { AuthProvider } from './contexts/AuthContext';
+import { WalletConnectionProvider } from './components/WalletConnectionProvider';
 import { Toaster } from '@/components/ui/sonner';
 
 const queryClient = new QueryClient();
@@ -25,16 +26,18 @@ function App() {
       }}
     >
       <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <Router>
-              <div className="min-h-screen bg-background text-foreground">
-                <AppRoutes />
-                <Toaster />
-              </div>
-            </Router>
-          </AuthProvider>
-        </QueryClientProvider>
+        <WalletConnectionProvider>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <Router>
+                <div className="min-h-screen bg-background text-foreground">
+                  <AppRoutes />
+                  <Toaster />
+                </div>
+              </Router>
+            </AuthProvider>
+          </QueryClientProvider>
+        </WalletConnectionProvider>
       </WagmiProvider>
     </PrivyProvider>
   );
