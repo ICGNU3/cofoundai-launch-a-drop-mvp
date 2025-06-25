@@ -1,9 +1,8 @@
-
 import { useCallback } from "react";
 import { getCoinHelperText, defaultCoinParams } from "@/lib/zoraCoin";
 import { useZoraCoinFactory } from "@/hooks/useZoraCoinFactory";
 import type { MintingWorkflowParams } from "./types";
-import type { MintingStepKey } from "../minting/mintingWorkflowTypes";
+import type { MintingStepKey } from "@/components/minting/mintingWorkflowTypes";
 
 interface MintingActionsCallbacks {
   setCoverIpfs: (ipfs: string) => void;
