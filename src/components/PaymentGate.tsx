@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, Upgrade } from 'lucide-react';
+import { Lock, ArrowUp } from 'lucide-react';
 import { usePayment, PricingTier } from '@/hooks/usePayment';
 import { PricingPlans } from './PricingPlans';
 
@@ -49,7 +49,7 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
             onClick={() => initializePayment(requiredTier)}
             className="gap-2"
           >
-            <Upgrade className="w-4 h-4" />
+            <ArrowUp className="w-4 h-4" />
             Upgrade to {requiredPlan?.name}
           </Button>
         </CardContent>

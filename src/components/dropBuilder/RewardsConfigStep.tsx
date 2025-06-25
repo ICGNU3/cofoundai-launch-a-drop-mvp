@@ -7,12 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Gift, Edit, Trash2 } from 'lucide-react';
+import { Plus, Gift, Edit, Trash2, Lock } from 'lucide-react';
 import { SupporterReward } from '@/hooks/useDropBuilder';
+import { PaymentGate } from '../PaymentGate';
 
 interface RewardsConfigStepProps {
   rewards: SupporterReward[];
   onRewardsUpdate: (rewards: SupporterReward[]) => void;
+  canUseCustom: boolean;
 }
 
 const REWARD_TYPES = [
@@ -25,7 +27,8 @@ const REWARD_TYPES = [
 
 export const RewardsConfigStep: React.FC<RewardsConfigStepProps> = ({
   rewards,
-  onRewardsUpdate
+  onRewardsUpdate,
+  canUseCustom
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingReward, setEditingReward] = useState<SupporterReward | null>(null);
@@ -89,6 +92,10 @@ export const RewardsConfigStep: React.FC<RewardsConfigStepProps> = ({
   };
 
   const handleTypeChange = (value: string) => {
+    if (value === 'custom' && !canUseCustom) {
+      return; // Prevent selection if not allowed
+    }
+    
     const rewardType = REWARD_TYPES.find(r => r.value === value);
     setFormData(prev => ({
       ...prev,
@@ -106,6 +113,24 @@ export const RewardsConfigStep: React.FC<RewardsConfigStepProps> = ({
           Create exclusive perks for your token holders
         </p>
       </div>
+
+      {/* Custom Rewards Gate */}
+      {!canUseCustom && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="p-4 text-center">
+            <Lock className="w-8 h-8 mx-auto mb-2 text-orange-500" />
+            <p className="text-sm text-gray-600 mb-2">
+              Custom rewards and advanced reward features are available with Pro Launch
+            </p>
+            <PaymentGate 
+              requiredTier="pro" 
+              featureName="Custom Rewards Setup"
+            >
+              <></>
+            </PaymentGate>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Add Reward Button */}
       <div className="flex justify-center">
@@ -131,8 +156,12 @@ export const RewardsConfigStep: React.FC<RewardsConfigStepProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     {REWARD_TYPES.map(type => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
+                      <SelectItem 
+                        key={type.value} 
+                        value={type.value}
+                        disabled={type.value === 'custom' && !canUseCustom}
+                      >
+                        {type.label} {type.value === 'custom' && !canUseCustom && '(Pro Only)'}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -168,7 +197,7 @@ export const RewardsConfigStep: React.FC<RewardsConfigStepProps> = ({
                 />
               </div>
 
-              {formData.type === 'custom' && (
+              {formData.type === 'custom' && canUseCustom && (
                 <div className="space-y-2">
                   <Label>Custom Details</Label>
                   <Textarea

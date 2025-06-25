@@ -4,17 +4,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Coins, Hash, Users } from 'lucide-react';
+import { Coins, Hash, Users, Lock } from 'lucide-react';
 import { TokenConfig } from '@/hooks/useDropBuilder';
+import { PaymentGate } from '../PaymentGate';
 
 interface TokenConfigStepProps {
   tokenConfig: TokenConfig;
   onConfigUpdate: (config: TokenConfig) => void;
+  canUseAdvanced: boolean;
 }
 
 export const TokenConfigStep: React.FC<TokenConfigStepProps> = ({
   tokenConfig,
-  onConfigUpdate
+  onConfigUpdate,
+  canUseAdvanced
 }) => {
   const updateField = (field: keyof TokenConfig, value: string) => {
     onConfigUpdate({ ...tokenConfig, [field]: value });
@@ -115,6 +118,24 @@ export const TokenConfigStep: React.FC<TokenConfigStepProps> = ({
           Tell your story and explain what this project means to you
         </p>
       </div>
+
+      {/* Advanced Features Gate */}
+      {!canUseAdvanced && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="p-4 text-center">
+            <Lock className="w-8 h-8 mx-auto mb-2 text-orange-500" />
+            <p className="text-sm text-gray-600">
+              Advanced token customization features are available with Pro Launch
+            </p>
+            <PaymentGate 
+              requiredTier="pro" 
+              featureName="Advanced Token Customization"
+            >
+              <></>
+            </PaymentGate>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Preview Card */}
       <Card className="border-blue-200 bg-blue-50">
