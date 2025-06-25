@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import type { MintingState, MintingErrorInfo } from "./types";
+import type { MintingState, MintingError } from "./types";
 
 export function useMintingState() {
   const [state, setState] = useState<MintingState>({
@@ -27,7 +27,7 @@ export function useMintingState() {
   const setMintModalOpen = (mintModalOpen: boolean) => 
     setState(prev => ({ ...prev, mintModalOpen }));
 
-  const setLastError = (lastError: MintingErrorInfo | null) => 
+  const setLastError = (lastError: string | null) => 
     setState(prev => ({ ...prev, lastError }));
 
   return {

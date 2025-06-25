@@ -16,6 +16,7 @@ export interface MintingWorkflowParams {
     pledgeUSDC: string;
   };
   walletAddress: string;
+  coverBase64?: string | null;
 }
 
 export interface MintingResult {
@@ -27,3 +28,14 @@ export interface MintingError {
   message: string;
   code?: string | number;
 }
+
+export interface MintingState {
+  coverIpfs: string | null;
+  projectId: string | null;
+  loadingMint: boolean;
+  poolAddress: string | null;
+  mintModalOpen: boolean;
+  lastError: string | null;
+}
+
+export type MintingErrorInfo = MintingError;

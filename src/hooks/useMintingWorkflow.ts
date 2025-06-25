@@ -7,12 +7,45 @@ import { useMintingState } from "./minting/useMintingState";
 import { useMintingActions } from "./minting/useMintingActions";
 import type { MintingWorkflowParams } from "./minting/types";
 
-export function useMintingWorkflow(params: MintingWorkflowParams) {
+interface MintingWorkflowHookParams {
+  coverBase64?: string | null;
+  projectIdea: string;
+  projectType: any;
+  roles: any[];
+  expenses: any[];
+  pledgeUSDC: string;
+  walletAddress: string | null;
+  expenseSum: number;
+  fundingTarget: number;
+  onSaveComplete?: (projectRow: any) => void;
+}
+
+export function useMintingWorkflow(params: MintingWorkflowHookParams) {
   const { isMinting, currentStep, mintingStatus, progress, mintingSteps } = useMintingProcess();
   const { usdcxBalanceConfirmed, isPollingBalance, pollUSDCxBalance } = useUSDCxBalance();
   
+  const mintingWorkflowParams: MintingWorkflowParams = {
+    projectData: {
+      projectIdea: params.projectIdea,
+      projectType: params.projectType,
+      mode: "team",
+      roles: params.roles.map(role => ({
+        name: role.roleName || role.name,
+        percentage: role.percent || role.percentage,
+        wallet: role.walletAddress
+      })),
+      expenses: params.expenses.map(expense => ({
+        name: expense.expenseName || expense.name,
+        amount: expense.amountUSDC || expense.amount
+      })),
+      pledgeUSDC: params.pledgeUSDC
+    },
+    walletAddress: params.walletAddress || "",
+    coverBase64: params.coverBase64
+  };
+  
   const mintingState = useMintingState();
-  const mintingActions = useMintingActions(params, {
+  const mintingActions = useMintingActions(mintingWorkflowParams, {
     setCoverIpfs: mintingState.setCoverIpfs,
     setProjectId: mintingState.setProjectId,
     setLoadingMint: mintingState.setLoadingMint,

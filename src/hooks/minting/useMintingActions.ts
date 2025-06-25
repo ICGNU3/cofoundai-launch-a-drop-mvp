@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { getCoinHelperText, defaultCoinParams } from "@/lib/zoraCoin";
 import { useZoraCoinFactory } from "@/hooks/useZoraCoinFactory";
 import type { MintingWorkflowParams } from "./types";
+import type { MintingStepKey } from "../minting/mintingWorkflowTypes";
 
 interface MintingActionsCallbacks {
   setCoverIpfs: (ipfs: string) => void;
@@ -18,7 +19,7 @@ export function useMintingActions(
 ) {
   const { createCoin, isCreating } = useZoraCoinFactory();
 
-  const handleMintFlow = useCallback(async () => {
+  const handleMintFlow = useCallback(async (opts: { gasSpeed: "slow" | "standard" | "fast" }): Promise<{ txHash?: string; step?: MintingStepKey; error?: string }> => {
     const { 
       setCoverIpfs, 
       setProjectId, 
@@ -55,11 +56,18 @@ export function useMintingActions(
       setProjectId(result.hash); // Use transaction hash as project ID
       setPoolAddress(result.coinAddress || '0x0000000000000000000000000000000000000000');
 
-      return result;
+      return {
+        txHash: result.hash,
+        step: "complete" as MintingStepKey
+      };
     } catch (error: any) {
       console.error('Error in mint flow:', error);
-      setLastError(error.message || 'Failed to create token');
-      throw error;
+      const errorMessage = error.message || 'Failed to create token';
+      setLastError(errorMessage);
+      return {
+        error: errorMessage,
+        step: "error" as MintingStepKey
+      };
     } finally {
       setLoadingMint(false);
     }
