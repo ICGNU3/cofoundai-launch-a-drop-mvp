@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
+import { base, baseSepolia } from 'wagmi/chains';
 
 interface WalletContextType {
   address: string | null;
@@ -8,7 +9,9 @@ interface WalletContextType {
   isConnecting: boolean;
   connect: (connectorId?: string) => void;
   disconnect: () => void;
+  switchToSupportedChain: () => void;
   chainId: number | undefined;
+  isOnSupportedChain: boolean;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -25,11 +28,16 @@ interface WalletConnectionProviderProps {
   children: React.ReactNode;
 }
 
+const SUPPORTED_CHAINS = [base.id, baseSepolia.id];
+
 export const WalletConnectionProvider: React.FC<WalletConnectionProviderProps> = ({ children }) => {
   const { address, isConnected, chain } = useAccount();
   const { connect: wagmiConnect, connectors, isPending } = useConnect();
   const { disconnect: wagmiDisconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
   const [localAddress, setLocalAddress] = useState<string | null>(null);
+
+  const isOnSupportedChain = chain ? SUPPORTED_CHAINS.includes(chain.id) : false;
 
   // Load saved address from localStorage on mount
   useEffect(() => {
@@ -44,13 +52,13 @@ export const WalletConnectionProvider: React.FC<WalletConnectionProviderProps> =
     if (isConnected && address) {
       setLocalAddress(address);
       localStorage.setItem('neplus_wallet_address', address);
-      console.log('Wallet connected:', address);
+      console.log('Wallet connected:', address, 'Chain:', chain?.name);
     } else {
       setLocalAddress(null);
       localStorage.removeItem('neplus_wallet_address');
       console.log('Wallet disconnected');
     }
-  }, [isConnected, address]);
+  }, [isConnected, address, chain]);
 
   const connect = (connectorId?: string) => {
     const connector = connectorId 
@@ -68,13 +76,22 @@ export const WalletConnectionProvider: React.FC<WalletConnectionProviderProps> =
     localStorage.removeItem('neplus_wallet_address');
   };
 
+  const switchToSupportedChain = () => {
+    if (switchChain) {
+      // Default to Base mainnet, fallback to Base Sepolia for testing
+      switchChain({ chainId: base.id });
+    }
+  };
+
   const value: WalletContextType = {
     address: address || localAddress,
     isConnected: isConnected,
     isConnecting: isPending,
     connect,
     disconnect,
-    chainId: chain?.id
+    switchToSupportedChain,
+    chainId: chain?.id,
+    isOnSupportedChain
   };
 
   return (
