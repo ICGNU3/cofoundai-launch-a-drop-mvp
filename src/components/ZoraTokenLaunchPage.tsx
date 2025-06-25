@@ -2,10 +2,11 @@
 import React from 'react';
 import { ZoraTokenLaunchForm } from './ZoraTokenLaunchForm';
 import { ZoraRoyaltyTracker } from './ZoraRoyaltyTracker';
+import { TokenDashboardPage } from './TokenDashboardPage';
 import { EnhancedWalletConnection } from './EnhancedWalletConnection';
 import { useWallet } from './WalletConnectionProvider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Rocket, BarChart3, Wallet } from 'lucide-react';
+import { Rocket, BarChart3, TrendingUp } from 'lucide-react';
 
 export const ZoraTokenLaunchPage: React.FC = () => {
   const { isConnected } = useWallet();
@@ -28,10 +29,14 @@ export const ZoraTokenLaunchPage: React.FC = () => {
         </div>
 
         <Tabs defaultValue="launch" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="launch" className="flex items-center gap-2">
               <Rocket className="w-4 h-4" />
               Launch Token
+            </TabsTrigger>
+            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Token Dashboard
             </TabsTrigger>
             <TabsTrigger value="tracker" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
@@ -41,6 +46,10 @@ export const ZoraTokenLaunchPage: React.FC = () => {
 
           <TabsContent value="launch">
             <ZoraTokenLaunchForm />
+          </TabsContent>
+
+          <TabsContent value="dashboard">
+            <TokenDashboardPage />
           </TabsContent>
 
           <TabsContent value="tracker">
