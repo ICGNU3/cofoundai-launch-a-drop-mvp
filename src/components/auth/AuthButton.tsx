@@ -3,15 +3,17 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAccount } from 'wagmi';
 import { AuthModal } from './AuthModal';
 import { UserProfile } from './UserProfile';
 import { OnboardingModal } from './OnboardingModal';
-import { User } from 'lucide-react';
+import { User, CheckCircle } from 'lucide-react';
 
 export const AuthButton: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const { address, isConnected } = useAccount();
 
   // Safely use auth context with error boundary
   let authData;
@@ -44,6 +46,34 @@ export const AuthButton: React.FC = () => {
     );
   }
 
+  // Show connected state if wallet is connected
+  if (isConnected && address) {
+    return (
+      <>
+        <Button
+          variant="outline"
+          onClick={() => setShowProfileModal(true)}
+          className="gap-2 bg-green-500 border-green-500 hover:bg-green-600 text-white"
+        >
+          <CheckCircle className="w-4 h-4" />
+          <span className="hidden sm:inline">
+            Connected
+          </span>
+        </Button>
+        
+        <UserProfile 
+          isOpen={showProfileModal} 
+          onClose={() => setShowProfileModal(false)} 
+        />
+        <OnboardingModal 
+          isOpen={showOnboardingModal} 
+          onClose={() => setShowOnboardingModal(false)} 
+        />
+      </>
+    );
+  }
+
+  // Show authenticated user profile
   if (isAuthenticated && profile) {
     return (
       <>
