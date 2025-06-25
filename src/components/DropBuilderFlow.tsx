@@ -90,6 +90,7 @@ export const DropBuilderFlow: React.FC = () => {
           <PaymentGate 
             requiredTier="pro" 
             featureName="Drop Launch"
+            showPricing={false}
           >
             <LaunchStep
               dropData={dropData}
