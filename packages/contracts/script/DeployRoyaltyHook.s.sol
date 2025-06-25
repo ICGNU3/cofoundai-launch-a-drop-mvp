@@ -8,13 +8,13 @@ import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 import {Hooks} from "v4-core/libraries/Hooks.sol";
 
 contract DeployRoyaltyHook is Script {
-    // Zora testnet PoolManager address (you may need to update this)
-    address constant POOL_MANAGER = 0x0000000000000000000000000000000000000000; // TODO: Update with actual address
+    // Zora testnet PoolManager address
+    address constant POOL_MANAGER = 0x7Da1D65F8B249183667cdE74C5CBD46dD38AA829;
     
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address creator = vm.envAddress("CREATOR_ADDRESS");
-        uint256 royaltyBps = vm.envUint("ROYALTY_BPS"); // Default to 250 (2.5%) if not set
+        uint256 royaltyBps = vm.envUint("ROYALTY_BPS");
         
         vm.startBroadcast(deployerPrivateKey);
 
@@ -27,9 +27,11 @@ contract DeployRoyaltyHook is Script {
         vm.stopBroadcast();
 
         // Print deployment information
+        console.log("=== DEPLOYMENT SUCCESSFUL ===");
         console.log("CreatorRoyaltyHook deployed at:", address(hook));
         console.log("Creator address:", creator);
         console.log("Royalty BPS:", royaltyBps);
+        console.log("PoolManager address:", POOL_MANAGER);
         
         // Calculate and print hook flags
         Hooks.Permissions memory permissions = hook.getHookPermissions();
@@ -50,7 +52,9 @@ contract DeployRoyaltyHook is Script {
         if (permissions.afterAddLiquidityReturnDelta) hookFlags |= uint160(1 << 147);
         if (permissions.afterRemoveLiquidityReturnDelta) hookFlags |= uint160(1 << 146);
         
-        console.log("Hook flags (hex):", vm.toString(hookFlags));
-        console.log("Hook flags (decimal):", hookFlags);
+        console.log("");
+        console.log("=== COPY THIS ADDRESS FOR YOUR ENV ===");
+        console.log("VITE_CREATOR_ROYALTY_HOOK=", address(hook));
+        console.log("=====================================");
     }
 }

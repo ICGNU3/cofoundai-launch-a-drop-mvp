@@ -9,6 +9,91 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      audio_rooms: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          daily_room_name: string | null
+          ended_at: string | null
+          grove_id: string
+          id: string
+          is_active: boolean | null
+          max_participants: number | null
+          scheduled_for: string | null
+          started_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          daily_room_name?: string | null
+          ended_at?: string | null
+          grove_id: string
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          scheduled_for?: string | null
+          started_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          daily_room_name?: string | null
+          ended_at?: string | null
+          grove_id?: string
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          scheduled_for?: string | null
+          started_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_rooms_grove_id_fkey"
+            columns: ["grove_id"]
+            isOneToOne: false
+            referencedRelation: "groves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audio_transcripts: {
+        Row: {
+          created_at: string | null
+          encrypted_data: string | null
+          expires_at: string | null
+          id: string
+          room_id: string
+          transcript_text: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          encrypted_data?: string | null
+          expires_at?: string | null
+          id?: string
+          room_id: string
+          transcript_text?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          encrypted_data?: string | null
+          expires_at?: string | null
+          id?: string
+          room_id?: string
+          transcript_text?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_transcripts_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "audio_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contribution_checklists: {
         Row: {
           completed_at: string | null
@@ -83,6 +168,186 @@ export type Database = {
           },
         ]
       }
+      grove_invitations: {
+        Row: {
+          accepted_at: string | null
+          grove_id: string
+          id: string
+          invited_at: string | null
+          invited_by: string
+          invitee_email: string | null
+          invitee_name: string | null
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          grove_id: string
+          id?: string
+          invited_at?: string | null
+          invited_by: string
+          invitee_email?: string | null
+          invitee_name?: string | null
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          grove_id?: string
+          id?: string
+          invited_at?: string | null
+          invited_by?: string
+          invitee_email?: string | null
+          invitee_name?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grove_invitations_grove_id_fkey"
+            columns: ["grove_id"]
+            isOneToOne: false
+            referencedRelation: "groves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grove_members: {
+        Row: {
+          grove_id: string
+          id: string
+          joined_at: string | null
+          user_id: string
+        }
+        Insert: {
+          grove_id: string
+          id?: string
+          joined_at?: string | null
+          user_id: string
+        }
+        Update: {
+          grove_id?: string
+          id?: string
+          joined_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grove_members_grove_id_fkey"
+            columns: ["grove_id"]
+            isOneToOne: false
+            referencedRelation: "groves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grove_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          grove_id: string
+          id: string
+          message_type: string | null
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          grove_id: string
+          id?: string
+          message_type?: string | null
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          grove_id?: string
+          id?: string
+          message_type?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grove_messages_grove_id_fkey"
+            columns: ["grove_id"]
+            isOneToOne: false
+            referencedRelation: "groves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groves: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          grove_type: string | null
+          id: string
+          invite_code: string
+          is_complete: boolean | null
+          is_private: boolean | null
+          merge_eligible: boolean | null
+          owner_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          grove_type?: string | null
+          id?: string
+          invite_code: string
+          is_complete?: boolean | null
+          is_private?: boolean | null
+          merge_eligible?: boolean | null
+          owner_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          grove_type?: string | null
+          id?: string
+          invite_code?: string
+          is_complete?: boolean | null
+          is_private?: boolean | null
+          merge_eligible?: boolean | null
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string | null
+          daily_digest_enabled: boolean | null
+          enable_audio_notifications: boolean | null
+          enable_chat_notifications: boolean | null
+          enable_grove_invites: boolean | null
+          enable_merge_notifications: boolean | null
+          id: string
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          daily_digest_enabled?: boolean | null
+          enable_audio_notifications?: boolean | null
+          enable_chat_notifications?: boolean | null
+          enable_grove_invites?: boolean | null
+          enable_merge_notifications?: boolean | null
+          id?: string
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          daily_digest_enabled?: boolean | null
+          enable_audio_notifications?: boolean | null
+          enable_chat_notifications?: boolean | null
+          enable_grove_invites?: boolean | null
+          enable_merge_notifications?: boolean | null
+          id?: string
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       onboarding_steps: {
         Row: {
           id: string
@@ -117,6 +382,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       project_activity_log: {
         Row: {
@@ -638,6 +927,41 @@ export type Database = {
           },
         ]
       }
+      speaker_queue: {
+        Row: {
+          id: string
+          is_speaking: boolean | null
+          position: number
+          raised_hand_at: string | null
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_speaking?: boolean | null
+          position: number
+          raised_hand_at?: string | null
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_speaking?: boolean | null
+          position?: number
+          raised_hand_at?: string | null
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "speaker_queue_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "audio_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_invitations: {
         Row: {
           accepted_at: string | null
@@ -770,6 +1094,42 @@ export type Database = {
           },
         ]
       }
+      user_questionnaires: {
+        Row: {
+          big_five_scores: Json | null
+          completed_at: string | null
+          created_at: string | null
+          enneagram_type: number | null
+          id: string
+          interest_tags: string[] | null
+          pronouns: string | null
+          region: string | null
+          user_id: string
+        }
+        Insert: {
+          big_five_scores?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          enneagram_type?: number | null
+          id?: string
+          interest_tags?: string[] | null
+          pronouns?: string | null
+          region?: string | null
+          user_id: string
+        }
+        Update: {
+          big_five_scores?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          enneagram_type?: number | null
+          id?: string
+          interest_tags?: string[] | null
+          pronouns?: string | null
+          region?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       v_stats: {
@@ -781,6 +1141,21 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_expired_transcripts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      find_matching_groves: {
+        Args: { user_id: string }
+        Returns: {
+          grove_id: string
+          compatibility_score: number
+        }[]
+      }
+      generate_invite_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
