@@ -25,9 +25,9 @@ function App() {
         },
       }}
     >
-      <WagmiProvider config={config}>
-        <WalletConnectionProvider>
-          <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <WagmiProvider config={config}>
+          <WalletConnectionProvider>
             <AuthProvider>
               <Router>
                 <div className="min-h-screen bg-background text-foreground">
@@ -36,9 +36,9 @@ function App() {
                 </div>
               </Router>
             </AuthProvider>
-          </QueryClientProvider>
-        </WalletConnectionProvider>
-      </WagmiProvider>
+          </WalletConnectionProvider>
+        </WagmiProvider>
+      </QueryClientProvider>
     </PrivyProvider>
   );
 }
